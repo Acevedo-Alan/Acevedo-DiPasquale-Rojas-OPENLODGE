@@ -1,0 +1,137 @@
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #e8f5e8 0%, #f0f8ff 100%);
+  color: #2c5530;
+  overflow-x: hidden;
+}
+
+/* Header */
+.header {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  padding: 1rem 2rem;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.logo {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #2d5a3d;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo::before {
+  content: "🏠";
+  font-size: 1.5rem;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #2c5530;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: #4a7c59;
+}
+
+/* Hero Section */
+.hero {
+  padding: 6rem 2rem 2rem;
+  text-align: center;
+}
+
+.hero__title {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.hero__subtitle {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.hero__search-btn {
+  padding: 0.8rem 2rem;
+  background-color: #2c5530;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.hero__search-btn:hover {
+  background-color: #4a7c59;
+}
+
+/* Featured Properties */
+.featured-properties {
+  margin: 2rem 0;
+}
+
+.featured-properties__title {
+  font-size: 2rem;
+  color: #2c5530;
+}
+
+/* Properties Feed */
+.properties-feed__title {
+  font-size: 2rem;
+  color: #2c5530;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header,
+.logo,
+.nav-links li {
+  animation: fadeInUp 0.8s ease forwards;
+}
+
+ul li:hover {
+  transform: translateY(-3px);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}

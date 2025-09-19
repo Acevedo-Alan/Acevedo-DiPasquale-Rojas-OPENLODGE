@@ -4,35 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="index.css">
-
     <title>OpenLodge</title>
 </head>
 <body>
     <header class="header">
         
     </header>
-    <div class="bienvenida">
-        <h1>Tu sistema de reservas ideal te espera</h1>
-        <h3>Descubre las mejores casas, con la comodidad y tranquilidad que buscas</h3>
-        <button class="buscador-desplegar">Buscar propiedades</button>
-    </div>
-    <main class="main">
-        <section class="propiedades-destacadas">
-            <h1 class="propiedades-destacadas-h1">Propiedades destacadas</h1>
-            <div class="propiedad-info">
+
+    <section class="hero">
+        <h1 class="hero__title">Tu sistema de reservas ideal te espera</h1>
+        <h3 class="hero__subtitle">Descubre las mejores casas, con la comodidad y tranquilidad que buscas</h3>
+        <button class="hero__search-btn">Buscar propiedades</button>
+    </section>
+
+    <main class="main-content">
+        <section class="featured-properties">
+            <h1 class="featured-properties__title">Propiedades destacadas</h1>
+            <div class="featured-properties__list">
 
             </div>
-            <div class="flechitas">--------------------</div>
+            <div class="featured-properties__arrows">--------------------</div>
         </section>
-        <section class="propiedades-feed">
-            <h1 class="propiedades-feed-h1">Explora las propiedades disponibles</h1>
-            <div class="propiedad-info"></div>
+
+        <section class="properties-feed">
+            <h1 class="properties-feed__title">Explora las propiedades disponibles</h1>
+            <div class="properties-feed__list"></div>
         </section>
     </main>
+
     <footer class="footer"></footer>
 
     <script src="scripts/header.js"></script>
     <script src="scripts/footer.js"></script>
-    <script src="scripts/propiedades-feed.js"></script>
+    <script src="scripts/properties-feed.js"></script>
 </body>
 </html>
