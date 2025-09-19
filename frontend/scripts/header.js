@@ -1,4 +1,3 @@
-
 const header = document.querySelector(".header");
 
 const userRole = localStorage.getItem("role");
