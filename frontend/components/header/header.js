@@ -11,10 +11,10 @@ if (userRole === "ANFITRION") {
         </div>
         <ul class="menu">
             <li class="item"><a href=".">inicio</a></li>
-            <li class="item"><a href="#">perfil</a></li>
-            <li class="item"><a href="#">sobre nosotros</a></li>
-            <li class="item"><a href="#">agregar propiedad</a></li>
-            <li class="item"><a href="#">contacto</a></li>
+            <li class="item"><a href="perfil.html">perfil</a></li>
+            <li class="item"><a href="about.html">sobre nosotros</a></li>
+            <li class="item"><a href="agregar-propiedad.html">agregar propiedad</a></li>
+            <li class="item"><a href="contacto.html">contacto</a></li>
         </ul>
     </nav>
     `;

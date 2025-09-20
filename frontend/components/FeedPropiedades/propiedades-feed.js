@@ -1,14 +1,15 @@
-const propiedadesFeed = document.querySelector(".propiedad-info");
+const propiedadesFeed = document.querySelectorAll(".propiedad-info");
 
-propiedadesFeed.innerHTML = `
-    <img src="#" alt="imagen de la prop">
-    <div class="info">
-        <p class="info-propiedad-nombre">Nombre</p>
-        <p class="info-propiedad-direccion">Dirección</p>
-        <p class="info-propiedad-descripcion">Descripción</p>
-        <p class="info-propiedad-precio">Precio</p>
-        <div class="calificacion">------</div>
-        <button class="boton-reservar">reservar</button>
-    </div>
-`;
-
+propiedadesFeed.forEach((feed) => {
+  feed.innerHTML = `
+        <img src="#" alt="imagen de la prop">
+        <div class="info">
+            <p class="propiedad-info-nombre">Nombre</p>
+            <p class="propiedad-info-direccion">Dirección</p>
+            <p class="propiedad-info-descripcion">Descripción</p>
+            <p class="propiedad-info-precio">Precio</p>
+            <div class="calificacion">------</div>
+            <button class="boton-ver nav-btn" data-target="/pages/alojamiento/alojamiento.html">ver propiedad</button>
+        </div>
+    `;
+});
