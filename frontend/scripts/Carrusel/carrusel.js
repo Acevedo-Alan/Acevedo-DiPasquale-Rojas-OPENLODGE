@@ -26,13 +26,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   
-    // 👇 Control interno del tamaño (no visible para usuarios)
-    // Podés cambiar el valor de la variable CSS en el código
+    // Control del tamaño de las img
+ 
     function setImageHeight(px) {
       document.documentElement.style.setProperty("--image-height", px + "px");
     }
-  
-    // ejemplo: setear altura en 280px
     setImageHeight(280);
   });
   
