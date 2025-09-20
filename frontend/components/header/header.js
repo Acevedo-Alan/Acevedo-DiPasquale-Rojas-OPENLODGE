@@ -11,14 +11,13 @@ if (userRole === "ANFITRION") {
         </div>
         <ul class="menu">
             <li class="item"><a href=".">inicio</a></li>
-            <li class="item"><a href="perfil.html">perfil</a></li>
-            <li class="item"><a href="about.html">sobre nosotros</a></li>
-            <li class="item"><a href="agregar-propiedad.html">agregar propiedad</a></li>
-            <li class="item"><a href="contacto.html">contacto</a></li>
+            <li class="item"><a href="/pages/perfil/perfil.html">perfil</a></li>
+            <li class="item"><a href="#">sobre nosotros</a></li>
+            <li class="item"><a href="/pages/agregarPropiedad/formulario-registro-propiedad.html">agregar propiedad</a></li>
         </ul>
     </nav>
     `;
-} else {
+} else if (userRole === "HUESPED") {
     header.innerHTML = `
     <nav class="nav">
         <div class="logo-container">
@@ -29,7 +28,20 @@ if (userRole === "ANFITRION") {
             <li class="item"><a href="#">inicio</a></li>
             <li class="item"><a href="#">perfil</a></li>
             <li class="item"><a href="#">sobre nosotros</a></li>
-            <li class="item"><a href="#">contacto</a></li>
+        </ul>
+    </nav>
+    `;
+} else {
+  header.innerHTML = `
+    <nav class="nav">
+        <div class="logo-container">
+            <div class="logo"></div>
+            <p>OpenLodge</p>
+        </div>
+        <ul class="menu">
+            <li class="item"><a href=".">inicio</a></li>
+            <li class="item"><a href="/pages/autenticacion/login/login.html">inicia sesión</a></li>
+            <li class="item"><a href="/pages/autenticacion/registro/registro.html">registrate</a></li>
         </ul>
     </nav>
 `;
