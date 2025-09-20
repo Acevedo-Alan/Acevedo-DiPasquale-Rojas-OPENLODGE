@@ -1,4 +1,4 @@
-const footer = document.querySelector(".site-footer");
+const footer = document.querySelector(".footer");
 
 footer.innerHTML = `
   <div class="footer-container">
