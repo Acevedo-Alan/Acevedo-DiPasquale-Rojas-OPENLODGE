@@ -1,6 +1,6 @@
 const header = document.querySelector(".header");
 
-const userRole = localStorage.getItem("role");
+const userRole = "ANFITRION";
 
 if (userRole === "ANFITRION") {
     header.innerHTML = `
@@ -10,7 +10,7 @@ if (userRole === "ANFITRION") {
             <p>OpenLodge</p>
         </div>
         <ul class="menu">
-            <li class="item"><a href="#">inicio</a></li>
+            <li class="item"><a href=".">inicio</a></li>
             <li class="item"><a href="#">perfil</a></li>
             <li class="item"><a href="#">sobre nosotros</a></li>
             <li class="item"><a href="#">agregar propiedad</a></li>
