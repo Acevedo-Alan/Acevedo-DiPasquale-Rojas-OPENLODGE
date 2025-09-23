@@ -1,10 +1,14 @@
 document.addEventListener("DOMContentLoaded", () => {
   // const role = localStorage.getItem("role");
   const role = "ANFITRION";
+
+   if (role != "ANFITRION" && role != "HUESPED") {
+     window.location.href = "/pages/autenticacion/login/login.html";
+   }
   
   if (role === "ANFITRION") {
     const vistaAnfitrion = document.getElementById("vista-anfitrion");
-    if (anfitrion) anfitrion.style.display = "block";
+    if (vistaAnfitrion) vistaAnfitrion.style.display = "block";
   }
 
   if (role === "HUESPED") {

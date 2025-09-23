@@ -8,14 +8,71 @@
 <body>
     <header class="header"></header>
 
-    <div class="main-alojamiento">
-           
+    <div id="vista-anfitrion" style="display: none;">
+        <div class="main-alojamieno">
+            <h2 id="nombre-propiedad">Nombre de la propiedad</h2>
+            <section class="detalles">
+                <div class="carrusel-alojamiento">
+                    <h3 id="localidad">Nombre de la zona o barrio</h3>
+                    <h3 id="direccion">direccion</h3>
+                    <h3 id="nombre-anfitrion">Nombre del propietario</h3>
+                    <h3 id="precio-propiedad">Precio por noche</h3>
+                    <button class="nav-btn" data-target="#">Ver certificado de propiedad</button>
+                </div>
+            </section>
+            <section class="servicios">
+                <h2>servicios disponibles</h2>
+                <div class="servicios-alojamiento" id="servicios-alojamiento">
+                    <div class="carrusel-servicios">servicio*</div>
+                </div>
+                <p id="disponibilidad">Disponible: si/no</p>
+                <button class="calendario-disponibilidad nav-btn" data-target="#">Ver calendario de disponibilidad</button>
+                <button class="nav-btn" data-target="/pages/alojamiento/modificarReserva/modificarReserva.html">Modificar alojamiento</button>
+                <button class="Eliminar-popup">Eliminar alojamiento</button>
+                <button class="nav-btn" data-target="/pages/alojamiento/modificarReserva/modificarReserva.html">Modificar reserva</button>
+            </section>
+            <section class="reviews">
+                <h2>comentarios</h2>
+                <p>Estrellas</p>
+                <div class="comentarios-container">---------------</div>
+            </section>
+        </div>
+    </div>
+
+    <div id="vista-huesped" style="display: none;">
+        <div class="main-alojamiento">
+            <h2 id="nombre-propiedad">Nombre de la propiedad</h2>
+                <section class="detalles">
+                    <div class="carrusel-alojamiento">
+                        <h3 id="localidad">Nombre de la zona o barrio</h3>
+                        <h3 id="direccion">direccion</h3>
+                        <h3 id="nombre-anfitrion">Nombre del propietario</h3>
+                        <h3 id="precio-propiedad">Precio por noche</h3>
+                        <button class="nav-btn" data-target="#">Ver certificado de propiedad</button>
+                    </div>
+                </section>
+                <section class="servicios">
+                    <h2>servicios disponibles</h2>
+                    <div class="servicios-alojamiento" id="servicios-alojamiento">
+                        <div class="carrusel-servicios">servicio*</div>
+                    </div>
+                    <p id="disponibilidad">Disponible: si/no</p>
+                    <button class="calendario-disponibilidad nav-btn" data-target="#">Ver calendario de disponibilidad</button>
+                    <button class="nav-btn" data-target="/pages/alojamiento/formularioReserva/formularioReserva.html">Reservar ahora</button>
+                    <button class="nav-btn" data-target="/pages/alojamiento/modificarReserva/modificarReserva.html">Modificar reserva</button>
+                </section>
+                <section class="reviews">
+                    <h2>comentarios</h2>
+                    <p>Estrellas</p>
+                    <div class="comentarios-container">---------------</div>
+                </section>
+        </div>
     </div>
 
     <footer class="footer"> </footer>
 
     <script src="/services/enrutador.js"></script>
-    <script src="alojamiento.js"></script>
+    <script src="/services/userRoleManager.js"></script>
     <script src="/components/header/header.js"></script>
     <script src="/components/footer/footer.js"></script>
 </body>
