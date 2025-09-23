@@ -9,7 +9,6 @@ propiedadesFeed.forEach((feed) => {
             <p class="propiedad-info-descripcion">Descripción</p>
             <p class="propiedad-info-precio">Precio</p>
             <div class="calificacion">------</div>
-            <button class="boton-ver nav-btn" data-target="/pages/alojamiento/alojamiento.html">ver propiedad</button>
         </div>
     `;
 });

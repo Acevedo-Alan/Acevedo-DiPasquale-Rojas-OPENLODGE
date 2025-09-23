@@ -1,10 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
   // const role = localStorage.getItem("role");
-  const role = "HUESPED";
+  const role = "ANFITRION";
   
   if (role === "ANFITRION") {
     const vistaAnfitrion = document.getElementById("vista-anfitrion");
-    alert("hasta aca funca");
     if (anfitrion) anfitrion.style.display = "block";
   }
 
