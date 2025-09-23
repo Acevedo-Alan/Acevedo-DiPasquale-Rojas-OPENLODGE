@@ -14,6 +14,8 @@ if (userRole === "ANFITRION") {
             <li class="item"><a href="/pages/perfil/perfil.html">perfil</a></li>
             <li class="item"><a href="#">sobre nosotros</a></li>
             <li class="item"><a href="/pages/agregarPropiedad/formulario-registro-propiedad.html">agregar propiedad</a></li>
+            <li class="item"><a href="/pages/agregarPropiedad/formulario-registro-propiedad.html">Login</a></li>
+
         </ul>
     </nav>
     `;
