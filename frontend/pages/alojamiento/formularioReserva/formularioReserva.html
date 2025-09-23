@@ -10,7 +10,40 @@
 
     <main class="main-reserva">
         <div class="form-container">
-            
+        <form id="form-reserva">
+            <label for="fecha-reserva">Fecha de reserva:</label>
+            <input 
+            type="date" 
+            id="fecha-reserva" 
+            name="fecha-reserva" 
+            lang="es-ES" 
+            required
+            />
+
+            <label for="dias">Cantidad de días:</label>
+            <input 
+            type="number" 
+            id="dias" 
+            name="dias" 
+            min="1" 
+            required
+            />
+
+            <h3>SELECCIONE SERVICIOS</h3>
+            <div class="servicios">
+            <label><input type="checkbox" name="servicios" value="wifi"> Wifi</label><br>
+            <label><input type="checkbox" name="servicios" value="desayuno"> Desayuno</label><br>
+            <label><input type="checkbox" name="servicios" value="pileta"> Pileta</label><br>
+            <label><input type="checkbox" name="servicios" value="cochera"> Cochera</label><br>
+            </div>
+
+            <label>
+            <input type="checkbox" id="terminos" name="terminos" required>
+            Acepto los términos y condiciones
+            </label>
+
+            <button type="submit">Reservar</button>
+        </form>
         </div>
     </main>
 

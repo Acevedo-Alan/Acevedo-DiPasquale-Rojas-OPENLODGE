@@ -10,7 +10,7 @@ if (userRole === "ANFITRION") {
             <p>OpenLodge</p>
         </div>
         <ul class="menu">
-            <li class="item"><a href=".">inicio</a></li>
+            <li class="item"><a href="/pages/index/index.html">inicio</a></li>
             <li class="item"><a href="/pages/perfil/perfil.html">perfil</a></li>
             <li class="item"><a href="#">sobre nosotros</a></li>
             <li class="item"><a href="/pages/agregarPropiedad/formulario-registro-propiedad.html">agregar propiedad</a></li>
@@ -25,7 +25,7 @@ if (userRole === "ANFITRION") {
             <p>OpenLodge</p>
         </div>
         <ul class="menu">
-            <li class="item"><a href="#">inicio</a></li>
+            <li class="item"><a href="/pages/index/index.html">inicio</a></li>
             <li class="item"><a href="#">perfil</a></li>
             <li class="item"><a href="#">sobre nosotros</a></li>
         </ul>
@@ -39,7 +39,7 @@ if (userRole === "ANFITRION") {
             <p>OpenLodge</p>
         </div>
         <ul class="menu">
-            <li class="item"><a href=".">inicio</a></li>
+            <li class="item"><a href="/pages/index/index.html">inicio</a></li>
             <li class="item"><a href="/pages/autenticacion/login/login.html">inicia sesión</a></li>
             <li class="item"><a href="/pages/autenticacion/registro/registro.html">registrate</a></li>
         </ul>
