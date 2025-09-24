@@ -12,7 +12,7 @@ footer.innerHTML = `
     <nav class="footer-nav" aria-label="Enlaces principales">
       <h4 class="footer-heading">Enlaces</h4>
       <ul>
-        <li><a href="#">Inicio</a></li>
+        <li><a href="/pages/about/about.html">Sobre nosotros</a></li>
         <li><a href="#">Buscar</a></li>
         <li><a href="#">Publicar</a></li>
         <li><a href="#">Contacto</a></li>

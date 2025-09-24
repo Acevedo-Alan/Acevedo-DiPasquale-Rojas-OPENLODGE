@@ -10,30 +10,7 @@
 <body>
     <!-- Header -->
     <header class="header" id="header">
-        <nav class="nav" id="nav">
-            <div class="logo-container">
-                <div class="logo"></div>
-                <p>OpenLodge</p>
-            </div>
-            
-            <ul class="nav-center">
-                <li><a href="#inicio">Inicio</a></li>
-                <li><a href="#destinos">Destinos</a></li>
-                <li><a href="#experiencias">Experiencias</a></li>
-                <li><a href="#ofertas">Ofertas</a></li>
-            </ul>
-            
-            <div class="nav-actions">
-                <a href="/pages/autenticacion/login/login.html">Iniciar sesión</a>
-                <button class="btn-cta">Reservar ahora</button>
-            </div>
-            
-            <button class="mobile-menu-toggle" id="mobileToggle">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-        </nav>
+        
     </header>
 
     <!-- Carousel -->
@@ -364,5 +341,11 @@
             new SearchController();
         });
     </script>
+    
+    
+    <script src="/components/header/header.js"></script>
+    <script src="/components/footer/footer.js"></script>
+    <script src="/services/enrutador.js"></script>
+    <script src="/services/userRoleManager.js"></script>
 </body>
 </html>
