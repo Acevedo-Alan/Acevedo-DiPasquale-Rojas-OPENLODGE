@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/components/header/header.css">
+    <link rel="stylesheet" href="/components/footer/footer.css">
+    <title>Reservacion de alojamiento</title>
+</head>
+<body>
+    <header class="header"></header>
+
+    <main class="main-agregar-prop">
+        <div class="form-container">
+            <form id="form-registrar-propiedad">
+                <h2>Registrar propiedad</h2>
+
+                <label for="nombre-propiedad">Nombre de la propiedad:</label>
+                <input 
+                type="text" 
+                id="nombre-propiedad" 
+                name="nombre-propiedad" 
+                required
+                />
+
+                <label for="zona">Barrio o zona:</label>
+                <input 
+                type="text" 
+                id="zona" 
+                name="zona" 
+                required
+                />
+
+                <label for="direccion">Calle, altura, piso o dpto:</label>
+                <input 
+                type="text" 
+                id="direccion" 
+                name="direccion" 
+                required
+                />
+
+                <label for="precio">Precio por noche:</label>
+                <input 
+                type="number" 
+                id="precio" 
+                name="precio" 
+                min="0" 
+                required
+                />
+
+                <h3>SELECCIONE SERVICIOS A BRINDAR</h3>
+                <div class="servicios">
+                <label><input type="checkbox" name="servicios" value="wifi"> Wifi</label><br>
+                <label><input type="checkbox" name="servicios" value="desayuno"> Desayuno</label><br>
+                <label><input type="checkbox" name="servicios" value="pileta"> Pileta</label><br>
+                <label><input type="checkbox" name="servicios" value="cochera"> Cochera</label><br>
+                </div>
+
+                <div class="uploads">
+                <label for="fotos">Subir fotos de la propiedad:</label>
+                <input type="file" id="fotos" name="fotos" accept="image/*" multiple>
+
+                <label for="certificado">Subir certificado de la propiedad:</label>
+                <input type="file" id="certificado" name="certificado" accept=".pdf,.jpg,.png">
+                </div>
+
+
+                <label>
+                <input type="checkbox" id="terminos" name="terminos" required>
+                Acepto los términos y condiciones
+                </label>
+
+                <button type="submit">Registrar propiedad</button>
+            </form>
+        </div>
+    </main>
+
+    <footer class="footer"></footer>
+
+    <script src="/services/enrutador.js"></script>
+    <script src="/services/userRoleManager.js"></script>
+    <script src="/components/header/header.js"></script>
+    <script src="/components/footer/footer.js"></script>
+</body>
+</html>

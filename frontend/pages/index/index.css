@@ -219,6 +219,24 @@ body {
   fill: currentColor;
 }
 
+.btn-primary{
+    width: 100%;
+    background: #edf2f7;
+    color: #2d3748;
+    border: none;
+    padding: 0.875rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 0.75rem;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    border: 1px solid transparent;
+}
+
 /* Mobile Menu */
 .mobile-menu-toggle {
   display: none;
