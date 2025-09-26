@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   // const role = localStorage.getItem("role");
-  const role = "HUESPED";
+  const role = "ANFITRION";
 
    if (role != "ANFITRION" && role != "HUESPED") {
      window.location.href = "/pages/autenticacion/login/login.html";
