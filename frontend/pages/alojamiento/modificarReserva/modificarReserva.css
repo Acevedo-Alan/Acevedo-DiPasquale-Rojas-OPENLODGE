@@ -148,7 +148,7 @@ body {
 }
 
 .main-modificar-reserva p::before {
-    content: "⚠️";
+    content: "";
     font-size: 1.125rem;
 }
 

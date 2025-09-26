@@ -69,8 +69,8 @@ h3 {
 }
 
 h3::before {
-    content: "⚡";
-    margin-right: 0.5rem;
+    content: "";
+    margin-right: 0;
     font-size: 1rem;
 }
 
