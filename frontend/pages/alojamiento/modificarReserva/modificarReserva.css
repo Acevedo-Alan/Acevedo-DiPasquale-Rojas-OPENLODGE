@@ -1,0 +1,314 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: #6b9b7a;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Main Container */
+.main-modificar-reserva {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    margin-top: 72px;
+    /* Header spacing */
+    min-height: calc(100vh - 144px);
+    /* Full height minus header/footer */
+}
+
+/* Success Message */
+.main-modificar-reserva h2 {
+    background: rgba(255, 255, 255, 0.95);
+    color: #2d3748;
+    padding: 1.5rem 2rem;
+    border-radius: 12px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    max-width: 400px;
+    width: 100%;
+}
+
+/* Property Info Card */
+.propiedad-info {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+    max-width: 400px;
+    width: 100%;
+    position: relative;
+}
+
+/* Property Image */
+.propiedad-imagen {
+    width: 100%;
+    height: 200px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.propiedad-imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Property Details */
+.propiedad-detalles {
+    color: #2d3748;
+}
+
+.propiedad-nombre {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+}
+
+.propiedad-direccion {
+    font-size: 0.95rem;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+}
+
+.propiedad-precio {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+}
+
+.propiedad-dueño {
+    font-size: 0.875rem;
+    color: #718096;
+    margin-bottom: 1rem;
+}
+
+/* Star Rating */
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
+}
+
+.star {
+    width: 18px;
+    height: 18px;
+    fill: #f6e05e;
+}
+
+.star.half {
+    fill: url(#half-star);
+}
+
+.rating-text {
+    margin-left: 0.5rem;
+    font-size: 0.875rem;
+    color: #4a5568;
+    font-weight: 500;
+}
+
+/* Warning Message */
+.main-modificar-reserva p {
+    background: rgba(245, 158, 11, 0.1);
+    color: #92400e;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 2rem;
+    border: 2px solid rgba(245, 158, 11, 0.3);
+    backdrop-filter: blur(10px);
+    max-width: 400px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.main-modificar-reserva p::before {
+    content: "⚠️";
+    font-size: 1.125rem;
+}
+
+/* Buttons Container */
+.buttons-container {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Navigation Buttons */
+.nav-btn {
+    flex: 1;
+    background: rgba(45, 55, 72, 0.9);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 56px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.nav-btn:hover {
+    background: rgba(45, 55, 72, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
+}
+
+/* Modify Button (Primary) */
+.nav-btn[data-target*="formularioReserva"] {
+    background: rgba(255, 255, 255, 0.95);
+    color: #2d3748;
+    font-weight: 600;
+}
+
+.nav-btn[data-target*="formularioReserva"]:hover {
+    background: white;
+    color: #1a202c;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main-modificar-reserva {
+        padding: 1rem;
+        margin-top: 60px;
+    }
+
+    .main-modificar-reserva h2 {
+        font-size: 1.125rem;
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .propiedad-info {
+        padding: 1.25rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .propiedad-imagen {
+        height: 180px;
+    }
+
+    .buttons-container {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .nav-btn {
+        padding: 0.875rem 1.5rem;
+        font-size: 0.95rem;
+    }
+
+    .main-modificar-reserva p {
+        padding: 0.875rem 1.25rem;
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-modificar-reserva {
+        padding: 0.75rem;
+    }
+
+    .main-modificar-reserva h2,
+    .propiedad-info,
+    .main-modificar-reserva p,
+    .buttons-container {
+        max-width: 100%;
+    }
+
+    .propiedad-imagen {
+        height: 160px;
+        margin-bottom: 0.75rem;
+    }
+
+    .propiedad-info {
+        padding: 1rem;
+    }
+}
+
+/* Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.main-modificar-reserva>* {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.main-modificar-reserva>*:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.main-modificar-reserva>*:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.main-modificar-reserva>*:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.main-modificar-reserva>*:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+/* Focus States */
+.nav-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+/* SVG for half star rating */
+svg defs {
+    display: none;
+}
+
+/* Glassmorphism effect enhancement */
+.main-modificar-reserva h2,
+.propiedad-info,
+.main-modificar-reserva p,
+.nav-btn {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
