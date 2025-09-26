@@ -1,6 +1,6 @@
 const header = document.querySelector(".header");
 
-const userRole = "DAS";
+const userRole = "ANFITRION";
 
 if (userRole === "ANFITRION") {
     header.innerHTML = `
@@ -36,6 +36,11 @@ if (userRole === "ANFITRION") {
             <li class="item"><a href="#">perfil</a></li>
             <li class="item"><a href="#">sobre nosotros</a></li>
         </ul>
+        <Button class="mobile-menu-toggle" id="mobileToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </Button>
     </nav>
     `;
 } else {

@@ -238,61 +238,6 @@ body {
   border-radius: 2px;
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .nav-center {
-    gap: 1.5rem;
-  }
-
-  .carousel-overlay h1 {
-    font-size: 2.5rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .mobile-menu-toggle {
-    display: block;
-  }
-
-  .nav-center,
-  .nav-actions {
-    display: none;
-  }
-
-  .nav.mobile-active .nav-center,
-  .nav.mobile-active .nav-actions {
-    display: flex;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    flex-direction: column;
-    padding: 1rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  }
-
-  .carousel-overlay h1 {
-    font-size: 2rem;
-  }
-
-  .carousel-overlay p {
-    font-size: 1rem;
-  }
-
-  .search-container {
-    flex-direction: column;
-  }
-
-  .search-group {
-    width: 100%;
-  }
-
-  .search-btn {
-    width: 100%;
-    justify-content: center;
-  }
-}
 
 /* Content placeholder */
 .main-content {

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/components/footer/footer.css ">
     <link rel="stylesheet" href="/components/header/header.css">
+    <link rel="stylesheet" href="/components/carrusel/carrusel.css">
     <link rel="stylesheet" href="index.css">
     <title>OpenLodge</title>
 </head>
@@ -14,7 +15,7 @@
         
     </header>
 
-    <!-- Carousel -->
+    <!-- Carousel 
     <div class="carousel-container">
         <div class="carousel-slide active">
             <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600" alt="Hotel de lujo">
@@ -50,7 +51,9 @@
         </div>
 
         <div class="carousel-dots" id="dots"></div>
-    </div>
+    </div> -->
+
+    <div class="carrusel"></div>
 
     <!-- Search Bar -->
     <section class="search-section">
@@ -82,10 +85,7 @@
         </div>
     </section>
 
-    <!-- Main Content (Tu contenido existente) -->
-    <main class="main-content">
-        <h1>*** --- *** --- </h1>
-    </main>
+
 
     <section class="destinations" id="destinos">
         <div class="section-title">
@@ -109,7 +109,7 @@
                     <div class="destination-price">
                         $299 <span>/ noche</span>
                     </div>
-                    <button class="btn btn-primary" style="width: 100%;">Reservar ahora</button>
+                    <button class="btn btn-primary nav-btn" style="width: 100%;" data-target="/pages/alojamiento/alojamiento.html">Reservar ahora</button>
                 </div>
             </div>
             <div class="destination-card">
@@ -128,7 +128,7 @@
                     <div class="destination-price">
                         $450 <span>/ noche</span>
                     </div>
-                    <button class="btn btn-primary" style="width: 100%;">Reservar ahora</button>
+                    <button class="btn btn-primary nav-btn" style="width: 100%;" data-target="/pages/alojamiento/alojamiento.html">Reservar ahora</button>
                 </div>
             </div>
             <div class="destination-card">
@@ -147,15 +147,20 @@
                     <div class="destination-price">
                         $599 <span>/ noche</span>
                     </div>
-                    <button class="btn btn-primary" style="width: 100%;">Reservar ahora</button>
+                    <button class="btn btn-primary nav-btn" style="width: 100%;" data-target="/pages/alojamiento/alojamiento.html">Reservar ahora</button>
                 </div>
             </div>
         </div>
     </section>
 
+    <main class="main-content">
+        <h1>*** --- *** --- </h1>
+    </main>
+
     <footer class="footer"></footer>
     
     <script src="/components/header/header.js"></script>
+    <script src="/components/carrusel/carrusel.js"></script>
     <script src="/components/footer/footer.js"></script>
     <script src="/services/enrutador.js"></script>
     <script src="/services/userRoleManager.js"></script>

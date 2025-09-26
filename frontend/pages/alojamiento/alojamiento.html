@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="alojamiento.css">
+    <link rel="stylesheet" href="/components/header/header.css">
+    <link rel="stylesheet" href="/components/footer/footer.css">
+    <link rel="stylesheet" href="/components/carrusel/carrusel.css">
     <title>Alojamiento-nombre-propiedad</title>
+   
 </head>
 <body>
     <header class="header"></header>
@@ -11,6 +16,10 @@
     <div id="vista-anfitrion" style="display: none;">
         <div class="main-alojamieno">
             <h2 id="nombre-propiedad">Nombre de la propiedad</h2>
+            
+            <!-- Carrusel reposicionado aquí -->
+            <div class="carrusel"></div>
+            
             <section class="detalles">
                 <div class="carrusel-alojamiento">
                     <h3 id="localidad">Nombre de la zona o barrio</h3>
@@ -42,30 +51,34 @@
     <div id="vista-huesped" style="display: none;">
         <div class="main-alojamiento">
             <h2 id="nombre-propiedad">Nombre de la propiedad</h2>
-                <section class="detalles">
-                    <div class="carrusel-alojamiento">
-                        <h3 id="localidad">Nombre de la zona o barrio</h3>
-                        <h3 id="direccion">direccion</h3>
-                        <h3 id="nombre-anfitrion">Nombre del propietario</h3>
-                        <h3 id="precio-propiedad">Precio por noche</h3>
-                        <button class="nav-btn" data-target="#">Ver certificado de propiedad</button>
-                    </div>
-                </section>
-                <section class="servicios">
-                    <h2>servicios disponibles</h2>
-                    <div class="servicios-alojamiento" id="servicios-alojamiento">
-                        <div class="carrusel-servicios">servicio*</div>
-                    </div>
-                    <p id="disponibilidad">Disponible: si/no</p>
-                    <button class="calendario-disponibilidad nav-btn" data-target="#">Ver calendario de disponibilidad</button>
-                    <button class="nav-btn" data-target="/pages/alojamiento/formularioReserva/formularioReserva.html">Reservar ahora</button>
-                    <button class="nav-btn" data-target="/pages/alojamiento/modificarReserva/modificarReserva.html">Modificar reserva</button>
-                </section>
-                <section class="reviews">
-                    <h2>comentarios</h2>
-                    <p>Estrellas</p>
-                    <div class="comentarios-container">---------------</div>
-                </section>
+            
+            <!-- Carrusel reposicionado aquí -->
+            <div class="carrusel"></div>
+            
+            <section class="detalles">
+                <div class="carrusel-alojamiento">
+                    <h3 id="localidad">Nombre de la zona o barrio</h3>
+                    <h3 id="direccion">direccion</h3>
+                    <h3 id="nombre-anfitrion">Nombre del propietario</h3>
+                    <h3 id="precio-propiedad">Precio por noche</h3>
+                    <button class="nav-btn" data-target="#">Ver certificado de propiedad</button>
+                </div>
+            </section>
+            <section class="servicios">
+                <h2>servicios disponibles</h2>
+                <div class="servicios-alojamiento" id="servicios-alojamiento">
+                    <div class="carrusel-servicios">servicio*</div>
+                </div>
+                <p id="disponibilidad">Disponible: si/no</p>
+                <button class="calendario-disponibilidad nav-btn" data-target="#">Ver calendario de disponibilidad</button>
+                <button class="nav-btn" data-target="/pages/alojamiento/formularioReserva/formularioReserva.html">Reservar ahora</button>
+                <button class="nav-btn" data-target="/pages/alojamiento/modificarReserva/modificarReserva.html">Modificar reserva</button>
+            </section>
+            <section class="reviews">
+                <h2>comentarios</h2>
+                <p>Estrellas</p>
+                <div class="comentarios-container">---------------</div>
+            </section>
         </div>
     </div>
 
@@ -74,6 +87,7 @@
     <script src="/services/enrutador.js"></script>
     <script src="/services/userRoleManager.js"></script>
     <script src="/components/header/header.js"></script>
+    <script src="/components/carrusel/carrusel.js"></script>
     <script src="/components/footer/footer.js"></script>
 </body>
 </html>

@@ -128,3 +128,53 @@
     transform: translateY(-2px);
     box-shadow: 0 6px 25px rgba(16, 185, 129, 0.3);
 }
+
+/* Botón menú móvil */
+.mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+}
+
+.mobile-menu-toggle span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background: #333;
+    margin: 5px 0;
+    transition: all 0.3s ease;
+    border-radius: 2px;
+}
+
+/* Responsive del header */
+@media (max-width: 1024px) {
+    .nav-center {
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 860px) {
+    .mobile-menu-toggle {
+        display: block;
+    }
+
+    .nav-center,
+    .nav-actions {
+        display: none;
+    }
+
+    .nav.mobile-active .nav-center,
+    .nav.mobile-active .nav-actions {
+        display: flex;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        flex-direction: column;
+        padding: 1rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+}
