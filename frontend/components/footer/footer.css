@@ -1,39 +1,179 @@
-footer {
-    background-color: #1e1e2f;
+/* Footer Styles */
+.footer {
+    background: #6b9b7a;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 3rem 0 1.5rem 0;
+    margin-top: auto;
+}
+
+.footer-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 5%;
+}
+
+.footer-brand .brand-title {
+    font-size: 1.5rem;
+    font-weight: 600;
     color: #ffffff;
-    padding: 2rem;
-    text-align: center;
+    margin-bottom: 0.5rem;
 }
 
-.newsletter-form input[type="email"] {
-    padding: 0.5rem;
-    margin-right: 0.5rem;
-    border-radius: 5px;
-    border: none;
+.footer-brand .brand-tag {
+    color: #e5f2e7;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0;
 }
 
-.newsletter-form button {
-    background-color: #667eea;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 5px;
-    cursor: pointer;
+.footer-heading {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 1rem;
 }
 
-.social-icon {
-    display: inline-block;
-    margin: 0 0.5rem;
-    cursor: pointer;
+.footer-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-.social-icon svg {
-    width: 24px;
-    height: 24px;
-    fill: white;
-    transition: fill 0.3s;
+.footer-nav li {
+    margin-bottom: 0.75rem;
 }
 
-.social-icon:hover svg {
-    fill: #667eea;
+.footer-nav a,
+.footer-contact a,
+.footer-legal a {
+    text-decoration: none;
+    color: #d4e6d7;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    position: relative;
+}
+
+.footer-nav a:hover,
+.footer-contact a:hover,
+.footer-legal a:hover {
+    color: #ffffff;
+}
+
+.footer-nav a::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #ffffff;
+    transition: width 0.3s ease;
+}
+
+.footer-nav a:hover::after {
+    width: 100%;
+}
+
+.footer-contact address {
+    font-style: normal;
+    line-height: 1.6;
+}
+
+.socials {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.social {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.social:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.social svg {
+    fill: #ffffff;
+    transition: fill 0.3s ease;
+}
+
+.social:hover svg {
+    fill: #6b9b7a;
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 5%;
+    padding-right: 5%;
+}
+
+.footer-bottom p {
+    color: #d4e6d7;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.footer-legal {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+    margin: 0;
+    padding: 0;
+}
+
+.footer-legal a {
+    font-size: 0.9rem;
+    color: #d4e6d7;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .footer-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        text-align: center;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .footer-legal {
+        justify-content: center;
+    }
+
+    .socials {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 1024px) {
+    .footer-container {
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
 }

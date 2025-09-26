@@ -1,124 +1,189 @@
-class HeaderManager {
-    private header: HTMLElement;
-    private mobileMenuBtn: HTMLElement;
-    private navLinks: HTMLElement;
-    private searchBtn: HTMLElement;
-    private isMenuOpen: boolean;
-
-    constructor() {
-        this.header = document.getElementById('header')!;
-        this.mobileMenuBtn = document.getElementById('mobileMenuBtn')!;
-        this.navLinks = document.getElementById('navLinks')!;
-        this.searchBtn = document.getElementById('searchBtn')!;
-        this.isMenuOpen = false;
-
-        this.init();
-    }
-
-    private init(): void {
-        this.mobileMenuBtn.addEventListener('click', () => this.toggleMobileMenu());
-        window.addEventListener('scroll', () => this.handleScroll());
-        this.searchBtn.addEventListener('click', () => this.handleSearch());
-
-        this.navLinks.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => this.closeMobileMenu());
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!this.header.contains(e.target as Node) && this.isMenuOpen) {
-                this.closeMobileMenu();
+/* <script>
+        // TypeScript compilado a JavaScript
+        class HeaderController {
+            constructor() {
+                this.header = document.getElementById('header');
+                this.nav = document.getElementById('nav');
+                this.mobileToggle = document.getElementById('mobileToggle');
+                this.init();
             }
-        });
 
-        this.setupSmoothScroll();
-        this.loadSampleProperties();
-    }
-
-    private toggleMobileMenu(): void {
-        this.isMenuOpen = !this.isMenuOpen;
-        this.mobileMenuBtn.classList.toggle('active');
-        this.navLinks.classList.toggle('active');
-    }
-
-    private closeMobileMenu(): void {
-        this.isMenuOpen = false;
-        this.mobileMenuBtn.classList.remove('active');
-        this.navLinks.classList.remove('active');
-    }
-
-    private handleScroll(): void {
-        const scrollY = window.scrollY;
-        if (scrollY > 50) {
-            this.header.classList.add('scrolled');
-        } else {
-            this.header.classList.remove('scrolled');
-        }
-
-        const hero = document.querySelector('.hero') as HTMLElement;
-        if (hero && scrollY < window.innerHeight) {
-            hero.style.transform = `translateY(${scrollY * 0.5}px)`;
-        }
-    }
-
-    private handleSearch(): void {
-        this.searchBtn.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            this.searchBtn.style.transform = '';
-        }, 150);
-
-        document.getElementById('properties')?.scrollIntoView({
-            behavior: 'smooth'
-        });
-    }
-
-    private setupSmoothScroll(): void {
-        this.navLinks.querySelectorAll('a[href^="#"]').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const targetId = link.getAttribute('href')!.substring(1);
-                const targetElement = document.getElementById(targetId);
-                targetElement?.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
+            init() {
+                // Sticky header on scroll
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 50) {
+                        this.header.classList.add('scrolled');
+                    } else {
+                        this.header.classList.remove('scrolled');
+                    }
                 });
-            });
+
+                // Mobile menu toggle
+                this.mobileToggle?.addEventListener('click', () => {
+                    this.nav.classList.toggle('mobile-active');
+                });
+
+                // Dynamic header based on user role
+                this.updateHeaderByRole();
+            }
+
+            updateHeaderByRole() {
+                const userRole = this.getUserRole(); // Simulated - replace with actual role logic
+                
+                if (userRole === "ANFITRION") {
+                    this.updateMenuForHost();
+                } else if (userRole === "HUESPED") {
+                    this.updateMenuForGuest();
+                }
+            }
+
+            getUserRole() {
+                // This should connect to your actual authentication system
+                return localStorage.getItem('userRole') || 'GUEST';
+            }
+
+            updateMenuForHost() {
+                const navCenter = document.querySelector('.nav-center');
+                navCenter.innerHTML = `
+                    <li><a href="#inicio">Inicio</a></li>
+                    <li><a href="#propiedades">Mis Propiedades</a></li>
+                    <li><a href="#agregar">Agregar Propiedad</a></li>
+                    <li><a href="#reservas">Reservaciones</a></li>
+                `;
+            }
+
+            updateMenuForGuest() {
+                const navCenter = document.querySelector('.nav-center');
+                navCenter.innerHTML = `
+                    <li><a href="#inicio">Inicio</a></li>
+                    <li><a href="#destinos">Destinos</a></li>
+                    <li><a href="#favoritos">Favoritos</a></li>
+                    <li><a href="#reservas">Mis Reservas</a></li>
+                `;
+            }
+        }
+
+        class CarouselController {
+            constructor() {
+                this.currentSlide = 0;
+                this.slides = document.querySelectorAll('.carousel-slide');
+                this.dotsContainer = document.getElementById('dots');
+                this.prevBtn = document.getElementById('prevBtn');
+                this.nextBtn = document.getElementById('nextBtn');
+                this.autoPlayInterval = null;
+                this.init();
+            }
+
+            init() {
+                this.createDots();
+                this.updateSlide();
+                this.startAutoPlay();
+                
+                this.prevBtn?.addEventListener('click', () => this.prevSlide());
+                this.nextBtn?.addEventListener('click', () => this.nextSlide());
+
+                // Pause autoplay on hover
+                const container = document.querySelector('.carousel-container');
+                container?.addEventListener('mouseenter', () => this.stopAutoPlay());
+                container?.addEventListener('mouseleave', () => this.startAutoPlay());
+            }
+
+            createDots() {
+                this.slides.forEach((_, index) => {
+                    const dot = document.createElement('div');
+                    dot.className = 'dot';
+                    if (index === 0) dot.classList.add('active');
+                    dot.addEventListener('click', () => this.goToSlide(index));
+                    this.dotsContainer?.appendChild(dot);
+                });
+            }
+
+            updateSlide() {
+                this.slides.forEach((slide, index) => {
+                    slide.classList.toggle('active', index === this.currentSlide);
+                });
+
+                const dots = this.dotsContainer?.querySelectorAll('.dot');
+                dots?.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === this.currentSlide);
+                });
+            }
+
+            nextSlide() {
+                this.currentSlide = (this.currentSlide + 1) % this.slides.length;
+                this.updateSlide();
+            }
+
+            prevSlide() {
+                this.currentSlide = (this.currentSlide - 1 + this.slides.length) % this.slides.length;
+                this.updateSlide();
+            }
+
+            goToSlide(index) {
+                this.currentSlide = index;
+                this.updateSlide();
+            }
+
+            startAutoPlay() {
+                this.autoPlayInterval = setInterval(() => this.nextSlide(), 5000);
+            }
+
+            stopAutoPlay() {
+                if (this.autoPlayInterval) {
+                    clearInterval(this.autoPlayInterval);
+                }
+            }
+        }
+
+        class SearchController {
+            constructor() {
+                this.searchBtn = document.querySelector('.search-btn');
+                this.destinationInput = document.getElementById('destination');
+                this.checkinInput = document.getElementById('checkin');
+                this.checkoutInput = document.getElementById('checkout');
+                this.guestsInput = document.getElementById('guests');
+                this.init();
+            }
+
+            init() {
+                // Set minimum date to today
+                const today = new Date().toISOString().split('T')[0];
+                if (this.checkinInput) this.checkinInput.min = today;
+                if (this.checkoutInput) this.checkoutInput.min = today;
+
+                // Handle check-in date change
+                this.checkinInput?.addEventListener('change', (e) => {
+                    const checkinDate = e.target.value;
+                    if (this.checkoutInput) {
+                        this.checkoutInput.min = checkinDate;
+                        if (this.checkoutInput.value && this.checkoutInput.value < checkinDate) {
+                            this.checkoutInput.value = '';
+                        }
+                    }
+                });
+
+                // Handle search
+                this.searchBtn?.addEventListener('click', () => this.performSearch());
+            }
+
+            performSearch() {
+                const searchData = {
+                    destination: this.destinationInput?.value,
+                    checkin: this.checkinInput?.value,
+                    checkout: this.checkoutInput?.value,
+                    guests: this.guestsInput?.value
+                };
+
+                console.log('Searching with:', searchData);
+                // Implement your search logic here
+                // You can redirect to search results page or trigger an API call
+            }
+        }
+
+        // Initialize controllers when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new HeaderController();
+            new CarouselController();
+            new SearchController();
         });
-    }
-
-    private loadSampleProperties(): void {
-        const featuredProperties = [
-            { title: "Casa moderna en el centro", description: "Hermosa casa con todas las comodidades.", price: "$150/noche" },
-            { title: "Cabaña en la montaña", description: "Perfecta para descansar en la naturaleza.", price: "$120/noche" },
-            { title: "Apartamento frente al mar", description: "Disfruta de las mejores vistas al océano.", price: "$200/noche" }
-        ];
-
-        const featuredList = document.getElementById('featuredList')!;
-        const propertiesList = document.getElementById('propertiesList')!;
-
-        featuredProperties.forEach(property => {
-            const card = this.createPropertyCard(property);
-            featuredList.appendChild(card.cloneNode(true));
-            propertiesList.appendChild(card.cloneNode(true));
-        });
-    }
-
-    private createPropertyCard(property: { title: string, description: string, price: string }): HTMLElement {
-        const card = document.createElement('div');
-        card.className = 'property-card';
-        card.innerHTML = `
-            <h3 style="color: #2c5530; margin-bottom: 1rem; font-size: 1.3rem;">${property.title}</h3>
-            <p style="margin-bottom: 1rem; color: #666;">${property.description}</p>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-weight: 600; color: #4a7c59; font-size: 1.2rem;">${property.price}</span>
-                <button style="padding: 0.5rem 1rem; background: #2c5530; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                    Ver más
-                </button>
-            </div>
-        `;
-        return card;
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    new HeaderManager();
-});
+    </script> */
