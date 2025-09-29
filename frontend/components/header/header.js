@@ -1,6 +1,6 @@
 const header = document.querySelector(".header");
 
-const userRole = "HUESPED";
+const userRole = "ANFITRION";
 
 if (userRole === "ANFITRION") {
     header.innerHTML = `

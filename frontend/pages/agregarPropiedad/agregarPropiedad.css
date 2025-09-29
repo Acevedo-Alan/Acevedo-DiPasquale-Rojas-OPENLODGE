@@ -12,7 +12,6 @@ body {
     line-height: 1.6;
 }
 
-/* Main Container */
 .main-agregar-prop {
     display: flex;
     justify-content: center;
@@ -22,7 +21,6 @@ body {
     margin-top: 72px;
 }
 
-/* Form Container */
 .form-container {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
@@ -35,14 +33,13 @@ body {
     animation: fadeInUp 0.6s ease;
 }
 
-/* Form Styling */
+
 #form-registrar-propiedad {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
 }
 
-/* Form Title */
 h2 {
     color: #2d3748;
     font-size: 1.75rem;
@@ -55,7 +52,6 @@ h2 {
     background-clip: text;
 }
 
-/* Section Titles */
 h3 {
     color: #4a5568;
     font-size: 1.125rem;
@@ -67,7 +63,6 @@ h3 {
     letter-spacing: 0.5px;
 }
 
-/* Labels */
 label {
     color: #4a5568;
     font-weight: 500;
@@ -75,7 +70,6 @@ label {
     margin-bottom: 0.5rem;
 }
 
-/* Input Fields */
 input[type="text"],
 input[type="number"],
 input[type="date"],
@@ -105,7 +99,6 @@ input[type="date"]:hover {
     border-color: #cbd5e0;
 }
 
-/* File Input Styling */
 input[type="file"] {
     padding: 0.75rem;
     border: 2px dashed #6b9b7a;
@@ -124,7 +117,6 @@ input[type="file"]:focus {
     box-shadow: 0 0 0 3px rgba(107, 155, 122, 0.2);
 }
 
-/* Services Section */
 .servicios {
     background: #f7fafc;
     border-radius: 8px;
@@ -147,7 +139,7 @@ input[type="file"]:focus {
     background: rgba(107, 155, 122, 0.1);
 }
 
-/* Checkbox Styling */
+
 input[type="checkbox"] {
     width: 18px;
     height: 18px;
@@ -155,7 +147,6 @@ input[type="checkbox"] {
     cursor: pointer;
 }
 
-/* File Upload Section */
 .uploads {
     background: #f7fafc;
     border-radius: 8px;
@@ -171,7 +162,6 @@ input[type="checkbox"] {
     color: #4a5568;
 }
 
-/* Terms and Conditions */
 label:has(input[type="checkbox"]#terminos) {
     display: flex;
     align-items: flex-start;
@@ -186,7 +176,6 @@ label:has(input[type="checkbox"]#terminos) {
     margin-top: 0.5rem;
 }
 
-/* Submit Button */
 button[type="submit"] {
     background: linear-gradient(135deg, #6b9b7a, #5a8a68);
     color: white;
@@ -212,7 +201,7 @@ button[type="submit"]:active {
     transform: translateY(0);
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
     .main-agregar-prop {
         padding: 1rem;
@@ -261,7 +250,6 @@ button[type="submit"]:active {
     }
 }
 
-/* Animation */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -274,7 +262,6 @@ button[type="submit"]:active {
     }
 }
 
-/* Form Validation States */
 input:invalid {
     border-color: #fc8181;
 }
@@ -287,14 +274,12 @@ input:valid {
     border-color: #68d391;
 }
 
-/* Loading state for submit button */
 button[type="submit"]:disabled {
     opacity: 0.7;
     cursor: not-allowed;
     transform: none;
 }
 
-/* Focus indicators for accessibility */
 input:focus-visible,
 button:focus-visible {
     outline: 2px solid #6b9b7a;

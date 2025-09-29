@@ -12,7 +12,6 @@ body {
     line-height: 1.6;
 }
 
-/* Main Container */
 .main-reserva {
     display: flex;
     justify-content: center;
@@ -20,9 +19,7 @@ body {
     min-height: calc(100vh - 144px);
     padding: 2rem 1rem;
     margin-top: 72px;
-}
 
-/* Form Container */
 .form-container {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
@@ -35,14 +32,12 @@ body {
     animation: fadeInScale 0.6s ease;
 }
 
-/* Form Styling */
 #form-reserva {
     display: flex;
     flex-direction: column;
     gap: 1.75rem;
 }
 
-/* Form Title (si se agrega) */
 .form-container h2 {
     color: #2d3748;
     font-size: 1.75rem;
@@ -55,7 +50,6 @@ body {
     background-clip: text;
 }
 
-/* Section Titles */
 h3 {
     color: #4a5568;
     font-size: 1.125rem;
@@ -74,21 +68,21 @@ h3::before {
     font-size: 1rem;
 }
 
-/* Input Groups */
+
 .input-group {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }
 
-/* Labels */
+
 label {
     color: #4a5568;
     font-weight: 500;
     font-size: 0.95rem;
 }
 
-/* Input Fields */
+
 input[type="date"],
 input[type="number"] {
     width: 100%;
@@ -117,7 +111,7 @@ input[type="number"]:hover {
     background: #f7fafc;
 }
 
-/* Date Input Specific Styling */
+
 input[type="date"] {
     position: relative;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%236b9b7a' viewBox='0 0 24 24'%3E%3Cpath d='M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z'/%3E%3C/svg%3E");
@@ -126,7 +120,7 @@ input[type="date"] {
     background-size: 20px;
 }
 
-/* Number Input Styling */
+
 input[type="number"] {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%236b9b7a' viewBox='0 0 24 24'%3E%3Cpath d='M9 11H7v6h2v-6zm6-6h-2v12h2V5zm-3 2h-2v8h2V7z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
@@ -134,7 +128,7 @@ input[type="number"] {
     background-size: 18px;
 }
 
-/* Services Section */
+
 .servicios {
     background: linear-gradient(135deg, #f0f9ff, #f7fafc);
     border-radius: 12px;
@@ -167,7 +161,7 @@ input[type="number"] {
     margin-bottom: 0;
 }
 
-/* Enhanced Checkbox Styling */
+
 input[type="checkbox"] {
     width: 20px;
     height: 20px;
@@ -181,7 +175,7 @@ input[type="checkbox"]:checked+span {
     font-weight: 600;
 }
 
-/* Terms and Conditions */
+
 label:has(input[type="checkbox"]#terminos) {
     display: flex;
     align-items: flex-start;
@@ -202,7 +196,7 @@ label:has(input[type="checkbox"]#terminos):hover {
     border-color: #6b9b7a;
 }
 
-/* Submit Button */
+
 button[type="submit"] {
     background: linear-gradient(135deg, #6b9b7a, #5a8a68);
     color: white;
@@ -303,7 +297,7 @@ button[type="submit"]:hover::before {
     }
 }
 
-/* Animations */
+
 @keyframes fadeInScale {
     from {
         opacity: 0;
@@ -328,7 +322,6 @@ button[type="submit"]:hover::before {
     }
 }
 
-/* Form Validation States */
 input:invalid {
     border-color: #fc8181;
     background-color: #fef5e7;
@@ -346,7 +339,7 @@ input:valid:focus {
     border-color: #6b9b7a;
 }
 
-/* Loading state for submit button */
+
 button[type="submit"]:disabled {
     opacity: 0.7;
     cursor: not-allowed;
@@ -357,10 +350,9 @@ button[type="submit"].loading {
     animation: pulse 2s infinite;
 }
 
-/* Accessibility improvements */
 input:focus-visible,
 button:focus-visible,
 label:focus-visible {
     outline: 3px solid #6b9b7a;
     outline-offset: 2px;
-}
+}}

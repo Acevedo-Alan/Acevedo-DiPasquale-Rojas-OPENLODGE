@@ -61,13 +61,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Ir a una diapositiva específica
   function goToSlide(slideIndex) {
-    // Remover clase active de todas las diapositivas y puntos
     slides.forEach((slide) => slide.classList.remove("active"));
     document
       .querySelectorAll(".carousel-dot")
       .forEach((dot) => dot.classList.remove("active"));
-
-    // Activar la diapositiva y punto actual
     slides[slideIndex].classList.add("active");
     document
       .querySelectorAll(".carousel-dot")
@@ -92,7 +89,6 @@ document.addEventListener("DOMContentLoaded", function () {
   nextBtn.addEventListener("click", nextSlide);
   prevBtn.addEventListener("click", prevSlide);
 
-  // Auto-play (opcional)
   let autoplayInterval = setInterval(nextSlide, 5000);
 
   // Pausar autoplay al hacer hover
@@ -127,11 +123,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const difference = startX - endX;
 
     if (Math.abs(difference) > 50) {
-      // Mínimo 50px de swipe
       if (difference > 0) {
-        nextSlide(); // Swipe izquierda = siguiente
+        nextSlide(); 
       } else {
-        prevSlide(); // Swipe derecha = anterior
+        prevSlide();
       }
     }
   });
