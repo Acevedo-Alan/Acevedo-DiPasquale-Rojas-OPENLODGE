@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/components/header/header.css">
+    <link rel="stylesheet" href="/components/footer/footer.css">
+    <link rel="stylesheet" href="perfil.css">
+    <title>Nombre de usuario</title>
+</head>
+<body>
+    <header class="header"></header>
+    <div class="main-perfil">
+        <section class="informacion-usuario">
+            <div class="user-profile-pic">
+                <div class="profile-pic"></div>
+                <Button class="nav-btn" data-target="#">Cambiar foto</Button>
+                <Button class="nav-btn" data-target="/pages/perfil/historial/historial.html">Ver historial</Button>
+            </div>
+            <p>Nombre del usuario</p>
+            <p>Descripcion</p>
+        </section>
+        <section class="propiedades" id="vista-anfitrion" style="display: none;">
+            <div class="propiedad-foto">FOTO</div>
+            <div class="propiedad-foto">FOTO</div>
+            <div class="propiedad-foto">FOTO</div>
+        </section>
+        <section class="reseñas">
+            <div class="reviews-box"></div>
+        </section>
+    </div>
+    <footer class="footer"></footer>
+
+    <script src="/components/header/header.js"></script>
+    <script src="/components/footer/footer.js"></script>
+    <script src="/services/enrutador.js"></script>
+    <script src="/services/userRoleManager.js"></script>
+</body>
+</html>

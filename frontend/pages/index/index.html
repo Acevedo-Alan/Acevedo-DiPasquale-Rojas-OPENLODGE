@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/components/footer/footer.css ">
+    <link rel="stylesheet" href="/components/header/header.css">
+    <link rel="stylesheet" href="/components/carrusel/carrusel.css">
+    <link rel="stylesheet" href="index.css">
+    <link rel="icon" type="image/png" href="">
+    <title>OpenLodge</title>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header" id="header">
+        
+    </header>
+
+    <!-- Carousel 
+    <div class="carousel-container">
+        <div class="carousel-slide active">
+            <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1600" alt="Hotel de lujo">
+            <div class="carousel-overlay">
+                <h1>Descubre tu próximo destino</h1>
+                <p>Encuentra los mejores alojamientos con la comodidad y tranquilidad que buscas</p>
+            </div>
+        </div>
+        
+        <div class="carousel-slide">
+            <img src="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1600" alt="Resort tropical">
+            <div class="carousel-overlay">
+                <h1>Experiencias únicas</h1>
+                <p>Vive momentos inolvidables en lugares extraordinarios</p>
+            </div>
+        </div>
+        
+        <div class="carousel-slide">
+            <img src="img/hotel3.jpg" alt="Vista al mar">
+            <div class="carousel-overlay">
+                <h1>Tu escape perfecto</h1>
+                <p>Relájate y disfruta en los mejores destinos del mundo</p>
+            </div>
+        </div>
+
+        <div class="carousel-controls">
+            <button class="carousel-btn" id="prevBtn">
+                <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button class="carousel-btn" id="nextBtn">
+                <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
+        </div>
+
+        <div class="carousel-dots" id="dots"></div>
+    </div> -->
+
+    <div class="carrusel"></div>
+
+    <!-- Search Bar -->
+    <section class="search-section">
+        <div class="search-container">
+            <div class="search-group">
+                <label for="destination">Destino</label>
+                <input type="text" id="destination" class="search-input" placeholder="¿A dónde vas?">
+            </div>
+            
+            <div class="search-group">
+                <label for="checkin">Check-in</label>
+                <input type="date" id="checkin" class="search-input">
+            </div>
+            
+            <div class="search-group">
+                <label for="checkout">Check-out</label>
+                <input type="date" id="checkout" class="search-input">
+            </div>
+            
+            <div class="search-group">
+                <label for="guests">Huéspedes</label>
+                <input type="number" id="guests" class="search-input" placeholder="2 adultos" min="1" max="20">
+            </div>
+            
+            <button class="search-btn">
+                <svg viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" fill="none"/></svg>
+                Buscar
+            </button>
+        </div>
+    </section>
+
+
+
+    <section class="destinations" id="destinos">
+        <div class="section-title">
+            <h2>Destinos Destacados</h2>
+            <p>Explora nuestras propiedades más exclusivas</p>
+        </div>
+        <div class="destinations-grid">
+            <div class="destination-card">
+                <div class="destination-image" style="background-image: url(img/hotel5.jpg);">
+                    <span class="destination-badge">Más Popular</span>
+                </div>
+                <div class="destination-content">
+                    <div class="destination-header">
+                        <h3 class="destination-title">Paradise Beach</h3>
+                        <div class="rating">
+                            <span class="stars">★★★★★</span>
+                            <span>4.9</span>
+                        </div>
+                    </div>
+                    <p style="color: var(--gray-medium);">Cancún, México</p>
+                    <div class="destination-price">
+                        $299 <span>/ noche</span>
+                    </div>
+                    <button class="btn btn-primary nav-btn" style="width: 100%;" data-target="/pages/alojamiento/alojamiento.html">Reservar ahora</button>
+                </div>
+            </div>
+            <div class="destination-card">
+                <div class="destination-image" style="background-image: url(img/hotel6.jpg);">
+                    <span class="destination-badge">Oferta Especial</span>
+                </div>
+                <div class="destination-content">
+                    <div class="destination-header">
+                        <h3 class="destination-title">Hotel Urban Elite</h3>
+                        <div class="rating">
+                            <span class="stars">★★★★★</span>
+                            <span>4.8</span>
+                        </div>
+                    </div>
+                    <p style="color: var(--gray-medium);">Nueva York, USA</p>
+                    <div class="destination-price">
+                        $450 <span>/ noche</span>
+                    </div>
+                    <button class="btn btn-primary nav-btn" style="width: 100%;" data-target="/pages/alojamiento/alojamiento.html">Reservar ahora</button>
+                </div>
+            </div>
+            <div class="destination-card">
+                <div class="destination-image" style="background-image: url(img/hotel7.jpg);">
+                    <span class="destination-badge">Lujo</span>
+                </div>
+                <div class="destination-content">
+                    <div class="destination-header">
+                        <h3 class="destination-title">Villa Montaña Serena</h3>
+                        <div class="rating">
+                            <span class="stars">★★★★★</span>
+                            <span>5.0</span>
+                        </div>
+                    </div>
+                    <p style="color: var(--gray-medium);">Alpes Suizos, Suiza</p>
+                    <div class="destination-price">
+                        $599 <span>/ noche</span>
+                    </div>
+                    <button class="btn btn-primary nav-btn" style="width: 100%;" data-target="/pages/alojamiento/alojamiento.html">Reservar ahora</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main class="main-content">
+        <h1>*** --- *** --- </h1>
+    </main>
+
+    <footer class="footer"></footer>
+    
+    <script src="/components/header/header.js"></script>
+    <script src="/components/carrusel/carrusel.js"></script>
+    <script src="/components/footer/footer.js"></script>
+    <script src="/services/enrutador.js"></script>
+    <script src="/services/userRoleManager.js"></script>
+</body>
+</html>
