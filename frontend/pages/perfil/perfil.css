@@ -1,9 +1,370 @@
-*{
-    padding: 0;
+* {
     margin: 0;
+    padding: 0;
     box-sizing: border-box;
 }
 
-.main-perfil{
-    margin-top: 90px;
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: #f7fafc;
+    min-height: 100vh;
+    color: #2d3748;
+    line-height: 1.6;
+}
+
+/* Main Container */
+.main-perfil {
+    max-width: 1000px;
+    margin: 90px auto 2rem;
+    padding: 0 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* User Information Section */
+.informacion-usuario {
+    background: white;
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    animation: fadeInUp 0.6s ease;
+}
+
+/* User Profile Picture Container */
+.user-profile-pic {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+/* Profile Picture */
+.profile-pic {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6b9b7a, #5a8a68);
+    box-shadow: 0 8px 24px rgba(107, 155, 122, 0.3);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.profile-pic:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 32px rgba(107, 155, 122, 0.4);
+}
+
+.profile-pic::after {
+    content: "👤";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 4rem;
+    opacity: 0.7;
+}
+
+/* User Profile Buttons */
+.user-profile-pic .nav-btn {
+    background: #edf2f7;
+    color: #2d3748;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    width: auto;
+    min-width: 180px;
+}
+
+.user-profile-pic .nav-btn:hover {
+    background: #6b9b7a;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(107, 155, 122, 0.3);
+}
+
+/* User Info Text */
+.informacion-usuario p:first-of-type {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+}
+
+.informacion-usuario p:last-of-type {
+    font-size: 1rem;
+    color: #718096;
+    max-width: 600px;
+    line-height: 1.6;
+}
+
+/* Properties Section (for Anfitrion) */
+.propiedades {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    animation: fadeInUp 0.7s ease;
+}
+
+.propiedades::before {
+    content: "Mis Propiedades";
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #6b9b7a;
+}
+
+.propiedades {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.propiedad-foto {
+    aspect-ratio: 4/3;
+    background: linear-gradient(135deg, #e2e8f0, #cbd5e0);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: #a0aec0;
+    font-size: 1.125rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.propiedad-foto:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(107, 155, 122, 0.2);
+    background: linear-gradient(135deg, #d4e6d7, #c8dccb);
+}
+
+.propiedad-foto::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(107, 155, 122, 0.1), rgba(90, 138, 104, 0.1));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.propiedad-foto:hover::after {
+    opacity: 1;
+}
+
+/* Reviews Section */
+.reseñas {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    animation: fadeInUp 0.8s ease;
+}
+
+.reseñas::before {
+    content: "Reseñas";
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #6b9b7a;
+}
+
+.reviews-box {
+    background: #f7fafc;
+    border-radius: 12px;
+    padding: 2rem;
+    min-height: 200px;
+    border: 2px dashed #cbd5e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a0aec0;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.reviews-box:empty::after {
+    content: "No hay reseñas disponibles";
+}
+
+.reviews-box:hover {
+    border-color: #6b9b7a;
+    background: rgba(107, 155, 122, 0.05);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main-perfil {
+        margin-top: 70px;
+        padding: 0 1rem;
+        gap: 1.5rem;
+    }
+
+    .informacion-usuario {
+        padding: 2rem 1.5rem;
+    }
+
+    .profile-pic {
+        width: 120px;
+        height: 120px;
+    }
+
+    .profile-pic::after {
+        font-size: 3rem;
+    }
+
+    .user-profile-pic .nav-btn {
+        min-width: 160px;
+        padding: 0.625rem 1.25rem;
+        font-size: 0.875rem;
+    }
+
+    .informacion-usuario p:first-of-type {
+        font-size: 1.25rem;
+    }
+
+    .informacion-usuario p:last-of-type {
+        font-size: 0.95rem;
+    }
+
+    .propiedades,
+    .reseñas {
+        padding: 1.5rem;
+    }
+
+    .propiedades::before,
+    .reseñas::before {
+        font-size: 1.125rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .propiedades {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .reviews-box {
+        padding: 1.5rem;
+        min-height: 150px;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-perfil {
+        padding: 0 0.75rem;
+    }
+
+    .informacion-usuario {
+        padding: 1.5rem 1rem;
+    }
+
+    .profile-pic {
+        width: 100px;
+        height: 100px;
+    }
+
+    .profile-pic::after {
+        font-size: 2.5rem;
+    }
+
+    .user-profile-pic {
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .user-profile-pic .nav-btn {
+        min-width: 140px;
+        padding: 0.625rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    .propiedades {
+        grid-template-columns: 1fr;
+    }
+
+    .propiedad-foto {
+        font-size: 1rem;
+    }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Focus States */
+.nav-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(107, 155, 122, 0.3);
+}
+
+/* Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Card Hover Effects */
+.informacion-usuario,
+.propiedades,
+.reseñas {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.informacion-usuario:hover,
+.propiedades:hover,
+.reseñas:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+/* Loading State for Property Photos */
+.propiedad-foto.loading {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
 }

@@ -1,0 +1,299 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: #f7fafc;
+    min-height: 100vh;
+    color: #2d3748;
+    line-height: 1.6;
+}
+
+/* Main Container */
+.main-historial {
+    max-width: 900px;
+    margin: 90px auto 2rem;
+    padding: 0 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.main-historial::before {
+    content: "Historial de Reservas";
+    display: block;
+    font-size: 2rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 3px solid #6b9b7a;
+    text-align: center;
+}
+
+/* History Container Card */
+.historial-container {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    animation: fadeInLeft 0.5s ease forwards;
+    opacity: 0;
+    border-left: 4px solid transparent;
+}
+
+.historial-container:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.historial-container:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+.historial-container:nth-child(4) {
+    animation-delay: 0.3s;
+}
+
+.historial-container:hover {
+    transform: translateX(8px);
+    box-shadow: 0 4px 20px rgba(107, 155, 122, 0.15);
+    border-left-color: #6b9b7a;
+}
+
+/* Profile Picture in History */
+.historial-container .profile-pic {
+    width: 60px;
+    height: 60px;
+    min-width: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6b9b7a, #5a8a68);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(107, 155, 122, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.historial-container .profile-pic::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+}
+
+.historial-container:hover .profile-pic {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 6px 16px rgba(107, 155, 122, 0.4);
+}
+
+.historial-container:hover .profile-pic::before {
+    transform: translateX(100%);
+}
+
+/* History Text */
+.historial-container p {
+    color: #4a5568;
+    font-size: 1rem;
+    font-weight: 500;
+    flex: 1;
+    line-height: 1.5;
+}
+
+.historial-container p strong {
+    color: #2d3748;
+    font-weight: 600;
+}
+
+/* Empty State */
+.main-historial:empty::after {
+    content: "No hay historial disponible";
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 12px;
+    padding: 3rem;
+    color: #a0aec0;
+    font-size: 1.125rem;
+    min-height: 200px;
+    border: 2px dashed #cbd5e0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main-historial {
+        margin-top: 70px;
+        padding: 0 1rem;
+        gap: 1.25rem;
+    }
+
+    .main-historial::before {
+        font-size: 1.5rem;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.75rem;
+    }
+
+    .historial-container {
+        padding: 1.25rem;
+        gap: 1.25rem;
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+    }
+
+    .historial-container:hover {
+        transform: translateY(-4px);
+    }
+
+    .historial-container .profile-pic {
+        width: 80px;
+        height: 80px;
+        min-width: 80px;
+        font-size: 2rem;
+    }
+
+    .historial-container p {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-historial {
+        padding: 0 0.75rem;
+    }
+
+    .main-historial::before {
+        font-size: 1.25rem;
+    }
+
+    .historial-container {
+        padding: 1rem;
+        gap: 1rem;
+    }
+
+    .historial-container .profile-pic {
+        width: 70px;
+        height: 70px;
+        min-width: 70px;
+        font-size: 1.75rem;
+    }
+
+    .historial-container p {
+        font-size: 0.875rem;
+    }
+}
+
+/* Animations */
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Timeline indicator */
+.historial-container::after {
+    content: "";
+    position: absolute;
+    right: 1.5rem;
+    width: 10px;
+    height: 10px;
+    background: #6b9b7a;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.historial-container:hover::after {
+    opacity: 1;
+}
+
+/* Alternate styling for better visual hierarchy */
+.historial-container:nth-child(even) {
+    background: linear-gradient(135deg, #ffffff, #f7fafc);
+}
+
+/* Focus states for accessibility */
+.historial-container:focus-within {
+    outline: 2px solid #6b9b7a;
+    outline-offset: 2px;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Loading state */
+.historial-container.loading {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Date badge (optional - can be added via JS) */
+.historial-container .date-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(107, 155, 122, 0.1);
+    color: #6b9b7a;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Status indicator (optional) */
+.historial-container .status-indicator {
+    width: 8px;
+    height: 8px;
+    background: #68d391;
+    border-radius: 50%;
+    position: absolute;
+    top: 1.5rem;
+    left: calc(60px + 1rem);
+    box-shadow: 0 0 8px rgba(104, 211, 145, 0.5);
+}
+
+.historial-container .status-indicator.pending {
+    background: #f6e05e;
+    box-shadow: 0 0 8px rgba(246, 224, 94, 0.5);
+}
+
+.historial-container .status-indicator.cancelled {
+    background: #fc8181;
+    box-shadow: 0 0 8px rgba(252, 129, 129, 0.5);
+}
