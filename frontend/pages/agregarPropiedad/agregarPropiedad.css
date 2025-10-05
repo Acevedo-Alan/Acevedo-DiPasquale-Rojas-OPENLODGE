@@ -263,7 +263,7 @@ button[type="submit"]:active {
 }
 
 input:invalid {
-    border-color: #fc8181;
+    border-color: #0a5300;
 }
 
 input:invalid:focus {
