@@ -1,12 +1,8 @@
-// Función para manejar el envío del formulario de login
 function handleLogin(event) {
     event.preventDefault();
     
     const dni = document.getElementById('dni').value;
     const password = document.getElementById('password').value;
-    
-    // Aquí iría la lógica de autenticación
-    console.log('Intentando iniciar sesión con:', { dni, password });
     
     // Simulación de proceso de login
     const button = event.target.querySelector('.btn-primary');
@@ -15,16 +11,14 @@ function handleLogin(event) {
     button.textContent = 'Iniciando sesión...';
     button.disabled = true;
     
-    // Simulación de llamada a API (reemplazar con tu lógica real)
+    // Simulación de llamada a API
     setTimeout(() => {
         button.textContent = originalText;
         button.disabled = false;
         
-        // Aquí deberías manejar la respuesta real del servidor
         alert('Funcionalidad de login pendiente de implementar');
-        
-        // Ejemplo de redirección exitosa:
-        // window.location.href = '/dashboard';
+
+        window.history.back();
     }, 2000);
 }
 
@@ -47,12 +41,10 @@ function setupDNIValidation() {
 // Animación de entrada suave del contenedor
 function setupEntranceAnimation() {
     const container = document.querySelector('.login-container');
-    
-    // Configurar estado inicial
+
     container.style.opacity = '0';
     container.style.transform = 'scale(0.9)';
     
-    // Aplicar animación después de un breve delay
     setTimeout(() => {
         container.style.transition = 'all 0.4s ease-out';
         container.style.opacity = '1';
@@ -60,22 +52,18 @@ function setupEntranceAnimation() {
     }, 100);
 }
 
-// Función para validar formato de DNI/CUIL (opcional)
+// Función para validar formato de DNI/CUIL
 function validateDNI(dni) {
-    // Validación básica: solo números y longitud apropiada
     const cleanDNI = dni.replace(/\D/g, '');
     return cleanDNI.length >= 7 && cleanDNI.length <= 11;
 }
 
-// Función para validar contraseña (personalizable según tus requisitos)
 function validatePassword(password) {
-    // Ejemplo: mínimo 6 caracteres
     return password.length >= 6;
 }
 
-// Función para mostrar mensajes de error (opcional)
+// Función para mostrar mensajes de error
 function showError(field, message) {
-    // Remover errores previos
     const existingError = field.parentElement.querySelector('.error-message');
     if (existingError) {
         existingError.remove();
@@ -115,24 +103,17 @@ function clearErrors() {
     });
 }
 
-// Inicialización cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', function() {
-    // Configurar validación de DNI
     setupDNIValidation();
-    
-    // Configurar animación de entrada
     setupEntranceAnimation();
     
-    // Agregar event listeners adicionales si es necesario
     const form = document.querySelector('.login-form');
     const dniField = document.getElementById('dni');
     const passwordField = document.getElementById('password');
     
-    // Limpiar errores cuando el usuario empiece a escribir
     dniField.addEventListener('input', clearErrors);
     passwordField.addEventListener('input', clearErrors);
     
-    // Opcional: Validación en tiempo real más avanzada
     form.addEventListener('input', function() {
         const dni = dniField.value;
         const password = passwordField.value;

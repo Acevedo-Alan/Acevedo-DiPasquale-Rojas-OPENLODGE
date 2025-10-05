@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear Cuenta - Alojamiento</title>
+    <link rel="stylesheet" href="registro.css">
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <h1>Crear Cuenta</h1>
+            <p>Únete a nuestra comunidad de alojamiento</p>
+        </div>
+        
+        <form class="register-form" onsubmit="handleRegister(event)">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input 
+                        type="text" 
+                        id="nombre" 
+                        name="nombre" 
+                        placeholder="Tu nombre"
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="apellido">Apellido</label>
+                    <input 
+                        type="text" 
+                        id="apellido" 
+                        name="apellido" 
+                        placeholder="Tu apellido"
+                        required
+                    >
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="dni">DNI o CUIL</label>
+                <input 
+                    type="text" 
+                    id="dni" 
+                    name="dni" 
+                    placeholder="Ingresa tu DNI o CUIL"
+                    required
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Correo electrónico</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    placeholder="tu@email.com"
+                    required
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="telefono">Número telefónico</label>
+                <input 
+                    type="tel" 
+                    id="telefono" 
+                    name="telefono" 
+                    placeholder="+54 9 11 1234-5678"
+                    required
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="direccion">Dirección</label>
+                <input 
+                    type="text" 
+                    id="direccion" 
+                    name="direccion" 
+                    placeholder="Calle, número, ciudad"
+                    required
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    placeholder="Mínimo 6 caracteres"
+                    required
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="tipo-usuario">Quiero</label>
+                <div class="custom-select" id="tipo-usuario-container">
+                    <div class="select-trigger" id="select-trigger">
+                        <span id="selected-option">Selecciona una opción</span>
+                        <svg class="select-arrow" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M4 6l4 4 4-4H4z"/>
+                        </svg>
+                    </div>
+                    <div class="select-options" id="select-options">
+                        <div class="select-option" data-value="anfitrion">
+                            <span>Hospedar</span>
+                            <small>Ofrecer mis propiedades</small>
+                        </div>
+                        <div class="select-option" data-value="huesped">
+                            <span>Alojarme</span>
+                            <small>Buscar alojamiento</small>
+                        </div>
+                    </div>
+                    <input type="hidden" id="tipo-usuario" name="tipo-usuario" required>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-primary">
+                Crear Cuenta
+            </button>
+            
+            <div class="divider">
+                <span>o</span>
+            </div>
+            
+            <div class="form-links">
+                <a href="/pages/autenticacion/login/login.html">¿Ya tienes cuenta? Inicia sesión</a>
+            </div>
+        </form>
+    </div>
+
+    <script src="registro.js"></script>
+</body>
+</html>

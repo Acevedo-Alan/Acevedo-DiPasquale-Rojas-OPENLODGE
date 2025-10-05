@@ -22,12 +22,10 @@ document.addEventListener("DOMContentLoaded", () => {
       overlay.style.opacity = "0";
       overlay.style.transition = "opacity 0.3s ease";
 
-      // Crear contenedor del contenido
       const content = document.createElement("div");
       content.style.textAlign = "center";
       content.style.animation = "fadeInScale 0.5s ease forwards";
 
-      // Crear spinner de carga
       const spinner = document.createElement("div");
       spinner.style.width = "50px";
       spinner.style.height = "50px";
@@ -37,7 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
       spinner.style.animation = "spin 1s linear infinite";
       spinner.style.marginBottom = "1.5rem";
 
-      // Crear texto de carga
       const loadingText = document.createElement("h1");
       loadingText.textContent = "Cargando...";
       loadingText.style.color = "#ffffff";
@@ -90,13 +87,10 @@ document.addEventListener("DOMContentLoaded", () => {
         document.head.appendChild(style);
       }
 
-      // Ensamblar el contenido
       content.appendChild(logo);
       content.appendChild(spinner);
       content.appendChild(loadingText);
       overlay.appendChild(content);
-
-      // Agregar overlay al body
       document.body.appendChild(overlay);
 
       // Animar entrada del overlay

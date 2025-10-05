@@ -12,7 +12,6 @@ body {
     line-height: 1.6;
 }
 
-/* Main Container */
 .main-perfil {
     max-width: 1000px;
     margin: 90px auto 2rem;
@@ -22,7 +21,7 @@ body {
     gap: 2rem;
 }
 
-/* User Information Section */
+
 .informacion-usuario {
     background: white;
     border-radius: 16px;
@@ -35,7 +34,6 @@ body {
     animation: fadeInUp 0.6s ease;
 }
 
-/* User Profile Picture Container */
 .user-profile-pic {
     display: flex;
     flex-direction: column;
@@ -44,7 +42,6 @@ body {
     margin-bottom: 2rem;
 }
 
-/* Profile Picture */
 .profile-pic {
     width: 150px;
     height: 150px;
@@ -71,7 +68,6 @@ body {
     opacity: 0.7;
 }
 
-/* User Profile Buttons */
 .user-profile-pic .nav-btn {
     background: #edf2f7;
     color: #2d3748;
@@ -95,7 +91,6 @@ body {
     box-shadow: 0 4px 15px rgba(107, 155, 122, 0.3);
 }
 
-/* User Info Text */
 .informacion-usuario p:first-of-type {
     font-size: 1.5rem;
     font-weight: 600;
@@ -110,7 +105,6 @@ body {
     line-height: 1.6;
 }
 
-/* Properties Section (for Anfitrion) */
 .propiedades {
     background: white;
     border-radius: 16px;
@@ -175,7 +169,6 @@ body {
     opacity: 1;
 }
 
-/* Reviews Section */
 .reseñas {
     background: white;
     border-radius: 16px;

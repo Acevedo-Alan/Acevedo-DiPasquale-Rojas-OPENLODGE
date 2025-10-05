@@ -37,7 +37,7 @@ carrusel.innerHTML = `<div class="carousel-container">
         <div class="carousel-dots" id="dots"></div>
     </div>`;
 
-// Funcionalidad del carrusel
+// Funcionalidad
 document.addEventListener("DOMContentLoaded", function () {
   const slides = document.querySelectorAll(".carousel-slide");
   const prevBtn = document.getElementById("prevBtn");
@@ -46,8 +46,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   let currentSlide = 0;
   const totalSlides = slides.length;
-
-  // Crear puntos indicadores
   function createDots() {
     dotsContainer.innerHTML = "";
     for (let i = 0; i < totalSlides; i++) {
@@ -59,7 +57,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Ir a una diapositiva específica
   function goToSlide(slideIndex) {
     slides.forEach((slide) => slide.classList.remove("active"));
     document
@@ -85,7 +82,6 @@ document.addEventListener("DOMContentLoaded", function () {
     goToSlide(prev);
   }
 
-  // Event listeners
   nextBtn.addEventListener("click", nextSlide);
   prevBtn.addEventListener("click", prevSlide);
 
@@ -104,11 +100,6 @@ document.addEventListener("DOMContentLoaded", function () {
   // Inicializar puntos
   createDots();
 
-  // Soporte para teclado
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowLeft") prevSlide();
-    if (e.key === "ArrowRight") nextSlide();
-  });
 
   // Soporte táctil básico
   let startX = 0;
