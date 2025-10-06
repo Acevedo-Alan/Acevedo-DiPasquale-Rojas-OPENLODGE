@@ -29,7 +29,7 @@ footer.innerHTML = `
 
     <div class="footer-newsletter" aria-label="Suscripción">
        <div class="socials" aria-label="Redes sociales">
-        <a href="#" class="social" aria-label="Facebook">
+        <a href="https://www.youtube.com/watch?v=unJARAGnorE" target="_blank" class="social" aria-label="Facebook">
           <!-- simple svg icon -->
           <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M22 12a10 10 0 1 0-11.5 9.9v-7h-2.2v-2.9h2.2V9.1c0-2.2 1.3-3.4 3.3-3.4.95 0 1.95.17 1.95.17v2.15h-1.1c-1.09 0-1.43.68-1.43 1.37v1.66h2.43l-.39 2.9H14.5v7A10 10 0 0 0 22 12z"/></svg>
         </a>

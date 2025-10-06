@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Popup System Demo</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <!-- Demo content -->
+    <div class="demo-container">
+        <h1>PRUEBA DE POPUPS ANASHEEI (BORRAR)</h1>
+        <div class="demo-buttons">
+            <button onclick="testSuccess()">Probar Success</button>
+            <button onclick="testWarning()">Probar Warning</button>
+            <button onclick="testError()">Probar Error</button>
+        </div>
+    </div>
+
+    <!-- Popup Container - This is what you need to include in your project -->
+    <div id="popupOverlay" class="popup-overlay">
+        <div id="popupContainer" class="popup-container">
+            <div class="popup-icon-container">
+                <div id="popupIcon" class="popup-icon"></div>
+            </div>
+            <h2 id="popupTitle" class="popup-title"></h2>
+            <p id="popupMessage" class="popup-message"></p>
+            <div class="popup-actions">
+                <button id="popupActionBtn" class="popup-btn popup-btn-primary"></button>
+                <button id="popupCloseBtn" class="popup-btn popup-btn-secondary">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confetti Canvas for Success Animations -->
+    <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
+
+    <script src="popup.js"></script>
+    <script>
+        // Demo functions
+        function testSuccess() {
+            showPopup(
+                'success',
+                '¡RESERVADO CON ÉXITO!',
+                'Tu reserva ha sido confirmada. Recibirás un correo con todos los detalles de tu estancia.',
+                'Ver mi reserva',
+                () => console.log('Navegando a reserva...')
+            );
+        }
+
+        function testWarning() {
+            showPopup(
+                'warning',
+                'ACCIÓN REQUERIDA',
+                'Por favor, completa todos los campos obligatorios antes de continuar con el proceso.',
+                'Completar información',
+                () => console.log('Completando información...')
+            );
+        }
+
+        function testError() {
+            showPopup(
+                'error',
+                'ERROR AL PROCESAR',
+                'No pudimos procesar tu solicitud. Por favor, verifica tu conexión e intenta nuevamente.',
+                'Reintentar',
+                () => console.log('Reintentando...')
+            );
+        }
+    </script>
+
+    <style>
+        /* Demo styles only */
+        .demo-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .demo-container h1 {
+            color: white;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            text-align: center;
+        }
+
+        .demo-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .demo-buttons button {
+            padding: 12px 32px;
+            font-size: 16px;
+            font-weight: 500;
+            border: none;
+            border-radius: 8px;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .demo-buttons button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</body>
+</html>

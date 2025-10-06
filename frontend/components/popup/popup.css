@@ -1,0 +1,301 @@
+/* Popup System Styles */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.popup-overlay.active {
+    opacity: 1;
+    visibility: visible;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.popup-container {
+    background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    transform: scale(0.7) translateY(20px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.popup-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-color) 0%, var(--accent-color-light) 100%);
+}
+
+.popup-overlay.active .popup-container {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+/* Icon Styles */
+.popup-icon-container {
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: center;
+}
+
+.popup-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Success Icon */
+.popup-icon.success {
+    background: linear-gradient(135deg, #2b9c4f 0%, #6b9b7a 100%);
+    animation: successPulse 0.6s ease-out;
+}
+
+.popup-icon.success::after {
+    content: '';
+    width: 30px;
+    height: 15px;
+    border-left: 3px solid white;
+    border-bottom: 3px solid white;
+    transform: rotate(-45deg) translateY(-4px);
+    animation: checkmark 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.2s forwards;
+    opacity: 0;
+}
+
+/* Warning Icon */
+.popup-icon.warning {
+    background: linear-gradient(135deg, #f5a524 0%, #f7b955 100%);
+    animation: warningPulse 2s ease-in-out infinite;
+}
+
+.popup-icon.warning::after {
+    content: '!';
+    color: white;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+/* Error Icon */
+.popup-icon.error {
+    background: linear-gradient(135deg, #d64545 0%, #e06060 100%);
+    animation: errorShake 0.5s ease-out;
+}
+
+.popup-icon.error::after {
+    content: '×';
+    color: white;
+    font-size: 40px;
+    font-weight: 300;
+}
+
+/* Text Styles */
+.popup-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.5px;
+}
+
+.popup-message {
+    font-size: 0.95rem;
+    color: #6b7280;
+    line-height: 1.6;
+    margin-bottom: 1.75rem;
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Button Styles */
+.popup-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.popup-btn {
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: 0.3px;
+    min-width: 120px;
+}
+
+.popup-btn-primary {
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-color-light) 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(43, 156, 79, 0.2);
+}
+
+.popup-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(43, 156, 79, 0.3);
+}
+
+.popup-btn-secondary {
+    background: rgba(107, 155, 122, 0.1);
+    color: #4b5563;
+    border: 1px solid rgba(107, 155, 122, 0.2);
+}
+
+.popup-btn-secondary:hover {
+    background: rgba(107, 155, 122, 0.15);
+    border-color: rgba(107, 155, 122, 0.3);
+}
+
+/* Type-specific colors */
+.popup-container.success {
+    --accent-color: #2b9c4f;
+    --accent-color-light: #6b9b7a;
+}
+
+.popup-container.warning {
+    --accent-color: #f5a524;
+    --accent-color-light: #f7b955;
+}
+
+.popup-container.error {
+    --accent-color: #d64545;
+    --accent-color-light: #e06060;
+}
+
+/* Confetti Canvas */
+.confetti-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10000;
+}
+
+/* Animations */
+@keyframes successPulse {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes checkmark {
+    0% {
+        opacity: 0;
+        transform: rotate(-45deg) translateY(-4px) scale(0.5);
+    }
+    100% {
+        opacity: 1;
+        transform: rotate(-45deg) translateY(-4px) scale(1);
+    }
+}
+
+@keyframes warningPulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(245, 165, 36, 0.4);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 15px rgba(245, 165, 36, 0);
+    }
+}
+
+@keyframes errorShake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-5px);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(5px);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .popup-container {
+        width: 95%;
+        padding: 2rem 1.5rem;
+    }
+
+    .popup-title {
+        font-size: 1.3rem;
+    }
+
+    .popup-message {
+        font-size: 0.9rem;
+        max-width: 100%;
+    }
+
+    .popup-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .popup-btn {
+        width: 100%;
+        padding: 14px 28px;
+    }
+}
+
+/* Accessibility - Focus States */
+.popup-btn:focus-visible {
+    outline: 3px solid rgba(107, 155, 122, 0.5);
+    outline-offset: 2px;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .popup-overlay,
+    .popup-container,
+    .popup-btn {
+        transition: none;
+    }
+    
+    .popup-icon.success,
+    .popup-icon.warning,
+    .popup-icon.error {
+        animation: none;
+    }
+}
