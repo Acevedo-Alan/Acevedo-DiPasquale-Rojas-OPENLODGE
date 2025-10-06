@@ -323,7 +323,7 @@ button[type="submit"]:hover::before {
 }
 
 input:invalid {
-    border-color: #fc8181;
+    border-color: #007c1f;
     background-color: #fef5e7;
 }
 
