@@ -26,10 +26,7 @@ if (userRole === "ANFITRION") {
             <li><a href="/pages/agregarPropiedad/agregarPropiedad.html">Agregar propiedad</a></li>
         </ul>
 
-        <div class="nav-actions">
-            <a href="#" class="btn-login">Iniciar sesión</a>
-            <a href="#" class="btn-register">Registrarse</a>
-        </div>
+        
 
         <button class="mobile-menu-toggle" id="mobileToggle">
             <span></span>
