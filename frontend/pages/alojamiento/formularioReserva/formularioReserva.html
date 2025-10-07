@@ -1,61 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/components/header/header.css">
-    <link rel="stylesheet" href="/components/footer/footer.css">
-    <link rel="stylesheet" href="formularioReserva.css">
-    <title>Reservacion de alojamiento</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/components/header/header.css">
+  <link rel="stylesheet" href="/components/footer/footer.css">
+  <link rel="stylesheet" href="formularioReserva.css">
+  <title>Reservación de alojamiento</title>
 </head>
 <body>
-    <header class="header"></header>
+  <header class="header"></header>
 
-    <main class="main-reserva">
-        <div class="form-container">
-        <form id="form-reserva">
-            <label for="fecha-reserva">Fecha de reserva:</label>
-            <input 
-            type="date" 
-            id="fecha-reserva" 
-            name="fecha-reserva" 
-            lang="es-ES" 
-            required
-            />
+  <main class="main-reserva">
+    <div class="form-container">
+      <form id="form-reserva">
+        <!-- Fecha de inicio -->
+        <label for="fecha-inicio">Fecha de inicio:</label>
+        <input 
+          type="date" 
+          id="fecha-inicio" 
+          name="fecha-inicio" 
+          lang="es-ES" 
+          required
+        />
 
-            <label for="dias">Cantidad de días:</label>
-            <input 
-            type="number" 
-            id="dias" 
-            name="dias" 
-            min="1" 
-            required
-            />
+        <!-- Fecha de fin -->
+        <label for="fecha-fin">Fecha de fin:</label>
+        <input 
+          type="date" 
+          id="fecha-fin" 
+          name="fecha-fin" 
+          lang="es-ES" 
+          required
+        />
 
-            <h3>SELECCIONE SERVICIOS</h3>
-            <div class="servicios">
-            <label><input type="checkbox" name="servicios" value="wifi"> Wifi</label><br>
-            <label><input type="checkbox" name="servicios" value="desayuno"> Desayuno</label><br>
-            <label><input type="checkbox" name="servicios" value="pileta"> Pileta</label><br>
-            <label><input type="checkbox" name="servicios" value="cochera"> Cochera</label><br>
-            </div>
+        <!-- Cantidad de huéspedes -->
+        <label for="huespedes">Cantidad de huéspedes:</label>
+        <input 
+          type="number" 
+          id="huespedes" 
+          name="huespedes" 
+          min="1" 
+          required
+        />
 
-            <label>
-            <input type="checkbox" id="terminos" name="terminos" required>
-            Acepto los términos y condiciones
-            </label>
-
-            <button type="submit">Reservar</button>
-        </form>
+        <!-- Servicios -->
+        <h3>Seleccione servicios</h3>
+        <div class="servicios">
+          <label><input type="checkbox" name="servicios" value="wifi"> Wifi</label><br>
+          <label><input type="checkbox" name="servicios" value="desayuno"> Desayuno</label><br>
+          <label><input type="checkbox" name="servicios" value="pileta"> Pileta</label><br>
+          <label><input type="checkbox" name="servicios" value="cochera"> Cochera</label><br>
         </div>
-    </main>
 
-    <footer class="footer"></footer>
+        <!-- Términos -->
+        <label>
+          <input type="checkbox" id="terminos" name="terminos" required>
+          Acepto los términos y condiciones
+        </label>
 
-    <script src="/pages/alojamiento/formularioReserva/formularioReserva.js"></script>
-    <script src="/services/enrutador.js"></script>
-    <script src="/services/userRoleManager.js"></script>
-    <script src="/components/header/header.js"></script>
-    <script src="/components/footer/footer.js"></script>
+        <button type="submit">Reservar</button>
+      </form>
+    </div>
+  </main>
+
+  <footer class="footer"></footer>
+
+  <script src="/pages/alojamiento/formularioReserva/formularioReserva.js"></script>
+  <script src="/services/enrutador.js"></script>
+  <script src="/services/userRoleManager.js"></script>
+  <script src="/components/header/header.js"></script>
+  <script src="/components/footer/footer.js"></script>
 </body>
 </html>

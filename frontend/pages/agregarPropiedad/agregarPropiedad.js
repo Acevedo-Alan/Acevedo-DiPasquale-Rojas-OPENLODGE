@@ -1,11 +1,14 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("form-reserva");
+  const form = document.getElementById("form-registrar-propiedad");
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
-    mostrarPopup("¡Reserva realizada con éxito!");
-    
-    setTimeout(() => window.location.href = "/pages/alojamiento/alojamiento.html", 2000);
+    mostrarPopup("Alojamiento creado con éxito!");
+
+    setTimeout(
+      () => (window.location.href = "/pages/alojamiento/alojamiento.html"),
+      2000
+    );
   });
 
   function mostrarPopup(mensaje) {
@@ -52,31 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Botón para cerrar
     document.getElementById("cerrar-popup").addEventListener("click", () => {
       overlay.remove();
-      form.reset(); 
+      form.reset();
     });
   }
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("form-reserva");
-  const fechaInicio = document.getElementById("fecha-inicio");
-  const fechaFin = document.getElementById("fecha-fin");
-
-  // Bloquear fechas pasadas
-  const hoy = new Date().toISOString().split("T")[0];
-  fechaInicio.min = hoy;
-  fechaFin.min = hoy;
-
-  // Actualizar fecha mínima de fin cuando cambia la de inicio
-  fechaInicio.addEventListener("change", () => {
-    fechaFin.min = fechaInicio.value;
-  });
-
-  // Validar antes de enviar
-  form.addEventListener("submit", (e) => {
-    if (fechaFin.value <= fechaInicio.value) {
-      e.preventDefault();
-      alert("La fecha de fin debe ser posterior a la fecha de inicio.");
-    }
-  });
 });
