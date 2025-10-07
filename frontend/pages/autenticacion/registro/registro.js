@@ -1,6 +1,8 @@
+// Función para manejar el envío del formulario de registro
 function handleRegister(event) {
   event.preventDefault();
 
+  // Recopilar datos del formulario
   const formData = {
     nombre: document.getElementById("nombre").value,
     apellido: document.getElementById("apellido").value,
@@ -9,9 +11,9 @@ function handleRegister(event) {
     telefono: document.getElementById("telefono").value,
     direccion: document.getElementById("direccion").value,
     password: document.getElementById("password").value,
-    tipoUsuario: document.getElementById("tipo-usuario").value,
   };
 
+  // Validar que todos los campos estén completos
   if (!validateForm(formData)) {
     return;
   }
@@ -25,74 +27,165 @@ function handleRegister(event) {
   button.textContent = "Creando cuenta...";
   button.disabled = true;
 
-  // Simulación de llamada a API
+  // Simulación de llamada a API (reemplazar con tu lógica real)
   setTimeout(() => {
     button.textContent = originalText;
     button.disabled = false;
 
+    // Aquí deberías manejar la respuesta real del servidor
     alert(
       "Cuenta creada exitosamente! (Funcionalidad pendiente de implementar)"
     );
 
-    window.location.href = '/pages/autenticacion/login/login.html';
+    // Ejemplo de redirección exitosa:
+    window.location.href = "/pages/autenticacion/login/login.html";
   }, 2000);
 }
 
 // Validación completa del formulario
 function validateForm(data) {
- 
+  let isValid = true;
+
+  // Validar nombre y apellido
+  if (data.nombre.length < 2) {
+    showError(
+      document.getElementById("nombre"),
+      "El nombre debe tener al menos 2 caracteres"
+    );
+    isValid = false;
+  }
+
+  if (data.apellido.length < 2) {
+    showError(
+      document.getElementById("apellido"),
+      "El apellido debe tener al menos 2 caracteres"
+    );
+    isValid = false;
+  }
+
+  // Validar DNI/CUIL
+  if (!validateDNI(data.dni)) {
+    showError(
+      document.getElementById("dni"),
+      "DNI/CUIL inválido (7-11 dígitos)"
+    );
+    isValid = false;
+  }
+
+  // Validar email
+  if (!validateEmail(data.email)) {
+    showError(document.getElementById("email"), "Correo electrónico inválido");
+    isValid = false;
+  }
+
+  // Validar teléfono
+  if (!validatePhone(data.telefono)) {
+    showError(
+      document.getElementById("telefono"),
+      "Número telefónico inválido"
+    );
+    isValid = false;
+  }
+
+  // Validar dirección
+  if (data.direccion.length < 5) {
+    showError(
+      document.getElementById("direccion"),
+      "La dirección debe ser más específica"
+    );
+    isValid = false;
+  }
+
+  // Validar contraseña
+  if (!validatePassword(data.password)) {
+    showError(
+      document.getElementById("password"),
+      "La contraseña debe tener al menos 6 caracteres"
+    );
+    isValid = false;
+  }
+
+  return isValid;
 }
 
+// Validaciones específicas
+function validateDNI(dni) {
+  const cleanDNI = dni.replace(/\D/g, "");
+  return cleanDNI.length >= 7 && cleanDNI.length <= 11;
+}
 
-// Configurar desplegacion de opciones
-function setupCustomSelect() {
-  const selectTrigger = document.getElementById("select-trigger");
-  const selectOptions = document.getElementById("select-options");
-  const hiddenInput = document.getElementById("tipo-usuario");
-  const selectedOption = document.getElementById("selected-option");
-  const options = document.querySelectorAll(".select-option");
+function validateEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
 
-  // Toggle desplegacion
-  selectTrigger.addEventListener("click", function (e) {
-    e.stopPropagation();
-    selectTrigger.classList.toggle("active");
-    selectOptions.classList.toggle("active");
-  });
+function validatePhone(phone) {
+  const cleanPhone = phone.replace(/\D/g, "");
+  return cleanPhone.length >= 10;
+}
 
-  // Seleccionar opción
-  options.forEach((option) => {
-    option.addEventListener("click", function () {
-      const value = this.getAttribute("data-value");
-      const text = this.querySelector("span").textContent;
+function validatePassword(password) {
+  return password.length >= 6;
+}
 
-      // Actualizar valores
-      hiddenInput.value = value;
-      selectedOption.textContent = text;
-      selectTrigger.classList.add("has-value");
+// Configurar validación en tiempo real para DNI
+function setupDNIValidation() {
+  const dniInput = document.getElementById("dni");
 
-      // Remover clase selected de todas las opciones
-      options.forEach((opt) => opt.classList.remove("selected"));
+  if (!dniInput) return;
 
-      // Agregar clase selected a la opción actual
-      this.classList.add("selected");
+  dniInput.addEventListener("input", function (e) {
+    let value = e.target.value.replace(/\D/g, "");
 
-      // Cerrar desplegacion
-      selectTrigger.classList.remove("active");
-      selectOptions.classList.remove("active");
+    if (value.length > 11) {
+      value = value.slice(0, 11);
+    }
 
-      // Remover error si existía
-      clearError(selectTrigger);
-    });
-  });
+    e.target.value = value;
 
-  // Cerrar desplegacion al hacer click fuera
-  document.addEventListener("click", function (e) {
-    if (!e.target.closest(".custom-select")) {
-      selectTrigger.classList.remove("active");
-      selectOptions.classList.remove("active");
+    // Validación visual en tiempo real
+    if (value.length >= 7 && value.length <= 11) {
+      e.target.classList.remove("error");
+      e.target.classList.add("valid");
+    } else if (value.length > 0) {
+      e.target.classList.remove("valid");
+      e.target.classList.add("error");
+    } else {
+      e.target.classList.remove("error", "valid");
     }
   });
 }
+
+// Configurar validación de teléfono
+function setupPhoneValidation() {
+  const phoneInput = document.getElementById("telefono");
+
+  if (!phoneInput) return;
+
+  phoneInput.addEventListener("input", function (e) {
+    // Permitir números, espacios, guiones y el símbolo +
+    let value = e.target.value.replace(/[^\d\s\-+]/g, "");
+    e.target.value = value;
+  });
+}
+
+// Configurar validación de email
+function setupEmailValidation() {
+  const emailInput = document.getElementById("email");
+
+  if (!emailInput) return;
+
+  emailInput.addEventListener("blur", function (e) {
+    if (validateEmail(e.target.value)) {
+      e.target.classList.remove("error");
+      e.target.classList.add("valid");
+    } else if (e.target.value.length > 0) {
+      e.target.classList.remove("valid");
+      e.target.classList.add("error");
+    }
+  });
+}
+
 
 // Función para mostrar mensajes de error
 function showError(field, message) {
@@ -143,6 +236,8 @@ function clearAllErrors() {
 function setupEntranceAnimation() {
   const container = document.querySelector(".register-container");
 
+  if (!container) return;
+
   container.style.opacity = "0";
   container.style.transform = "scale(0.95)";
 
@@ -176,22 +271,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Validación en tiempo real del botón de submit
   const form = document.querySelector(".register-form");
-  form.addEventListener("input", function () {
-    const submitButton = form.querySelector(".btn-primary");
-    const allInputs = form.querySelectorAll('input:not([type="hidden"])');
-    const hiddenInput = document.getElementById("tipo-usuario");
 
-    let allFilled = true;
-    allInputs.forEach((input) => {
-      if (!input.value) {
+  if (form) {
+    form.addEventListener("input", function () {
+      const submitButton = form.querySelector(".btn-primary");
+      const allInputs = form.querySelectorAll('input:not([type="hidden"])');
+
+      let allFilled = true;
+      allInputs.forEach((input) => {
+        if (!input.value) {
+          allFilled = false;
+        }
+      });
+
+      // Solo verificar dropdown si existe
+      const hiddenInput = document.getElementById("tipo-usuario");
+      if (hiddenInput && !hiddenInput.value) {
         allFilled = false;
       }
+
+      if (submitButton) {
+        submitButton.style.opacity = allFilled ? "1" : "0.7";
+      }
     });
-
-    if (!hiddenInput.value) {
-      allFilled = false;
-    }
-
-    submitButton.style.opacity = allFilled ? "1" : "0.7";
-  });
+  }
 });
