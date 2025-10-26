@@ -1,5 +1,7 @@
 package com.backend.Services;
 
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -10,6 +12,7 @@ import com.backend.Security.JwtUtil;
 import com.backend.dtos.LoginRequest;
 import com.backend.dtos.LoginResponse;
 import com.backend.dtos.RegisterRequest;
+import com.backend.enums.Roles;
 
 @Service
 public class AutenticacionService {
@@ -24,17 +27,25 @@ public class AutenticacionService {
     private JwtUtil tokenUtilidades;
 
     //REgistro
-    public void registroService(RegisterRequest request){
+    public void registroService(RegisterRequest request) {
         if (!repository.existsByUsername(request.getUsername())) {
             String hashedPassword = passwordEncoder.encode(request.getPassword());
+
             Usuario usuario = new Usuario();
             usuario.setUsername(request.getUsername());
             usuario.setPassword(hashedPassword);
+            usuario.setEmail(request.getEmail());
+            usuario.setNombre(request.getNombre());
+            usuario.setApellido(request.getApellido());
+            usuario.setFechaNacimiento(request.getFechaNacimiento());
+            usuario.setFechaCreacion(new Date());
+            usuario.setRol(Roles.HUESPED);
             repository.save(usuario);
-        }else{
+        } else {
             throw new RuntimeException("El usuario ya fue registrado");
         }
     }
+
 
 
     //Login

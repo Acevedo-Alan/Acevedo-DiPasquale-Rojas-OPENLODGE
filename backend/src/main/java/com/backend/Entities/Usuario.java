@@ -26,19 +26,19 @@ public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "Username", nullable = false, length = 100)
+    @Column(name = "username", nullable = false, length = 100)
     private String username;
-    @Column(name = "Password", nullable = false, length = 350)
+    @Column(name = "password", nullable = false, length = 350)
     private String password;
-    @Column(name = "Email", nullable = false, length = 100)
+    @Column(name = "email", nullable = false, length = 100)
     private String email;
-    @Column(name = "Nombre", nullable = false, length = 100)
+    @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
-    @Column(name = "Apellido", nullable = false, length = 100)
+    @Column(name = "apellido", nullable = false, length = 100)
     private String apellido;
-    @Column(name = "Fecha_nacimiento", nullable = false)
+    @Column(name = "fecha_nacimiento", nullable = false)
     private Date fechaNacimiento;
-    @Column(name = "Fecha_creacion", nullable = false)
+    @Column(name = "fecha_creacion", nullable = false)
     private Date fechaCreacion;
     @Enumerated(EnumType.STRING)
     Roles rol;
