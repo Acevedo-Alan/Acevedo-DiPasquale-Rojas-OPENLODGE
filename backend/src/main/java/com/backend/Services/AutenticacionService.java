@@ -47,7 +47,6 @@ public class AutenticacionService {
     }
 
 
-
     //Login
     public LoginResponse loginService(LoginRequest request){
         Usuario usuario = repository.findByUsername(request.getUsername())
