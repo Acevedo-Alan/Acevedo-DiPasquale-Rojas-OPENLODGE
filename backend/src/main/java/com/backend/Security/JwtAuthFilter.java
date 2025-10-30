@@ -1,17 +1,15 @@
 package com.backend.Security;
 
 import java.io.IOException;
+import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import com.backend.Repositories.IUsuarioRepository;
-import com.backend.Entities.Usuario;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,44 +22,54 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUtil jwtUtil;
 
-    @Autowired
-    private IUsuarioRepository usuarioRepository;
-
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest request, 
+            HttpServletResponse response, 
+            FilterChain filterChain
+    ) throws ServletException, IOException {
 
-        String header = request.getHeader("Authorization");
-        String token = null;
-        String username = null;
-
-        // Verificamos si el header contiene el token
-        if (header != null && header.startsWith("Bearer ")) {
-            token = header.substring(7); // quitamos "Bearer "
-            try {
-                username = jwtUtil.getUsernameFromToken(token);
-            } catch (Exception e) {
-                logger.error("Token inválido o expirado");
-            }
+        final String authHeader = request.getHeader("Authorization");
+        
+        // Si no hay header o no empieza con "Bearer ", continuar
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
         }
 
-        // Si hay username y no hay autenticación previa, validamos el token
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            Usuario usuario = usuarioRepository.findByUsername(username).orElse(null);
+        try {
+            // Extraer el token (quitar "Bearer ")
+            final String token = authHeader.substring(7);
+            final String username = jwtUtil.getUsernameFromToken(token);
 
-            if (usuario != null && jwtUtil.validarSesion(token)) {
-                UsernamePasswordAuthenticationToken authToken =
+            // Si hay username y no hay autenticación previa
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                
+                // Validar el token
+                if (jwtUtil.validarToken(token)) {
+                    // Extraer el rol
+                    String rol = jwtUtil.getRolFromToken(token);
+                    
+                    // Crear autenticación con el rol
+                    UsernamePasswordAuthenticationToken authToken = 
                         new UsernamePasswordAuthenticationToken(
-                                new User(usuario.getUsername(), usuario.getPassword(), java.util.List.of()),
-                                null,
-                                java.util.List.of()
+                            username,
+                            null,
+                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + rol))
                         );
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                    
+                    authToken.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                    );
+                    
+                    // Establecer la autenticación en el contexto
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
+        } catch (Exception e) {
+            logger.error("Error al procesar el token JWT: " + e.getMessage());
         }
 
-        // Continuamos la cadena de filtros
         filterChain.doFilter(request, response);
     }
 }

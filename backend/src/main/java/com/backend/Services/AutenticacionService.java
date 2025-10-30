@@ -1,10 +1,11 @@
 package com.backend.Services;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.Entities.Usuario;
 import com.backend.Repositories.IUsuarioRepository;
@@ -24,37 +25,82 @@ public class AutenticacionService {
     private PasswordEncoder passwordEncoder;
     
     @Autowired
-    private JwtUtil tokenUtilidades;
+    private JwtUtil jwtUtil;
 
-    //REgistro
+    // Registro (RF01, RF05)
+    @Transactional
     public void registroService(RegisterRequest request) {
-        if (!repository.existsByUsername(request.getUsername())) {
-            String hashedPassword = passwordEncoder.encode(request.getPassword());
-
-            Usuario usuario = new Usuario();
-            usuario.setUsername(request.getUsername());
-            usuario.setPassword(hashedPassword);
-            usuario.setEmail(request.getEmail());
-            usuario.setNombre(request.getNombre());
-            usuario.setApellido(request.getApellido());
-            usuario.setFechaNacimiento(request.getFechaNacimiento());
-            usuario.setFechaCreacion(new Date());
-            usuario.setRol(Roles.HUESPED);
-            repository.save(usuario);
-        } else {
-            throw new RuntimeException("El usuario ya fue registrado");
+        // Validar que el username no exista
+        if (repository.existsByUsername(request.getUsername())) {
+            throw new IllegalArgumentException("El nombre de usuario ya está en uso");
         }
+
+        // Validar que el email no exista
+        if (repository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("El correo electrónico ya está registrado");
+        }
+
+        // Validar formato de contraseña (RNF03)
+        validarFormatoPassword(request.getPassword());
+
+        // Crear el usuario
+        Usuario usuario = new Usuario();
+        usuario.setUsername(request.getUsername());
+        usuario.setPassword(passwordEncoder.encode(request.getPassword()));
+        usuario.setEmail(request.getEmail());
+        usuario.setNombre(request.getNombre());
+        usuario.setApellido(request.getApellido());
+        usuario.setFechaNacimiento(request.getFechaNacimiento());
+        usuario.setFechaCreacion(LocalDate.now()); 
+        usuario.setRol(Roles.HUESPED); // Por defecto es huésped
+        
+        repository.save(usuario);
+
+        // TODO: Enviar correo de confirmación (RF05)
+        // emailService.enviarCorreoConfirmacion(usuario.getEmail());
     }
 
-
-    //Login
-    public LoginResponse loginService(LoginRequest request){
+    // Login (RF02)
+    public LoginResponse loginService(LoginRequest request) {
+        // Buscar usuario por username
         Usuario usuario = repository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new IllegalArgumentException("Usuario o contraseña inválidos"));
+
+        // Verificar contraseña
         if (!passwordEncoder.matches(request.getPassword(), usuario.getPassword())) {
-            throw new RuntimeException("Usuario o contraseña invalidos");
+            throw new IllegalArgumentException("Usuario o contraseña inválidos");
         }
-        String token = tokenUtilidades.generarToken(usuario.getUsername());
-        return new LoginResponse(token);
+
+        // Generar token JWT
+        String token = jwtUtil.generarToken(usuario.getUsername(), usuario.getRol().name());
+        
+        return new LoginResponse(
+            token, 
+            usuario.getUsername(), 
+            usuario.getNombre(), 
+            usuario.getRol().name()
+        );
+    }
+
+    // Validar formato de contraseña según RNF03
+    private void validarFormatoPassword(String password) {
+        if (password == null || password.length() < 8) {
+            throw new IllegalArgumentException(
+                "La contraseña debe tener al menos 8 caracteres"
+            );
+        }
+
+        boolean tieneMayuscula = password.chars().anyMatch(Character::isUpperCase);
+        boolean tieneMinuscula = password.chars().anyMatch(Character::isLowerCase);
+        boolean tieneNumero = password.chars().anyMatch(Character::isDigit);
+        boolean tieneEspecial = password.chars()
+            .anyMatch(c -> "!@#$%^&*()_+-=[]{}|;:,.<>?".indexOf(c) >= 0);
+
+        if (!tieneMayuscula || !tieneMinuscula || !tieneNumero || !tieneEspecial) {
+            throw new IllegalArgumentException(
+                "La contraseña debe contener al menos: una mayúscula, " +
+                "una minúscula, un número y un carácter especial"
+            );
+        }
     }
 }
