@@ -20,15 +20,20 @@ import lombok.NoArgsConstructor;
 public class Direccion {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    @Column(name = "calle")
+    private Long id;
+
+    @Column(name = "calle", length = 100)
     private String calle;
+
     @Column(name = "numero")
-    private int numero;
-    @Column(name = "depto")
+    private Integer numero;
+
+    @Column(name = "depto", length = 50)
     private String depto;
+
     @Column(name = "piso")
-    private int piso;
+    private Integer piso;
+
     @ManyToOne
     @JoinColumn(name = "id_ciudad", referencedColumnName = "id")
     private Ciudad ciudad;

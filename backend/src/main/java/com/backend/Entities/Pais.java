@@ -1,7 +1,8 @@
 package com.backend.Entities;
 
-
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -23,10 +24,12 @@ import lombok.NoArgsConstructor;
 public class Pais {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    @Column(name = "nombre")
+    private Long id;
+
+    @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
+
     @OneToMany(mappedBy = "pais", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Ciudad> ciudades;
 }
-  

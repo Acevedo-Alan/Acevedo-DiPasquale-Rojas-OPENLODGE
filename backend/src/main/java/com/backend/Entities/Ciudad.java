@@ -2,6 +2,8 @@ package com.backend.Entities;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,13 +26,16 @@ import lombok.NoArgsConstructor;
 public class Ciudad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    @Column(name = "nombre")
+    private Long id;
+
+    @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
+
     @OneToMany(mappedBy = "ciudad", cascade = CascadeType.ALL)
     private List<Direccion> direcciones;
+
     @ManyToOne
     @JoinColumn(name = "id_pais", referencedColumnName = "id")
+    @JsonBackReference
     private Pais pais;
 }
-  

@@ -8,25 +8,23 @@ import jakarta.persistence.Embeddable;
 
 @Embeddable
 public class ReservaId implements Serializable {
-    @Column(name = "id_alojamiento")
-    private int alojamientoId;
+    
     @Column(name = "id_usuario")
-    private int usuarioId;
+    private Long usuarioId;
+    
+    @Column(name = "id_alojamiento")
+    private Long alojamientoId;
 
+    // Constructor vacío requerido por JPA
     public ReservaId() {
-        // Constructor vacío requerido por JPA
     }
 
-    public ReservaId(int usuarioId, int alojamientoId) {
+    public ReservaId(Long usuarioId, Long alojamientoId) {
         this.usuarioId = usuarioId;
         this.alojamientoId = alojamientoId;
     }
 
-    // --- Métodos esenciales para Claves Compuestas ---
-
-    // 4. Se debe implementar equals() y hashCode()
-    // Esto es CRÍTICO para que Hibernate pueda identificar correctamente la clave.
-
+    // equals() y hashCode() son CRÍTICOS para claves compuestas
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -42,19 +40,19 @@ public class ReservaId implements Serializable {
     }
 
     // Getters y Setters
-    public int getusuarioId() {
+    public Long getUsuarioId() {
         return usuarioId;
     }
 
-    public void setusuarioId(int usuarioId) {
+    public void setUsuarioId(Long usuarioId) {
         this.usuarioId = usuarioId;
     }
 
-    public int getalojamientoId() {
+    public Long getAlojamientoId() {
         return alojamientoId;
     }
 
-    public void setalojamientoId(int alojamientoId) {
+    public void setAlojamientoId(Long alojamientoId) {
         this.alojamientoId = alojamientoId;
     }
 }

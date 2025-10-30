@@ -1,5 +1,6 @@
 package com.backend.dtos;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import lombok.AllArgsConstructor;
@@ -17,5 +18,5 @@ public class RegisterRequest {
     private String email;
     private String nombre;
     private String apellido;
-    private Date fechaNacimiento;
+    private LocalDate fechaNacimiento;
 }
