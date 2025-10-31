@@ -27,7 +27,6 @@ public class RegisterRequest {
     @Past(message = "La fecha de nacimiento debe ser pasada")
     private LocalDate fechaNacimiento;
 
-    // Getters y setters
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
     public String getPassword() { return password; }

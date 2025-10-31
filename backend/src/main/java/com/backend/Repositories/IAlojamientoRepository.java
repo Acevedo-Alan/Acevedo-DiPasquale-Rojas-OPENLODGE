@@ -27,6 +27,8 @@ public interface IAlojamientoRepository extends JpaRepository<Alojamiento, Long>
         @Param("checkout") LocalDate checkout
     );
     
+    List<Alojamiento> findByNombre(String nombre);
+
     // Buscar alojamientos por precio máximo
     List<Alojamiento> findByPrecioNocheLessThanEqual(Double precioMax);
     

@@ -27,23 +27,17 @@ public class AutenticacionService {
     @Autowired
     private JwtUtil jwtUtil;
 
-    // Registro (RF01, RF05)
     @Transactional
     public void registroService(RegisterRequest request) {
-        // Validar que el username no exista
         if (repository.existsByUsername(request.getUsername())) {
             throw new IllegalArgumentException("El nombre de usuario ya está en uso");
         }
 
-        // Validar que el email no exista
         if (repository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("El correo electrónico ya está registrado");
         }
-
-        // Validar formato de contraseña (RNF03)
         validarFormatoPassword(request.getPassword());
 
-        // Crear el usuario
         Usuario usuario = new Usuario();
         usuario.setUsername(request.getUsername());
         usuario.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -52,26 +46,18 @@ public class AutenticacionService {
         usuario.setApellido(request.getApellido());
         usuario.setFechaNacimiento(request.getFechaNacimiento());
         usuario.setFechaCreacion(LocalDate.now()); 
-        usuario.setRol(Roles.HUESPED); // Por defecto es huésped
+        usuario.setRol(Roles.HUESPED);
         
         repository.save(usuario);
-
-        // TODO: Enviar correo de confirmación (RF05)
-        // emailService.enviarCorreoConfirmacion(usuario.getEmail());
     }
 
-    // Login (RF02)
     public LoginResponse loginService(LoginRequest request) {
-        // Buscar usuario por username
         Usuario usuario = repository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("Usuario o contraseña inválidos"));
-
-        // Verificar contraseña
         if (!passwordEncoder.matches(request.getPassword(), usuario.getPassword())) {
             throw new IllegalArgumentException("Usuario o contraseña inválidos");
         }
 
-        // Generar token JWT
         String token = jwtUtil.generarToken(usuario.getUsername(), usuario.getRol().name());
         
         return new LoginResponse(
@@ -82,7 +68,7 @@ public class AutenticacionService {
         );
     }
 
-    // Validar formato de contraseña según RNF03
+    //Validacion auxiliar para la contraseña
     private void validarFormatoPassword(String password) {
         if (password == null || password.length() < 8) {
             throw new IllegalArgumentException(

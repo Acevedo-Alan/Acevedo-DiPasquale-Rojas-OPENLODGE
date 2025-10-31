@@ -18,13 +18,9 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JwtUtil {
     
-    // ✅ Usar la misma clave para generar y validar
     private static final String SECRET_KEY = "Y2xhdmUtc2VjcmV0YS1tdXktbGFyZ2EtcGFyYS1hcGxpY2FjaW9uLXNwcmluZy1ib290";
-    
-    // ✅ Expiración: 10 horas (36000000 ms)
     private static final long EXPIRATION_TIME = 36000000L;
 
-    // Generar token con username y rol
     public String generarToken(String username, String rol) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("rol", rol);
@@ -38,7 +34,6 @@ public class JwtUtil {
                 .compact();
     }
 
-    // Validar token
     public boolean validarToken(String token) {
         try {
             Jwts.parserBuilder()

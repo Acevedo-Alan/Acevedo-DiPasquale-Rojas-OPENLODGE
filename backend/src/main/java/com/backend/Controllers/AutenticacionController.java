@@ -26,7 +26,6 @@ public class AutenticacionController {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(new MessageResponse("Usuario registrado correctamente"));
         } catch (IllegalArgumentException e) {
-            // Errores de validación del negocio
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse(e.getMessage()));
         } catch (Exception e) {
