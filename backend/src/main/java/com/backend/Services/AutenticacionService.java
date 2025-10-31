@@ -57,7 +57,7 @@ public class AutenticacionService {
         if (!passwordEncoder.matches(request.getPassword(), usuario.getPassword())) {
             throw new IllegalArgumentException("Usuario o contraseña inválidos");
         }
-
+        
         String token = jwtUtil.generarToken(usuario.getUsername(), usuario.getRol().name());
         
         return new LoginResponse(
@@ -68,7 +68,7 @@ public class AutenticacionService {
         );
     }
 
-    //Validacion auxiliar para la contraseña
+    // Validar formato de contraseña
     private void validarFormatoPassword(String password) {
         if (password == null || password.length() < 8) {
             throw new IllegalArgumentException(
