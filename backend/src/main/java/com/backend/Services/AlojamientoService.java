@@ -111,7 +111,6 @@ public class AlojamientoService {
     }
 
 
-    //ACTUALIZAR ALOJAMIENTO
     public Alojamiento actualizarAlojamiento(Long id, AlojamientoDTO dto, String token){
         String rol = jwtUtil.getRolFromToken(token);
         
@@ -140,8 +139,6 @@ public class AlojamientoService {
 
         return alojamientoRepo.save(alojamiento);
     }
-
-    //ELIMINAR ALOJAMIENTO
 
     @Transactional
     public void eliminarAlojamiento(Long id, String token) {
