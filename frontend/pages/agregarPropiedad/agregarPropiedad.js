@@ -293,7 +293,7 @@ if (!document.querySelector("#login-animations")) {
       align-items: center;
       gap: 8px;
       background: #e0e7ff;
-      color: #4338ca;
+      color: #005834ff;
       padding: 6px 12px;
       border-radius: 6px;
       margin: 4px;
@@ -302,7 +302,7 @@ if (!document.querySelector("#login-animations")) {
     .servicio-tag button {
       background: none;
       border: none;
-      color: #4338ca;
+      color: #00d624ff;
       font-size: 20px;
       cursor: pointer;
       padding: 0;
