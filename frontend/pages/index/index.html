@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/components/footer/footer.css ">
+    <link rel="stylesheet" href="/components/footer/footer.css">
     <link rel="stylesheet" href="/components/header/header.css">
     <link rel="stylesheet" href="/components/carrusel/carrusel.css">
     <link rel="stylesheet" href="index.css">
@@ -12,9 +12,7 @@
 </head>
 <body>
     <!-- Header -->
-    <header class="header" id="header">
-        
-    </header>
+    <header class="header" id="header"></header>
 
     <div class="carrusel"></div>
 
@@ -48,84 +46,25 @@
         </div>
     </section>
 
-
-
     <section class="destinations" id="destinos">
         <div class="section-title">
             <h2>Destinos Destacados</h2>
             <p>Explora nuestras propiedades más exclusivas</p>
         </div>
         <div class="destinations-grid">
-            <div class="destination-card">
-                <div class="destination-image" style="background-image: url(img/hotel5.jpg);">
-                    <span class="destination-badge">Más Popular</span>
-                </div>
-                <div class="destination-content">
-                    <div class="destination-header">
-                        <h3 class="destination-title">Paradise Beach</h3>
-                        <div class="rating">
-                            <span class="stars">★★★★★</span>
-                            <span>4.9</span>
-                        </div>
-                    </div>
-                    <p style="color: var(--gray-medium);">Cancún, México</p>
-                    <div class="destination-price">
-                        $299 <span>/ noche</span>
-                    </div>
-                    <button class="btn btn-primary nav-btn" style="width: 100%;" data-target="/pages/alojamiento/alojamiento.html">Reservar ahora</button>
-                </div>
-            </div>
-            <div class="destination-card">
-                <div class="destination-image" style="background-image: url(img/hotel6.jpg);">
-                    <span class="destination-badge">Oferta Especial</span>
-                </div>
-                <div class="destination-content">
-                    <div class="destination-header">
-                        <h3 class="destination-title">Hotel Urban Elite</h3>
-                        <div class="rating">
-                            <span class="stars">★★★★★</span>
-                            <span>4.8</span>
-                        </div>
-                    </div>
-                    <p style="color: var(--gray-medium);">Nueva York, USA</p>
-                    <div class="destination-price">
-                        $450 <span>/ noche</span>
-                    </div>
-                    <button class="btn btn-primary nav-btn" style="width: 100%;" data-target="/pages/alojamiento/alojamiento.html">Reservar ahora</button>
-                </div>
-            </div>
-            <div class="destination-card">
-                <div class="destination-image" style="background-image: url(img/hotel7.jpg);">
-                    <span class="destination-badge">Lujo</span>
-                </div>
-                <div class="destination-content">
-                    <div class="destination-header">
-                        <h3 class="destination-title">Villa Montaña Serena</h3>
-                        <div class="rating">
-                            <span class="stars">★★★★★</span>
-                            <span>5.0</span>
-                        </div>
-                    </div>
-                    <p style="color: var(--gray-medium);">Alpes Suizos, Suiza</p>
-                    <div class="destination-price">
-                        $599 <span>/ noche</span>
-                    </div>
-                    <button class="btn btn-primary nav-btn" style="width: 100%;" data-target="/pages/alojamiento/alojamiento.html">Reservar ahora</button>
-                </div>
-            </div>
+            <!-- Las propiedades se cargan dinámicamente aca -->
         </div>
     </section>
 
-    <main class="main-content">
-        <h1>*** --- *** --- </h1>
-    </main>
+
 
     <footer class="footer"></footer>
     
+    <script src="/services/apiService.js"></script>
     <script src="/components/header/header.js"></script>
     <script src="/components/carrusel/carrusel.js"></script>
     <script src="/components/footer/footer.js"></script>
     <script src="/services/enrutador.js"></script>
-
+    <script src="index.js"></script>
 </body>
 </html>
