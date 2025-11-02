@@ -1,142 +1,200 @@
-function handleLogin(event) {
-    event.preventDefault();
-    
-    const dni = document.getElementById('dni').value;
-    const password = document.getElementById('password').value;
-    
-    // Simulación de proceso de login
-    const button = event.target.querySelector('.btn-primary');
-    const originalText = button.textContent;
-    
-    button.textContent = 'Iniciando sesión...';
-    button.disabled = true;
-    
-    // Simulación de llamada a API
-    setTimeout(() => {
-        button.textContent = originalText;
-        button.disabled = false;
-        
-        alert('Funcionalidad de login pendiente de implementar');
+const api = "http://localhost:8080";
 
-        window.history.back();
-    }, 2000);
-}
+async function login(event) {
+  event.preventDefault();
 
-// Validación en tiempo real para DNI/CUIL
-function setupDNIValidation() {
-    const dniInput = document.getElementById('dni');
-    
-    dniInput.addEventListener('input', function(e) {
-        let value = e.target.value.replace(/\D/g, ''); // Solo números
-        
-        // Limitar a 11 dígitos máximo (CUIL tiene 11 dígitos)
-        if (value.length > 11) {
-            value = value.slice(0, 11);
-        }
-        
-        e.target.value = value;
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+
+  const button = event.target.querySelector(".btn-primary");
+  const originalText = button.textContent;
+
+  button.textContent = "Iniciando sesión...";
+  button.disabled = true;
+
+  try {
+    const loginData = {
+      username: username,
+      password: password,
+    };
+
+    const response = await fetch(`${api}/autenticacion/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(loginData),
     });
-}
 
-// Animación de entrada suave del contenedor
-function setupEntranceAnimation() {
-    const container = document.querySelector('.login-container');
+    const data = await response.json();
 
-    container.style.opacity = '0';
-    container.style.transform = 'scale(0.9)';
-    
+    if (!response.ok) {
+      throw new Error(data.error || data.mensaje || "Error al iniciar sesion");
+    }
+
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("userId", data.userId);
+    localStorage.setItem("username", data.username);
+    localStorage.setItem("rol", data.rol);
+
+    showSuccess("Sesión iniciada correctamente");
+
     setTimeout(() => {
-        container.style.transition = 'all 0.4s ease-out';
-        container.style.opacity = '1';
-        container.style.transform = 'scale(1)';
-    }, 100);
+      window.location.href = "/pages/index/index.html";
+    }, 2000);
+  } catch (error) {
+    console.error("Erro en login: ", error);
+
+    let errorMessage = "Error en autenticacion";
+
+    if (error.message.includes("Credenciales")) {
+      errorMessage = "username o contraseña incorrectos";
+    } else if (error.message.includes("Usuario no encontrado")) {
+      errorMessage = "Usuario no encontrado";
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+
+    button.textContent = originalText;
+    button.disabled = false;
+  }
 }
 
-// Función para validar formato de DNI/CUIL
-function validateDNI(dni) {
-    const cleanDNI = dni.replace(/\D/g, '');
-    return cleanDNI.length >= 7 && cleanDNI.length <= 11;
-}
 
 function validatePassword(password) {
-    return password.length >= 6;
+  return password.length >= 6;
 }
 
-// Función para mostrar mensajes de error
 function showError(field, message) {
-    const existingError = field.parentElement.querySelector('.error-message');
-    if (existingError) {
-        existingError.remove();
+  clearError(field);
+
+  const errorElement = document.createElement("div");
+  errorElement.className = "error-message";
+  errorElement.textContent = message;
+  errorElement.style.color = "#e53e3e";
+  errorElement.style.fontSize = "12px";
+  errorElement.style.marginTop = "4px";
+
+  field.parentElement.appendChild(errorElement);
+  field.style.borderColor = "#e53e3e";
+
+  setTimeout(() => {
+    if (errorElement.parentElement) {
+      clearError(field);
     }
-    
-    // Crear elemento de error
-    const errorElement = document.createElement('div');
-    errorElement.className = 'error-message';
-    errorElement.textContent = message;
-    errorElement.style.color = '#e53e3e';
-    errorElement.style.fontSize = '12px';
-    errorElement.style.marginTop = '4px';
-    
-    // Insertar después del campo
-    field.parentElement.appendChild(errorElement);
-    
-    // Agregar estilo de error al campo
-    field.style.borderColor = '#e53e3e';
-    
-    // Remover error después de unos segundos
-    setTimeout(() => {
-        if (errorElement.parentElement) {
-            errorElement.remove();
-            field.style.borderColor = '#e5e7eb';
-        }
-    }, 3000);
+  }, 4000);
 }
 
-// Función para limpiar errores
+function showSuccess(message) {
+  const existingSuccess = document.querySelector(".success-message");
+  if (existingSuccess) {
+    existingSuccess.remove();
+  }
+
+  const successElement = document.createElement("div");
+  successElement.className = "success-message";
+  successElement.textContent = message;
+  successElement.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #10b981;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    z-index: 10000;
+    animation: slideIn 0.3s ease;
+  `;
+
+  document.body.appendChild(successElement);
+
+  setTimeout(() => {
+    successElement.remove();
+  }, 3000);
+}
+
+function clearError(field) {
+  const errorMessage = field.parentElement.querySelector(".error-message");
+  if (errorMessage) {
+    errorMessage.remove();
+  }
+  field.style.borderColor = "#e5e7eb";
+  field.classList.remove("error");
+}
+
 function clearErrors() {
-    const errorMessages = document.querySelectorAll('.error-message');
-    errorMessages.forEach(error => error.remove());
-    
-    const inputs = document.querySelectorAll('input');
-    inputs.forEach(input => {
-        input.style.borderColor = '#e5e7eb';
-    });
+  const errorMessages = document.querySelectorAll(".error-message");
+  errorMessages.forEach((error) => error.remove());
+
+  const inputs = document.querySelectorAll("input");
+  inputs.forEach((input) => {
+    input.style.borderColor = "#e5e7eb";
+    input.classList.remove("error");
+  });
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    setupDNIValidation();
-    setupEntranceAnimation();
-    
-    const form = document.querySelector('.login-form');
-    const dniField = document.getElementById('dni');
-    const passwordField = document.getElementById('password');
-    
-    dniField.addEventListener('input', clearErrors);
-    passwordField.addEventListener('input', clearErrors);
-    
-    form.addEventListener('input', function() {
-        const dni = dniField.value;
-        const password = passwordField.value;
-        const submitButton = form.querySelector('.btn-primary');
-        
-        // Habilitar/deshabilitar botón según validación
-        if (validateDNI(dni) && validatePassword(password)) {
-            submitButton.style.opacity = '1';
+function setupEntranceAnimation() {
+  const container = document.querySelector(".login-container");
+
+  if (!container) return;
+
+  container.style.opacity = "0";
+  container.style.transform = "scale(0.9)";
+
+  setTimeout(() => {
+    container.style.transition = "all 0.4s ease-out";
+    container.style.opacity = "1";
+    container.style.transform = "scale(1)";
+  }, 100);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  setupEntranceAnimation();
+
+  const form = document.querySelector(".login-form");
+  const usernameField = document.getElementById("username");
+  const passwordField = document.getElementById("password");
+
+  if (usernameField) usernameField.addEventListener("input", clearErrors);
+  if (passwordField) passwordField.addEventListener("input", clearErrors);
+
+  if (form) {
+    form.addEventListener("input", function () {
+      const username = usernameField?.value || "";
+      const password = passwordField?.value || "";
+      const submitButton = form.querySelector(".btn-primary");
+
+      if (submitButton) {
+        if (validatePassword(password)) {
+          submitButton.style.opacity = "1";
         } else {
-            submitButton.style.opacity = '0.7';
+          submitButton.style.opacity = "0.7";
         }
+      }
     });
+  }
+
+  // Verificar si ya está autenticado
+  if (localStorage.getItem("token")) {
+    window.location.href = "/pages/index/index.html";
+  }
 });
 
-// Función para manejar enlaces (crear cuenta y olvidé contraseña)
-function handleCreateAccount() {
-    // Redirigir a página de registro
-    // window.location.href = '/register';
-    console.log('Redirigiendo a crear cuenta...');
-}
-
-function handleForgotPassword() {
-    // Redirigir a página de recuperación de contraseña
-    // window.location.href = '/forgot-password';
-    console.log('Redirigiendo a recuperar contraseña...');
+if (!document.querySelector("#login-animations")) {
+  const style = document.createElement("style");
+  style.id = "login-animations";
+  style.textContent = `
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+  `;
+  document.head.appendChild(style);
 }
