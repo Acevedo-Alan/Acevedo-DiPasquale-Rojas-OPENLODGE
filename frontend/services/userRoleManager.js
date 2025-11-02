@@ -1,8 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Cambiar 'rol' por 'rol' (como lo guardas en login.js)
-  let rol = localStorage.getItem("rol"); // Usar 'let' en vez de 'const'
+  let rol = localStorage.getItem("rol");
 
-  // Verificar que rol existe antes de hacer trim
   if (!rol) {
     window.location.href = "/pages/autenticacion/login/login.html";
     return;
@@ -10,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   rol = rol.trim().toUpperCase();
 
-  console.log("Rol en userrolManager:", rol); // Para depurar
+  console.log("Rol en userrolManager:", rol);
 
   if (rol !== "ANFITRION" && rol !== "HUESPED") {
     window.location.href = "/pages/autenticacion/login/login.html";
@@ -40,13 +38,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   logoutButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      // Borrar todos los datos del storage
       localStorage.removeItem("token");
       localStorage.removeItem("rol");
       localStorage.removeItem("userId");
       localStorage.removeItem("username");
-
-      // Redirigir al login
       window.location.href = "/pages/autenticacion/login/login.html";
     });
   });

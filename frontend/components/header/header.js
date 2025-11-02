@@ -22,15 +22,12 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("Header element:", header);
 
   const token = localStorage.getItem("token") || "";
-
-  // Obtener el rol del token o del localStorage
   let rol = localStorage.getItem("rol") || "";
 
   // Si no hay rol en localStorage pero hay token, extraerlo del token
   if (!rol && token) {
     rol = getrolFromToken(token);
     console.log("Rol extraído del token:", rol);
-    // Opcional: guardar en localStorage para próximas veces
     if (rol) {
       localStorage.setItem("rol", rol);
     }
