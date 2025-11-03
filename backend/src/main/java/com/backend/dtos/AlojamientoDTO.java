@@ -36,21 +36,24 @@ public class AlojamientoDTO {
     @NotNull(message = "La dirección es obligatoria")
     private Direccion direccion;
 
-    private Set<Servicio> servicios;
+    @Min(value = 9, message = "al menos 9 caracteres")
+    private int telefono;
+
+    //private Set<Servicio> servicios;
 
     public AlojamientoDTO() {
     }
 
     public AlojamientoDTO(String nombre, String descripcion, String imagen, 
                          Double precioNoche, Integer capacidadHuespedes,
-                         Direccion direccion, Set<Servicio> servicios) {
+                         Direccion direccion, int telefono) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.imagen = imagen;
         this.precioNoche = precioNoche;
         this.capacidadHuespedes = capacidadHuespedes;
         this.direccion = direccion;
-        this.servicios = servicios;
+        this.telefono = telefono;
     }
 
     // Getters y Setters
@@ -102,11 +105,11 @@ public class AlojamientoDTO {
         this.direccion = direccion;
     }
 
-    public Set<Servicio> getServicios() {
-        return servicios;
+    public int getTelefono() {
+        return telefono;
     }
 
-    public void setServicios(Set<Servicio> servicios) {
-        this.servicios = servicios;
+    public void setTelefono(int telefono) {
+        this.telefono = telefono;
     }
 }
