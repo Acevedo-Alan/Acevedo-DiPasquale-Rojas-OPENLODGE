@@ -18,21 +18,8 @@ async function login(event) {
       password: password,
     };
 
-    const response = await fetch(`${api}/autenticacion/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(loginData),
-    });
+    const data = await apiService.login(loginData);
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || data.mensaje || "Error al iniciar sesion");
-    }
-
-    localStorage.setItem("token", data.token);
     localStorage.setItem("userId", data.userId);
     localStorage.setItem("username", data.username);
     localStorage.setItem("rol", data.rol);
@@ -176,7 +163,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Verificar si ya está autenticado
-  if (localStorage.getItem("token")) {
+  if (localStorage.getItem("userId")) {
     window.location.href = "/pages/index/index.html";
   }
 });

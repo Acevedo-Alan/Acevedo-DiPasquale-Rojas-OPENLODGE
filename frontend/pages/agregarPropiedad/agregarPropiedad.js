@@ -1,5 +1,3 @@
-const api = "http://localhost:8080";
-
 // Array para almacenar servicios seleccionados
 let serviciosSeleccionados = [];
 
@@ -8,15 +6,12 @@ async function register(event) {
 
   const nombre = document.getElementById("nombre").value.trim();
   const descripcion = document.getElementById("descripcion").value.trim();
-  const imagen = document.getElementById("imagen").value.trim();
+  const imagen = document.getElementById("imagen").value.trim() || "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800";
   const precioNoche = parseFloat(document.getElementById("precioNoche").value);
-  const capacidadHuespedes = parseInt(
-    document.getElementById("capacidadHuespedes").value
-  );
+  const capacidadHuespedes = parseInt(document.getElementById("capacidadHuespedes").value);
   const calle = document.getElementById("calle").value.trim();
-  const numero = parseInt(document.getElementById("numero").value);
+  const numero = document.getElementById("numero").value.trim();
   const ciudadNombre = document.getElementById("ciudad").value.trim();
-  const provinciaNombre = document.getElementById("provincia").value.trim();
   const paisNombre = document.getElementById("pais").value.trim();
 
   const button = event.target.querySelector(".btn-primary");
@@ -41,41 +36,22 @@ async function register(event) {
       throw new Error("Error al crear la ubicación. Intenta nuevamente.");
     }
 
-    // 5. Crear Dirección con solo el ID de la ciudad
-    const direccion = {
-      calle: calle,
-      numero: numero,
-      ciudad: {
-        id: ciudad.id,
-      },
-    };
-
-    // 5. Crear el alojamiento
+    // 5. Crear el alojamiento con su dirección
     const registroData = {
       nombre,
       descripcion,
       imagen,
       precioNoche,
       capacidadHuespedes,
-      direccion: direccion,
-      servicios: serviciosEntidades,
+      direccion: {
+        calle,
+        numero,
+        ciudad: ciudad
+      },
+      servicios: serviciosEntidades || new Set()
     };
 
-    const response = await fetch(`${api}/api/alojamientos/crearAlojamiento`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-      },
-      body: JSON.stringify(registroData),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.text();
-      throw new Error(errorData || "Error al registrar alojamiento");
-    }
-
-    const data = await response.json();
+    const data = await apiService.crearAlojamiento(registroData);
     showSuccess("Alojamiento registrado correctamente");
 
     setTimeout(() => {
@@ -83,7 +59,17 @@ async function register(event) {
     }, 2000);
   } catch (error) {
     console.error("Error en registro:", error);
-    showError(document.getElementById("nombre"), error.message);
+    let errorMessage = "Error al registrar el alojamiento";
+    
+    if (error.message.includes("ubicación")) {
+      errorMessage = "Error al crear la ubicación. Por favor, verifica los datos ingresados.";
+    } else if (error.message.includes("ciudad")) {
+      errorMessage = "Error al crear la ciudad. Por favor, verifica los datos ingresados.";
+    } else if (error.message.includes("país")) {
+      errorMessage = "Error al crear el país. Por favor, verifica los datos ingresados.";
+    }
+    
+    showError(document.getElementById("nombre"), errorMessage);
   } finally {
     button.textContent = originalText;
     button.disabled = false;
@@ -97,27 +83,13 @@ async function obtenerOCrearServicios(nombresServicios) {
   for (const nombreServicio of nombresServicios) {
     try {
       // Intentar buscar el servicio primero
-      let response = await fetch(
-        `${api}/api/servicios/nombre/${encodeURIComponent(nombreServicio)}`
-      );
-
-      if (response.ok) {
-        const servicio = await response.json();
+      const servicio = await apiService.getServicioByNombre(nombreServicio);
+      if (servicio) {
         serviciosEntidades.push(servicio);
       } else {
         // Si no existe, crearlo
-        response = await fetch(
-          `${api}/api/servicios?nombre=${encodeURIComponent(nombreServicio)}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (response.ok) {
-          const nuevoServicio = await response.json();
+        const nuevoServicio = await apiService.crearServicio({ nombre: nombreServicio });
+        if (nuevoServicio) {
           serviciosEntidades.push(nuevoServicio);
         }
       }
@@ -133,22 +105,14 @@ async function obtenerOCrearServicios(nombresServicios) {
 async function buscarOCrearPais(nombrePais) {
   try {
     // Intenta buscar el país primero
-    let response = await fetch(
-      `${api}/api/paises/nombre/${encodeURIComponent(nombrePais)}`
-    );
-
-    if (response.ok) {
-      return await response.json();
+    const pais = await apiService.getPaisByNombre(nombrePais);
+    if (pais) {
+      return pais;
     } else {
       // Si no existe, créalo
-      response = await fetch(`${api}/api/paises`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre: nombrePais }),
-      });
-
-      if (response.ok) {
-        return await response.json();
+      const nuevoPais = await apiService.crearPais({ nombre: nombrePais });
+      if (nuevoPais) {
+        return nuevoPais;
       }
     }
   } catch (error) {
@@ -162,32 +126,33 @@ async function buscarOCrearPais(nombrePais) {
 // Función para buscar o crear ciudad
 async function buscarOCrearCiudad(nombreCiudad, paisId) {
   try {
-    // Intenta buscar la ciudad primero
-    let response = await fetch(
-      `${api}/api/ciudades/nombre/${encodeURIComponent(
-        nombreCiudad
-      )}/pais/${paisId}`
-    );
-
-    if (response.ok) {
-      return await response.json();
-    } else {
-      // Si no existe, créala
-      response = await fetch(`${api}/api/ciudades`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre: nombreCiudad, paisId: paisId }),
+    let ciudad = await apiService.getCiudadByNombreAndPais(nombreCiudad, paisId);
+    
+    if (!ciudad) {
+      ciudad = await apiService.crearCiudad({
+        nombre: nombreCiudad,
+        pais: {
+          id: paisId
+        }
       });
-
-      if (response.ok) {
-        return await response.json();
-      }
     }
+
+    if (!ciudad || !ciudad.id) {
+      throw new Error("No se pudo crear o encontrar la ciudad");
+    }
+
+    return {
+      id: ciudad.id,
+      nombre: ciudad.nombre,
+      pais: {
+        id: ciudad.pais.id,
+        nombre: ciudad.pais.nombre
+      }
+    };
   } catch (error) {
     console.error("Error al buscar/crear ciudad:", error);
+    throw error;
   }
-
-  return { id: null, nombre: nombreCiudad };
 }
 
 // Manejo de servicios en la UI

@@ -1,15 +1,30 @@
 const API_BASE_URL = "http://localhost:8080";
 
 const apiService = {
-  // Utilidades
-  getAuthHeaders() {
-    const token = localStorage.getItem("token");
-    return {
-      "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
-    };
+  // Autenticación
+  async login(credentials) {
+    const response = await fetch(`${API_BASE_URL}/autenticacion/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(credentials),
+    });
+    return this.handleResponse(response);
   },
 
+  async register(userData) {
+    const response = await fetch(`${API_BASE_URL}/autenticacion/registro`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    });
+    return this.handleResponse(response);
+  },
+
+  // Utilidades
   async handleResponse(response) {
     if (!response.ok) {
       const error = await response.json().catch(() => ({}));
@@ -62,7 +77,7 @@ const apiService = {
       `${API_BASE_URL}/api/alojamientos/crearAlojamiento`,
       {
         method: "POST",
-        headers: this.getAuthHeaders(),
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(alojamientoDTO),
       }
     );
@@ -115,7 +130,7 @@ const apiService = {
       `${API_BASE_URL}/api/reservas/usuario/${usuarioId}`,
       {
         method: "POST",
-        headers: this.getAuthHeaders(),
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(reservaDTO),
       }
     );
@@ -180,6 +195,62 @@ const apiService = {
 
   async getServicioById(id) {
     const response = await fetch(`${API_BASE_URL}/api/servicios/${id}`);
+    return this.handleResponse(response);
+  },
+
+  async getServicioByNombre(nombre) {
+    const response = await fetch(`${API_BASE_URL}/api/servicios/nombre/${encodeURIComponent(nombre)}`);
+    return this.handleResponse(response);
+  },
+
+  async crearServicio(servicio) {
+    const response = await fetch(`${API_BASE_URL}/api/servicios`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(servicio),
+    });
+    return this.handleResponse(response);
+  },
+
+  async getPaisByNombre(nombre) {
+    const response = await fetch(`${API_BASE_URL}/api/paises/nombre/${encodeURIComponent(nombre)}`);
+    return this.handleResponse(response);
+  },
+
+  async crearPais(pais) {
+    const response = await fetch(`${API_BASE_URL}/api/paises`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(pais),
+    });
+    return this.handleResponse(response);
+  },
+
+  async getCiudadByNombreAndPais(nombreCiudad, paisId) {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/ciudades/buscar?nombre=${encodeURIComponent(nombreCiudad)}&paisId=${paisId}`
+      );
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error al buscar ciudad:', error);
+      return null;
+    }
+  },
+
+  async crearCiudad(ciudad) {
+    const response = await fetch(`${API_BASE_URL}/api/ciudades`, {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        nombre: ciudad.nombre,
+        paisId: ciudad.paisId
+      })
+    });
+
     return this.handleResponse(response);
   },
 };

@@ -38,7 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   logoutButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      localStorage.removeItem("token");
       localStorage.removeItem("rol");
       localStorage.removeItem("userId");
       localStorage.removeItem("username");

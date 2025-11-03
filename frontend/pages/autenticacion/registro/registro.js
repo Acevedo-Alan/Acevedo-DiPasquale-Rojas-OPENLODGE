@@ -1,5 +1,3 @@
-const api = "http://localhost:8080";
-
 // Función principal de registro
 async function register(event) {
   event.preventDefault();
@@ -35,16 +33,7 @@ async function register(event) {
       password,
     };
 
-    const response = await fetch(`${api}/autenticacion/registro`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(registroData),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok)
-      throw new Error(data.error || data.mensaje || "Error al registrar");
+    const data = await apiService.register(registroData);
 
     showSuccess("Registrado correctamente");
 

@@ -52,6 +52,18 @@ public class CiudadController {
         return ResponseEntity.ok(ciudadService.obtenerTodas());
     }
 
+    @GetMapping("/buscar")
+    public ResponseEntity<?> buscarCiudad(
+            @RequestParam String nombre,
+            @RequestParam Long paisId) {
+        try {
+            Ciudad ciudad = ciudadService.buscarPorNombreYPais(nombre, paisId);
+            return ResponseEntity.ok(ciudad);
+        } catch (RuntimeException e) {
+            return ResponseEntity.ok(null); // Retornamos null si no se encuentra
+        }
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> obtenerPorId(@PathVariable Long id) {
         try {

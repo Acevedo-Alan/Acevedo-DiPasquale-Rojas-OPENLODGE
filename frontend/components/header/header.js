@@ -1,46 +1,14 @@
 let header;
 
-// Función para decodificar el JWT y extraer el rol
-function getrolFromToken(token) {
-  try {
-    // El JWT tiene 3 partes separadas por puntos: header.payload.signature
-    const payload = token.split(".")[1];
-    // Decodificar base64
-    const decodedPayload = JSON.parse(atob(payload));
-    console.log("Payload decodificado:", decodedPayload);
-    // El rol está en la propiedad "rol" del payload
-    return decodedPayload.rol || "";
-  } catch (error) {
-    console.error("Error al decodificar token:", error);
-    return "";
-  }
-}
-
 document.addEventListener("DOMContentLoaded", () => {
   header = document.querySelector(".header");
-
   console.log("Header element:", header);
 
-  const token = localStorage.getItem("token") || "";
   let rol = localStorage.getItem("rol") || "";
-
-  // Si no hay rol en localStorage pero hay token, extraerlo del token
-  if (!rol && token) {
-    rol = getrolFromToken(token);
-    console.log("Rol extraído del token:", rol);
-    if (rol) {
-      localStorage.setItem("rol", rol);
-    }
-  }
-
-  console.log("Token:", token);
-  console.log("rol original:", localStorage.getItem("rol"));
-  console.log("rol procesado:", rol.trim().toUpperCase());
-
   rol = rol.trim().toUpperCase();
 
-  if (token) {
-    console.log("Tiene token, rol es:", rol);
+  if (rol) {
+    console.log("Usuario autenticado, rol es:", rol);
     if (rol === "ANFITRION") {
       console.log("Renderizando header ANFITRION");
       header.innerHTML = `
@@ -94,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </nav>
         `;
     } else {
-      console.log("rol no reconocido, mostrando header genérico con token");
+      console.log("rol no reconocido, mostrando header genérico para usuario autenticado");
       header.innerHTML = `
             <nav class="nav" id="nav">
                 <div class="logo-container">
@@ -120,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
         `;
     }
   } else {
-    console.log("No hay token, mostrando header sin autenticar");
+    console.log("Usuario no autenticado, mostrando header público");
     header.innerHTML = `
             <nav class="nav" id="nav">
                 <div class="logo-container">

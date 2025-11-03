@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import com.backend.Entities.Alojamiento;
@@ -17,28 +16,23 @@ import com.backend.dtos.AlojamientoDTO;
 
 @RestController
 @RequestMapping("/api/alojamientos")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://127.0.0.1:5500", "http://localhost:5500"}, allowCredentials = "true")
 public class AlojamientoController {
 
     @Autowired
     private AlojamientoService alojamientoService;
 
-    @PostMapping
-    public ResponseEntity<?> crearAlojamiento(
-            @RequestBody AlojamientoDTO dto,
-            @RequestHeader("Authorization") String token) {
+    @PostMapping("/crearAlojamiento")
+    public ResponseEntity<?> crearAlojamiento(@RequestBody AlojamientoDTO dto) {
         try {
-            String jwtToken = token.replace("Bearer ", "");
-            Alojamiento alojamiento = alojamientoService.crearAlojamiento(dto, jwtToken);
+            Alojamiento alojamiento = alojamientoService.crearAlojamiento(dto);
             return ResponseEntity.status(HttpStatus.CREATED).body(alojamiento);
-        } catch (AccessDeniedException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    @GetMapping
+    @GetMapping("/getAll")
     public ResponseEntity<List<Alojamiento>> getAlojamientos() {
         List<Alojamiento> alojamientos = alojamientoService.getAlojamientos();
         return ResponseEntity.ok(alojamientos);
@@ -83,29 +77,20 @@ public class AlojamientoController {
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizarAlojamiento(
             @PathVariable Long id,
-            @RequestBody AlojamientoDTO dto,
-            @RequestHeader("Authorization") String token) {
+            @RequestBody AlojamientoDTO dto) {
         try {
-            String jwtToken = token.replace("Bearer ", "");
-            Alojamiento alojamiento = alojamientoService.actualizarAlojamiento(id, dto, jwtToken);
+            Alojamiento alojamiento = alojamientoService.actualizarAlojamiento(id, dto);
             return ResponseEntity.ok(alojamiento);
-        } catch (AccessDeniedException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> eliminarAlojamiento(
-            @PathVariable Long id,
-            @RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> eliminarAlojamiento(@PathVariable Long id) {
         try {
-            String jwtToken = token.replace("Bearer ", "");
-            alojamientoService.eliminarAlojamiento(id, jwtToken);
+            alojamientoService.eliminarAlojamiento(id);
             return ResponseEntity.ok("Alojamiento eliminado exitosamente");
-        } catch (AccessDeniedException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

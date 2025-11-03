@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import com.backend.Entities.Alojamiento;
@@ -13,7 +12,6 @@ import com.backend.Entities.Usuario;
 import com.backend.Repositories.IAlojamientoRepository;
 import com.backend.Repositories.IReservaRepository;
 import com.backend.Repositories.IUsuarioRepository;
-import com.backend.Security.JwtUtil;
 import com.backend.dtos.AlojamientoDTO;
 
 import jakarta.transaction.Transactional;
@@ -24,22 +22,12 @@ public class AlojamientoService {
     private IAlojamientoRepository alojamientoRepo;
     @Autowired
     private IReservaRepository reservaRepo;
+
     @Autowired
     private IUsuarioRepository usuarioRepo;
-    @Autowired
-    private JwtUtil jwtUtil;
 
     @Transactional
-    public Alojamiento crearAlojamiento(AlojamientoDTO dto, String token){
-        String rol = jwtUtil.getRolFromToken(token);
-        if (!"ANFITRION".equalsIgnoreCase(rol)) {
-            throw new AccessDeniedException("No puedes crear alojamientos");
-        }
-        
-        Usuario anfitrion = usuarioRepo.findByUsername(
-            jwtUtil.getUsernameFromToken(token))
-                .orElseThrow(() -> new RuntimeException("Error al encontrar usuario")
-            );                       
+    public Alojamiento crearAlojamiento(AlojamientoDTO dto){                      
         Alojamiento alojamiento = new Alojamiento();
         alojamiento.setNombre(dto.getNombre());
         alojamiento.setDescripcion(dto.getDescripcion());
@@ -48,9 +36,13 @@ public class AlojamientoService {
         alojamiento.setCapacidadHuespedes(dto.getCapacidadHuespedes());
         alojamiento.setDireccion(dto.getDireccion());
         alojamiento.setServicios(dto.getServicios());
-        alojamiento.setAnfitrion(anfitrion);
         alojamiento.setFechaCreacion(LocalDate.now());
         alojamiento.setFechaModificacion(LocalDate.now());
+        
+        // Usar el primer usuario disponible como anfitrión temporal
+        Usuario anfitrion = usuarioRepo.findAll().stream().findFirst()
+            .orElseThrow(() -> new RuntimeException("No hay usuarios registrados en el sistema"));
+        alojamiento.setAnfitrion(anfitrion);
 
         return alojamientoRepo.save(alojamiento);
     }
@@ -111,22 +103,9 @@ public class AlojamientoService {
     }
 
 
-    public Alojamiento actualizarAlojamiento(Long id, AlojamientoDTO dto, String token){
-        String rol = jwtUtil.getRolFromToken(token);
-        
-        if(!"ANFITRION".equalsIgnoreCase(rol)){
-            throw new AccessDeniedException("No puedes modificar este alojamiento");
-        }
-
-        Usuario anfitrion = usuarioRepo.findByUsername(jwtUtil.getUsernameFromToken(token))
-            .orElseThrow(() -> new RuntimeException("Error al encontrar usuario"));
-
+    public Alojamiento actualizarAlojamiento(Long id, AlojamientoDTO dto){
         Alojamiento alojamiento = alojamientoRepo.findById(id)
             .orElseThrow(() -> new RuntimeException("Alojamiento no encontrado"));
-
-        if (!alojamiento.getAnfitrion().getId().equals(anfitrion.getId())) {
-            throw new RuntimeException("No tienes permisos para editar este alojamiento");
-        }
 
         alojamiento.setNombre(dto.getNombre());
         alojamiento.setDescripcion(dto.getDescripcion());
@@ -141,22 +120,9 @@ public class AlojamientoService {
     }
 
     @Transactional
-    public void eliminarAlojamiento(Long id, String token) {
-        String rol = jwtUtil.getRolFromToken(token);
-        
-        if(!"ANFITRION".equalsIgnoreCase(rol)){
-            throw new AccessDeniedException("No puedes eliminar este alojamiento");
-        }
-
+    public void eliminarAlojamiento(Long id) {
         Alojamiento alojamiento = alojamientoRepo.findById(id)
             .orElseThrow(() -> new RuntimeException("Alojamiento no encontrado"));
-
-        Usuario anfitrion = usuarioRepo.findByUsername(jwtUtil.getUsernameFromToken(token))
-            .orElseThrow(() -> new RuntimeException("Error al encontrar usuario"));
-
-        if (!alojamiento.getAnfitrion().getId().equals(anfitrion.getId())) {
-            throw new RuntimeException("No puedes eliminar este alojamiento");
-        }
 
         List<Reserva> reservasFuturas = reservaRepo.findReservasFuturas(id, LocalDate.now());
         if (!reservasFuturas.isEmpty()) {
