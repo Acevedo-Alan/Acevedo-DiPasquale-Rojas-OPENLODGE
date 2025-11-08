@@ -47,8 +47,11 @@ public class Usuario {
     @Column(name = "apellido", nullable = false, length = 100)
     private String apellido;
 
-    @Column(name = "telefono", length = 20)
+    @Column(name = "telefono")
     private String telefono;
+
+    @Column(name = "dni")
+    private int dni;
 
     @Column(name = "fecha_nacimiento", nullable = false)
     private LocalDate fechaNacimiento;
@@ -65,5 +68,6 @@ public class Usuario {
     private List<Reserva> reservas;
 
     @OneToMany(mappedBy = "anfitrion", cascade = CascadeType.ALL)
+    @JsonManagedReference("alojamiento-usuario")
     private List<Alojamiento> alojamientos;
 }

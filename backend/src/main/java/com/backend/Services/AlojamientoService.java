@@ -38,12 +38,13 @@ public class AlojamientoService {
     private IDireccionRepository direccionRepo; 
 
     @Transactional
-    public Alojamiento crearAlojamiento(AlojamientoDTO dto) {
+    public Alojamiento crearAlojamiento(AlojamientoDTO dto, Long id) {
+        Usuario anfitrion = usuarioRepo.findById(id)
+            .orElseThrow(() -> new RuntimeException("usuario no registrado en el sistema"));
         Pais pais = dto.getDireccion().getCiudad().getPais();
         if (pais.getId() == null) {
             pais = paisRepo.save(pais);
         } else {
-            // Si viene con ID, verificar que existe
             pais = paisRepo.findById(pais.getId())
                 .orElseThrow(() -> new RuntimeException("País no encontrado"));
         }
@@ -77,9 +78,6 @@ public class AlojamientoService {
         alojamiento.setDireccion(direccion);
         alojamiento.setFechaCreacion(LocalDate.now());
         alojamiento.setFechaModificacion(LocalDate.now());
-        
-        Usuario anfitrion = usuarioRepo.findAll().stream().findFirst()
-            .orElseThrow(() -> new RuntimeException("No hay usuarios registrados en el sistema"));
         alojamiento.setAnfitrion(anfitrion);
 
         return alojamientoRepo.save(alojamiento);

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
@@ -58,6 +59,7 @@ public class Alojamiento {
 
     @ManyToOne
     @JoinColumn(name = "id_anfitrion", referencedColumnName = "id")
+    @JsonBackReference("alojamiento-usuario")
     private Usuario anfitrion;
 
     @OneToOne(cascade = CascadeType.ALL)
