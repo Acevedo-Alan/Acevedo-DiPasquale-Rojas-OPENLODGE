@@ -1,7 +1,10 @@
 package com.backend.Services;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,12 +14,14 @@ import com.backend.Entities.Ciudad;
 import com.backend.Entities.Direccion;
 import com.backend.Entities.Pais;
 import com.backend.Entities.Reserva;
+import com.backend.Entities.Servicio;
 import com.backend.Entities.Usuario;
 import com.backend.Repositories.IAlojamientoRepository;
 import com.backend.Repositories.ICiudadRepository;
 import com.backend.Repositories.IDireccionRepository;
 import com.backend.Repositories.IPaisRepository;
 import com.backend.Repositories.IReservaRepository;
+import com.backend.Repositories.IServicioRepository;
 import com.backend.Repositories.IUsuarioRepository;
 import com.backend.dtos.AlojamientoDTO;
 
@@ -35,12 +40,14 @@ public class AlojamientoService {
     @Autowired
     private ICiudadRepository ciudadRepo; 
     @Autowired
-    private IDireccionRepository direccionRepo; 
+    private IDireccionRepository direccionRepo;
+    @Autowired
+    private IServicioRepository servicioRepo;
 
     @Transactional
     public Alojamiento crearAlojamiento(AlojamientoDTO dto, Long id) {
         Usuario anfitrion = usuarioRepo.findById(id)
-            .orElseThrow(() -> new RuntimeException("usuario no registrado en el sistema"));
+            .orElseThrow(() -> new RuntimeException("Usuario no registrado en el sistema"));
         Pais pais = dto.getDireccion().getCiudad().getPais();
         if (pais.getId() == null) {
             pais = paisRepo.save(pais);
@@ -48,13 +55,11 @@ public class AlojamientoService {
             pais = paisRepo.findById(pais.getId())
                 .orElseThrow(() -> new RuntimeException("País no encontrado"));
         }
-        
         Ciudad ciudad = dto.getDireccion().getCiudad();
         ciudad.setPais(pais);
         if (ciudad.getId() == null) {
             ciudad = ciudadRepo.save(ciudad);
         } else {
-           
             ciudad = ciudadRepo.findById(ciudad.getId())
                 .orElseThrow(() -> new RuntimeException("Ciudad no encontrada"));
         }
@@ -63,11 +68,23 @@ public class AlojamientoService {
         if (direccion.getId() == null) {
             direccion = direccionRepo.save(direccion);
         } else {
-    
             direccion = direccionRepo.findById(direccion.getId())
                 .orElseThrow(() -> new RuntimeException("Dirección no encontrada"));
         }
-        
+        Set<Servicio> servicios = new HashSet<>();
+        if (dto.getServicios() != null && !dto.getServicios().isEmpty()) {
+            servicios = dto.getServicios().stream()
+                .map(servicio -> {
+                    if (servicio.getId() != null) {
+                        return servicioRepo.findById(servicio.getId())
+                            .orElseThrow(() -> new RuntimeException("Servicio con ID " + servicio.getId() + " no encontrado"));
+                    } else {
+                        return servicioRepo.findByNombre(servicio.getNombre())
+                            .orElseGet(() -> servicioRepo.save(servicio));
+                    }
+                })
+                .collect(Collectors.toSet());
+        }
     
         Alojamiento alojamiento = new Alojamiento();
         alojamiento.setNombre(dto.getNombre());
@@ -79,6 +96,7 @@ public class AlojamientoService {
         alojamiento.setFechaCreacion(LocalDate.now());
         alojamiento.setFechaModificacion(LocalDate.now());
         alojamiento.setAnfitrion(anfitrion);
+        alojamiento.setServicios(servicios);
 
         return alojamientoRepo.save(alojamiento);
     }
@@ -144,7 +162,6 @@ public class AlojamientoService {
             pais = paisRepo.findById(pais.getId())
                 .orElseThrow(() -> new RuntimeException("País no encontrado"));
         }
-        
         Ciudad ciudad = dto.getDireccion().getCiudad();
         ciudad.setPais(pais);
         if (ciudad.getId() == null) {
@@ -153,7 +170,6 @@ public class AlojamientoService {
             ciudad = ciudadRepo.findById(ciudad.getId())
                 .orElseThrow(() -> new RuntimeException("Ciudad no encontrada"));
         }
-        
         Direccion direccion = dto.getDireccion();
         direccion.setCiudad(ciudad);
         if (direccion.getId() == null) {
@@ -163,6 +179,21 @@ public class AlojamientoService {
                 .orElseThrow(() -> new RuntimeException("Dirección no encontrada"));
         }
 
+        Set<Servicio> servicios = new HashSet<>();
+        if (dto.getServicios() != null && !dto.getServicios().isEmpty()) {
+            servicios = dto.getServicios().stream()
+                .map(servicio -> {
+                    if (servicio.getId() != null) {
+                        return servicioRepo.findById(servicio.getId())
+                            .orElseThrow(() -> new RuntimeException("Servicio con ID " + servicio.getId() + " no encontrado"));
+                    } else {
+                        return servicioRepo.findByNombre(servicio.getNombre())
+                            .orElseGet(() -> servicioRepo.save(servicio));
+                    }
+                })
+                .collect(Collectors.toSet());
+        }
+
         alojamiento.setNombre(dto.getNombre());
         alojamiento.setDescripcion(dto.getDescripcion());
         alojamiento.setImagen(dto.getImagen());
@@ -170,6 +201,7 @@ public class AlojamientoService {
         alojamiento.setCapacidadHuespedes(dto.getCapacidadHuespedes());
         alojamiento.setDireccion(direccion);
         alojamiento.setFechaModificacion(LocalDate.now());
+        alojamiento.setServicios(servicios);
 
         return alojamientoRepo.save(alojamiento);
     }

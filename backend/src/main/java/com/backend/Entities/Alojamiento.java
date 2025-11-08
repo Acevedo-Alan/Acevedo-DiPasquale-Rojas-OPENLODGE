@@ -73,7 +73,7 @@ public class Alojamiento {
     @ManyToMany
     @JoinTable(
         name = "servicio_alojamiento",
-        joinColumns = @JoinColumn(name = "id_hospedaje"),
+        joinColumns = @JoinColumn(name = "id_alojamiento"),
         inverseJoinColumns = @JoinColumn(name = "id_servicio")
     )
     private Set<Servicio> servicios = new HashSet<>();

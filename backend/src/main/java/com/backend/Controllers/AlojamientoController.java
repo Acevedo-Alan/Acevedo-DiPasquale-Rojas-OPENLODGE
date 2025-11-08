@@ -74,7 +74,7 @@ public class AlojamientoController {
         return ResponseEntity.ok(disponibles);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{id}/actualizarAlojamiento")
     public ResponseEntity<?> actualizarAlojamiento(
             @PathVariable Long id,
             @RequestBody AlojamientoDTO dto) {
