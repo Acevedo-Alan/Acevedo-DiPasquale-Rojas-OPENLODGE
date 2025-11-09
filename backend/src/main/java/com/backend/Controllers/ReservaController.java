@@ -2,14 +2,19 @@ package com.backend.Controllers;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import com.backend.Entities.Reserva;
 import com.backend.Services.ReservaService;
 import com.backend.dtos.ReservaDTO;
+import com.backend.dtos.ReservaResponseDTO;
+
 import jakarta.validation.Valid;
 
 @RestController
@@ -26,13 +31,13 @@ public class ReservaController {
             @Valid @RequestBody ReservaDTO dto) {
         try {
             Reserva reserva = reservaService.crearReserva(dto, usuarioId);
-            return ResponseEntity.status(HttpStatus.CREATED).body(reserva);
+            ReservaResponseDTO response = ReservaResponseDTO.fromEntity(reserva);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    //CORREGIR
     @PutMapping("/modificarReserva/usuario/{usuarioId}/alojamiento/{alojamientoId}")
     public ResponseEntity<?> modificarReserva(
             @PathVariable Long usuarioId,
@@ -42,14 +47,15 @@ public class ReservaController {
             @RequestParam Integer nuevosHuespedes) {
         try {
             Reserva reserva = reservaService.modificarReserva(
-                usuarioId, alojamientoId, nuevoCheckin, nuevoCheckout, nuevosHuespedes);
-            return ResponseEntity.ok(reserva);
+                    usuarioId, alojamientoId, nuevoCheckin, nuevoCheckout, nuevosHuespedes);
+            ReservaResponseDTO response = ReservaResponseDTO.fromEntity(reserva);
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    @DeleteMapping("/usuario/{usuarioId}/alojamiento/{alojamientoId}")
+    @DeleteMapping("/cancelarReserva/usuario/{usuarioId}/alojamiento/{alojamientoId}")
     public ResponseEntity<?> cancelarReserva(
             @PathVariable Long usuarioId,
             @PathVariable Long alojamientoId) {
@@ -61,21 +67,24 @@ public class ReservaController {
         }
     }
 
-    @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<List<Reserva>> obtenerHistorialUsuario(@PathVariable Long usuarioId) {
-        List<Reserva> reservas = reservaService.obtenerHistorialUsuario(usuarioId);
+    @GetMapping("/historial/usuario/{usuarioId}")
+    public ResponseEntity<List<ReservaResponseDTO>> obtenerHistorialUsuario(@PathVariable Long usuarioId) {
+        List<ReservaResponseDTO> reservas = reservaService.obtenerHistorialUsuario(usuarioId)
+                .stream().map(ReservaResponseDTO::fromEntity).collect(Collectors.toList());
         return ResponseEntity.ok(reservas);
     }
 
-    @GetMapping("/alojamiento/{alojamientoId}")
-    public ResponseEntity<List<Reserva>> obtenerHistorialAlojamiento(@PathVariable Long alojamientoId) {
-        List<Reserva> reservas = reservaService.obtenerHistorialAlojamiento(alojamientoId);
+    @GetMapping("/historial/alojamiento/{alojamientoId}")
+    public ResponseEntity<List<ReservaResponseDTO>> obtenerHistorialAlojamiento(@PathVariable Long alojamientoId) {
+        List<ReservaResponseDTO> reservas = reservaService.obtenerHistorialAlojamiento(alojamientoId)
+                .stream().map(ReservaResponseDTO::fromEntity).collect(Collectors.toList());
         return ResponseEntity.ok(reservas);
     }
 
-    @GetMapping("/usuario/{usuarioId}/reservasPasadas")
-    public ResponseEntity<List<Reserva>> obtenerReservasPasadas(@PathVariable Long usuarioId) {
-        List<Reserva> reservas = reservaService.obtenerReservasPasadas(usuarioId);
+    @GetMapping("/reservasPasadas/usuario/{usuarioId}")
+    public ResponseEntity<List<ReservaResponseDTO>> obtenerReservasPasadas(@PathVariable Long usuarioId) {
+        List<ReservaResponseDTO> reservas = reservaService.obtenerReservasPasadas(usuarioId)
+                .stream().map(ReservaResponseDTO::fromEntity).collect(Collectors.toList());
         return ResponseEntity.ok(reservas);
     }
 

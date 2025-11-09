@@ -14,7 +14,6 @@ public class UsuarioService {
     @Autowired
     private IUsuarioRepository usuarioRepo;
 
-    //Cambiar rol
     @Transactional
     public Usuario cambiarRol(Long id, Roles nuevoRol) {
         Usuario usuario = usuarioRepo.findById(id)
@@ -28,14 +27,10 @@ public class UsuarioService {
         usuario.setRol(nuevoRol);
         return usuarioRepo.save(usuario);
     }
-
-    // Obtener usuario por ID
     public Usuario obtenerPorId(Long id) {
         return usuarioRepo.findById(id)
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
     }
-
-    // Obtener usuario por username
     public Usuario obtenerPorUsername(String username) {
         return usuarioRepo.findByUsername(username)
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
