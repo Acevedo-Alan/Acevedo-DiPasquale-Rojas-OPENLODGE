@@ -14,13 +14,13 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/reservas")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://127.0.0.1:5500", "http://localhost:5500"}, allowCredentials = "true")
 public class ReservaController {
 
     @Autowired
     private ReservaService reservaService;
 
-    @PostMapping("/usuario/{usuarioId}")
+    @PostMapping("/crearReserva/usuario/{usuarioId}")
     public ResponseEntity<?> crearReserva(
             @PathVariable Long usuarioId,
             @Valid @RequestBody ReservaDTO dto) {
@@ -32,7 +32,8 @@ public class ReservaController {
         }
     }
 
-    @PutMapping("/usuario/{usuarioId}/alojamiento/{alojamientoId}")
+    //CORREGIR
+    @PutMapping("/modificarReserva/usuario/{usuarioId}/alojamiento/{alojamientoId}")
     public ResponseEntity<?> modificarReserva(
             @PathVariable Long usuarioId,
             @PathVariable Long alojamientoId,

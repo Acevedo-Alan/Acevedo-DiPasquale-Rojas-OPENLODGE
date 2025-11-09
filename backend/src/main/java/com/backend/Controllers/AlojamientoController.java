@@ -55,7 +55,7 @@ public class AlojamientoController {
         }
     }
 
-    @GetMapping("/anfitrion/{anfitrionId}")
+    @GetMapping("/getAlojamiento/anfitrion/{anfitrionId}")
     public ResponseEntity<List<AlojamientoResponseDTO>> getAlojamientosPorAnfitrion(
             @PathVariable Long anfitrionId) {
         List<Alojamiento> alojamientos = alojamientoService.getAlojamientosPorAnfitrion(anfitrionId);
@@ -65,7 +65,7 @@ public class AlojamientoController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{alojamientoId}/disponibilidad")
+    @GetMapping("/getAlojamiento/disponibilidad/{alojamientoId}")
     public ResponseEntity<List<Reserva>> getAlojamientosPorDisponibilidad(
             @PathVariable Long alojamientoId) {
         List<Reserva> reservas = alojamientoService.getAlojamientosPorDisponibilidad(alojamientoId);
@@ -87,7 +87,8 @@ public class AlojamientoController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{id}/actualizarAlojamiento")
+    //CORREGIR
+    @PutMapping("/actualizarAlojamiento/{id}/")
     public ResponseEntity<?> actualizarAlojamiento(
             @PathVariable Long id,
             @Valid @RequestBody AlojamientoDTO dto,
@@ -100,7 +101,7 @@ public class AlojamientoController {
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/eliminarAlojamiento/{id}")
     public ResponseEntity<?> eliminarAlojamiento(
             @PathVariable Long id,
             @RequestParam Long anfitrionId) {
