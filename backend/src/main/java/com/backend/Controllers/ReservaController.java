@@ -14,7 +14,7 @@ import com.backend.Services.ReservaService;
 import com.backend.dtos.ReservaDTO;
 
 @RestController
-@RequestMapping("/api/reservas")
+@RequestMapping("/reservas")
 @CrossOrigin(origins = "*")
 public class ReservaController {
 

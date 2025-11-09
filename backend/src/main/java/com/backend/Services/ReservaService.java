@@ -28,7 +28,6 @@ public class ReservaService {
     @Autowired
     private IAlojamientoRepository alojamientoRepo;
 
-    //Crear reserva
     @Transactional
     public Reserva crearReserva(ReservaDTO dto, Long usuarioId) {
         Usuario usuario = usuarioRepo.findById(usuarioId)
