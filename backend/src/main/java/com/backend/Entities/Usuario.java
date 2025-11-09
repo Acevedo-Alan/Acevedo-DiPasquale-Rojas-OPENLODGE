@@ -1,22 +1,11 @@
 package com.backend.Entities;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
-
 import com.backend.enums.Roles;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.EnumType;
-
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -50,7 +39,7 @@ public class Usuario {
     @Column(name = "telefono")
     private String telefono;
 
-    @Column(name = "dni")
+    @Column(name = "dni", nullable = false, unique = true)
     private int dni;
 
     @Column(name = "fecha_nacimiento", nullable = false)
@@ -60,14 +49,14 @@ public class Usuario {
     private LocalDate fechaCreacion;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "rol")
+    @Column(name = "rol", nullable = false, length = 50)
     private Roles rol;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "usuario", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JsonManagedReference("usuario-reservas")
-    private List<Reserva> reservas;
+    private List<Reserva> reservas = new ArrayList<>();
 
-    @OneToMany(mappedBy = "anfitrion", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "anfitrion", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JsonManagedReference("alojamiento-usuario")
-    private List<Alojamiento> alojamientos;
+    private List<Alojamiento> alojamientos = new ArrayList<>();
 }

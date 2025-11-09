@@ -2,17 +2,16 @@ package com.backend.Controllers;
 
 import java.time.LocalDate;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import com.backend.Entities.Alojamiento;
 import com.backend.Entities.Reserva;
 import com.backend.Services.AlojamientoService;
 import com.backend.dtos.AlojamientoDTO;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/alojamientos")
@@ -21,11 +20,13 @@ public class AlojamientoController {
 
     @Autowired
     private AlojamientoService alojamientoService;
-
+    
     @PostMapping("/crearAlojamiento")
-    public ResponseEntity<?> crearAlojamiento(@RequestBody AlojamientoDTO dto, @RequestParam Long id) {
+    public ResponseEntity<?> crearAlojamiento(
+            @Valid @RequestBody AlojamientoDTO dto, 
+            @RequestParam Long anfitrionId) {
         try {
-            Alojamiento alojamiento = alojamientoService.crearAlojamiento(dto, id);
+            Alojamiento alojamiento = alojamientoService.crearAlojamiento(dto, anfitrionId);
             return ResponseEntity.status(HttpStatus.CREATED).body(alojamiento);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -77,19 +78,21 @@ public class AlojamientoController {
     @PutMapping("/{id}/actualizarAlojamiento")
     public ResponseEntity<?> actualizarAlojamiento(
             @PathVariable Long id,
-            @RequestBody AlojamientoDTO dto) {
+            @Valid @RequestBody AlojamientoDTO dto,
+            @RequestParam Long anfitrionId) {
         try {
-            Alojamiento alojamiento = alojamientoService.actualizarAlojamiento(id, dto);
+            Alojamiento alojamiento = alojamientoService.actualizarAlojamiento(id, dto, anfitrionId);
             return ResponseEntity.ok(alojamiento);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> eliminarAlojamiento(@PathVariable Long id) {
+    public ResponseEntity<?> eliminarAlojamiento(
+            @PathVariable Long id,
+            @RequestParam Long anfitrionId) { 
         try {
-            alojamientoService.eliminarAlojamiento(id);
+            alojamientoService.eliminarAlojamiento(id, anfitrionId);
             return ResponseEntity.ok("Alojamiento eliminado exitosamente");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

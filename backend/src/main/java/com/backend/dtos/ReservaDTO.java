@@ -9,11 +9,8 @@ import jakarta.validation.constraints.NotNull;
 
 public class ReservaDTO {
 
-    @NotNull()
+    @NotNull(message = "El ID del alojamiento es obligatorio")
     private Long alojamientoId;
-
-    @NotNull()
-    private Long huespedId;
 
     @NotNull(message = "La fecha de check-in es obligatoria")
     @FutureOrPresent(message = "La fecha de check-in debe ser presente o futura")
@@ -30,9 +27,8 @@ public class ReservaDTO {
     public ReservaDTO() {
     }
 
-    public ReservaDTO(Long alojamientoId, Long huespedId, LocalDate checkin, LocalDate checkout, Integer huespedes) {
+    public ReservaDTO(Long alojamientoId, LocalDate checkin, LocalDate checkout, Integer huespedes) {
         this.alojamientoId = alojamientoId;
-        this.huespedId = huespedId;
         this.checkin = checkin;
         this.checkout = checkout;
         this.huespedes = huespedes;
@@ -68,13 +64,5 @@ public class ReservaDTO {
 
     public void setHuespedes(Integer huespedes) {
         this.huespedes = huespedes;
-    }
-
-    public Long getHuespedId() {
-        return huespedId;
-    }
-
-    public void setHuespedId(Long huespedId) {
-        this.huespedId = huespedId;
     }
 }

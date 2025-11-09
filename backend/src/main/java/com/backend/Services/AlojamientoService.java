@@ -5,26 +5,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.backend.Entities.Alojamiento;
-import com.backend.Entities.Ciudad;
-import com.backend.Entities.Direccion;
-import com.backend.Entities.Pais;
-import com.backend.Entities.Reserva;
-import com.backend.Entities.Servicio;
-import com.backend.Entities.Usuario;
-import com.backend.Repositories.IAlojamientoRepository;
-import com.backend.Repositories.ICiudadRepository;
-import com.backend.Repositories.IDireccionRepository;
-import com.backend.Repositories.IPaisRepository;
-import com.backend.Repositories.IReservaRepository;
-import com.backend.Repositories.IServicioRepository;
-import com.backend.Repositories.IUsuarioRepository;
+import com.backend.Entities.*;
+import com.backend.Repositories.*;
 import com.backend.dtos.AlojamientoDTO;
-
 import jakarta.transaction.Transactional;
 
 @Service
@@ -45,46 +30,13 @@ public class AlojamientoService {
     private IServicioRepository servicioRepo;
 
     @Transactional
-    public Alojamiento crearAlojamiento(AlojamientoDTO dto, Long id) {
-        Usuario anfitrion = usuarioRepo.findById(id)
-            .orElseThrow(() -> new RuntimeException("Usuario no registrado en el sistema"));
-        Pais pais = dto.getDireccion().getCiudad().getPais();
-        if (pais.getId() == null) {
-            pais = paisRepo.save(pais);
-        } else {
-            pais = paisRepo.findById(pais.getId())
-                .orElseThrow(() -> new RuntimeException("País no encontrado"));
-        }
-        Ciudad ciudad = dto.getDireccion().getCiudad();
-        ciudad.setPais(pais);
-        if (ciudad.getId() == null) {
-            ciudad = ciudadRepo.save(ciudad);
-        } else {
-            ciudad = ciudadRepo.findById(ciudad.getId())
-                .orElseThrow(() -> new RuntimeException("Ciudad no encontrada"));
-        }
-        Direccion direccion = dto.getDireccion();
-        direccion.setCiudad(ciudad);
-        if (direccion.getId() == null) {
-            direccion = direccionRepo.save(direccion);
-        } else {
-            direccion = direccionRepo.findById(direccion.getId())
-                .orElseThrow(() -> new RuntimeException("Dirección no encontrada"));
-        }
-        Set<Servicio> servicios = new HashSet<>();
-        if (dto.getServicios() != null && !dto.getServicios().isEmpty()) {
-            servicios = dto.getServicios().stream()
-                .map(servicio -> {
-                    if (servicio.getId() != null) {
-                        return servicioRepo.findById(servicio.getId())
-                            .orElseThrow(() -> new RuntimeException("Servicio con ID " + servicio.getId() + " no encontrado"));
-                    } else {
-                        return servicioRepo.findByNombre(servicio.getNombre())
-                            .orElseGet(() -> servicioRepo.save(servicio));
-                    }
-                })
-                .collect(Collectors.toSet());
-        }
+    public Alojamiento crearAlojamiento(AlojamientoDTO dto, Long anfitrionId) {
+        Usuario anfitrion = usuarioRepo.findById(anfitrionId)
+            .orElseThrow(() -> new RuntimeException("Usuario no registrado"));
+        
+        Direccion direccion = procesarDireccion(dto.getDireccion());
+        
+        Set<Servicio> servicios = procesarServicios(dto.getServicios());
     
         Alojamiento alojamiento = new Alojamiento();
         alojamiento.setNombre(dto.getNombre());
@@ -101,29 +53,118 @@ public class AlojamientoService {
         return alojamientoRepo.save(alojamiento);
     }
 
-    // TRAER ALOJAMIENTO
-    // TODOS
+    @Transactional
+    public Alojamiento actualizarAlojamiento(Long id, AlojamientoDTO dto, Long anfitrionId) {
+        Alojamiento alojamiento = alojamientoRepo.findById(id)
+            .orElseThrow(() -> new RuntimeException("Alojamiento no encontrado"));
+
+        if (!alojamiento.getAnfitrion().getId().equals(anfitrionId)) {
+            throw new RuntimeException("No tienes permiso para modificar este alojamiento");
+        }
+
+        Direccion direccion = procesarDireccion(dto.getDireccion());
+        Set<Servicio> servicios = procesarServicios(dto.getServicios());
+
+        alojamiento.setNombre(dto.getNombre());
+        alojamiento.setDescripcion(dto.getDescripcion());
+        alojamiento.setImagen(dto.getImagen());
+        alojamiento.setPrecioNoche(dto.getPrecioNoche());
+        alojamiento.setCapacidadHuespedes(dto.getCapacidadHuespedes());
+        alojamiento.setDireccion(direccion);
+        alojamiento.setFechaModificacion(LocalDate.now());
+        alojamiento.setServicios(servicios);
+
+        return alojamientoRepo.save(alojamiento);
+    }
+
+    @Transactional
+    public void eliminarAlojamiento(Long id, Long anfitrionId) {
+        Alojamiento alojamiento = alojamientoRepo.findById(id)
+            .orElseThrow(() -> new RuntimeException("Alojamiento no encontrado"));
+
+        if (!alojamiento.getAnfitrion().getId().equals(anfitrionId)) {
+            throw new RuntimeException("No tienes permiso para eliminar este alojamiento");
+        }
+
+        List<Reserva> reservasFuturas = reservaRepo.findReservasFuturas(id, LocalDate.now());
+        if (!reservasFuturas.isEmpty()) {
+            throw new RuntimeException("No se puede eliminar: tiene " + reservasFuturas.size() + " reservas futuras");
+        }
+
+        alojamientoRepo.delete(alojamiento);
+    }
+
+    private Direccion procesarDireccion(Direccion direccionDTO) {
+        Pais pais = direccionDTO.getCiudad().getPais();
+        if (pais.getId() == null) {
+            pais = paisRepo.save(pais);
+        } else {
+            pais = paisRepo.findById(pais.getId())
+                .orElseThrow(() -> new RuntimeException("País no encontrado"));
+        }
+        
+        Ciudad ciudad = direccionDTO.getCiudad();
+        ciudad.setPais(pais);
+        if (ciudad.getId() == null) {
+            ciudad = ciudadRepo.save(ciudad);
+        } else {
+            ciudad = ciudadRepo.findById(ciudad.getId())
+                .orElseThrow(() -> new RuntimeException("Ciudad no encontrada"));
+        }
+        
+        Direccion direccion = new Direccion();
+        direccion.setId(direccionDTO.getId());
+        direccion.setCalle(direccionDTO.getCalle());
+        direccion.setNumero(direccionDTO.getNumero());
+        direccion.setDepto(direccionDTO.getDepto());
+        direccion.setPiso(direccionDTO.getPiso());
+        direccion.setCiudad(ciudad);
+        
+        if (direccion.getId() == null) {
+            direccion = direccionRepo.save(direccion);
+        } else {
+            direccion = direccionRepo.findById(direccion.getId())
+                .orElseThrow(() -> new RuntimeException("Dirección no encontrada"));
+        }
+        
+        return direccion;
+    }
+
+    private Set<Servicio> procesarServicios(Set<Servicio> serviciosDTO) {
+        if (serviciosDTO == null || serviciosDTO.isEmpty()) {
+            return new HashSet<>();
+        }
+        
+        return serviciosDTO.stream()
+            .map(servicio -> {
+                if (servicio.getId() != null) {
+                    return servicioRepo.findById(servicio.getId())
+                        .orElseThrow(() -> new RuntimeException("Servicio ID " + servicio.getId() + " no encontrado"));
+                } else {
+                    return servicioRepo.findByNombre(servicio.getNombre())
+                        .orElseGet(() -> servicioRepo.save(servicio));
+                }
+            })
+            .collect(Collectors.toSet());
+    }
+
     public List<Alojamiento> getAlojamientos() {
         return alojamientoRepo.findAll();
     }
 
-    // Por ID
     public Alojamiento getAlojamientoById(Long id) {
         return alojamientoRepo.findById(id)
             .orElseThrow(() -> new RuntimeException("Alojamiento no encontrado"));
     }
 
-    // Por anfitrion
     public List<Alojamiento> getAlojamientosPorAnfitrion(Long anfitrionId) {
         return alojamientoRepo.findByAnfitrionId(anfitrionId);
     }
 
-    // Por disponibilidad
     public List<Reserva> getAlojamientosPorDisponibilidad(Long alojamientoId) {
         return reservaRepo.findByAlojamientoId(alojamientoId);
     }
 
-    // Con filtros
     public List<Alojamiento> buscarDisponibles(LocalDate checkin, LocalDate checkout,
                                                Integer capacidadMin, Double precioMax,
                                                Long ciudadId) {
@@ -148,74 +189,5 @@ public class AlojamientoService {
         }
 
         return disponibles;
-    }
-
-    @Transactional
-    public Alojamiento actualizarAlojamiento(Long id, AlojamientoDTO dto) {
-        Alojamiento alojamiento = alojamientoRepo.findById(id)
-            .orElseThrow(() -> new RuntimeException("Alojamiento no encontrado"));
-
-        Pais pais = dto.getDireccion().getCiudad().getPais();
-        if (pais.getId() == null) {
-            pais = paisRepo.save(pais);
-        } else {
-            pais = paisRepo.findById(pais.getId())
-                .orElseThrow(() -> new RuntimeException("País no encontrado"));
-        }
-        Ciudad ciudad = dto.getDireccion().getCiudad();
-        ciudad.setPais(pais);
-        if (ciudad.getId() == null) {
-            ciudad = ciudadRepo.save(ciudad);
-        } else {
-            ciudad = ciudadRepo.findById(ciudad.getId())
-                .orElseThrow(() -> new RuntimeException("Ciudad no encontrada"));
-        }
-        Direccion direccion = dto.getDireccion();
-        direccion.setCiudad(ciudad);
-        if (direccion.getId() == null) {
-            direccion = direccionRepo.save(direccion);
-        } else {
-            direccion = direccionRepo.findById(direccion.getId())
-                .orElseThrow(() -> new RuntimeException("Dirección no encontrada"));
-        }
-
-        Set<Servicio> servicios = new HashSet<>();
-        if (dto.getServicios() != null && !dto.getServicios().isEmpty()) {
-            servicios = dto.getServicios().stream()
-                .map(servicio -> {
-                    if (servicio.getId() != null) {
-                        return servicioRepo.findById(servicio.getId())
-                            .orElseThrow(() -> new RuntimeException("Servicio con ID " + servicio.getId() + " no encontrado"));
-                    } else {
-                        return servicioRepo.findByNombre(servicio.getNombre())
-                            .orElseGet(() -> servicioRepo.save(servicio));
-                    }
-                })
-                .collect(Collectors.toSet());
-        }
-
-        alojamiento.setNombre(dto.getNombre());
-        alojamiento.setDescripcion(dto.getDescripcion());
-        alojamiento.setImagen(dto.getImagen());
-        alojamiento.setPrecioNoche(dto.getPrecioNoche());
-        alojamiento.setCapacidadHuespedes(dto.getCapacidadHuespedes());
-        alojamiento.setDireccion(direccion);
-        alojamiento.setFechaModificacion(LocalDate.now());
-        alojamiento.setServicios(servicios);
-
-        return alojamientoRepo.save(alojamiento);
-    }
-
-    @Transactional
-    public void eliminarAlojamiento(Long id) {
-        Alojamiento alojamiento = alojamientoRepo.findById(id)
-            .orElseThrow(() -> new RuntimeException("Alojamiento no encontrado"));
-
-        List<Reserva> reservasFuturas = reservaRepo.findReservasFuturas(id, LocalDate.now());
-        if (!reservasFuturas.isEmpty()) {
-            throw new RuntimeException("No se puede eliminar: tiene reservas futuras activas");
-        }
-
-        alojamientoRepo.delete(alojamiento);
     }
 }

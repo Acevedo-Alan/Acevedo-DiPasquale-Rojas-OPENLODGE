@@ -2,16 +2,15 @@ package com.backend.Controllers;
 
 import java.time.LocalDate;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import com.backend.Entities.Reserva;
 import com.backend.Services.ReservaService;
 import com.backend.dtos.ReservaDTO;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/reservas")
@@ -24,7 +23,7 @@ public class ReservaController {
     @PostMapping("/usuario/{usuarioId}")
     public ResponseEntity<?> crearReserva(
             @PathVariable Long usuarioId,
-            @RequestBody ReservaDTO dto) {
+            @Valid @RequestBody ReservaDTO dto) {
         try {
             Reserva reserva = reservaService.crearReserva(dto, usuarioId);
             return ResponseEntity.status(HttpStatus.CREATED).body(reserva);
@@ -73,7 +72,7 @@ public class ReservaController {
         return ResponseEntity.ok(reservas);
     }
 
-    @GetMapping("/usuario/{usuarioId}/pasadas")
+    @GetMapping("/usuario/{usuarioId}/reservasPasadas")
     public ResponseEntity<List<Reserva>> obtenerReservasPasadas(@PathVariable Long usuarioId) {
         List<Reserva> reservas = reservaService.obtenerReservasPasadas(usuarioId);
         return ResponseEntity.ok(reservas);

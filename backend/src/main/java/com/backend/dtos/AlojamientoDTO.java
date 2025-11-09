@@ -21,6 +21,5 @@ public class AlojamientoDTO {
     private Double precioNoche;
     private Integer capacidadHuespedes;
     private Direccion direccion;
-    private int telefono;
     private Set<Servicio> servicios;
 }

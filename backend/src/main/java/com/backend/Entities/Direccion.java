@@ -1,5 +1,7 @@
 package com.backend.Entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -36,5 +38,6 @@ public class Direccion {
 
     @ManyToOne
     @JoinColumn(name = "id_ciudad", referencedColumnName = "id")
+    @JsonBackReference("ciudad-direcciones")
     private Ciudad ciudad;
 }
