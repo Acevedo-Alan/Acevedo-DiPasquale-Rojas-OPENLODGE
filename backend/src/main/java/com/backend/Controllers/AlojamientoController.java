@@ -2,6 +2,7 @@ package com.backend.Controllers;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import com.backend.Entities.Alojamiento;
 import com.backend.Entities.Reserva;
 import com.backend.Services.AlojamientoService;
 import com.backend.dtos.AlojamientoDTO;
+import com.backend.dtos.AlojamientoResponseDTO;
 import jakarta.validation.Valid;
 
 @RestController
@@ -20,40 +22,47 @@ public class AlojamientoController {
 
     @Autowired
     private AlojamientoService alojamientoService;
-    
+
     @PostMapping("/crearAlojamiento")
     public ResponseEntity<?> crearAlojamiento(
             @Valid @RequestBody AlojamientoDTO dto, 
             @RequestParam Long anfitrionId) {
         try {
             Alojamiento alojamiento = alojamientoService.crearAlojamiento(dto, anfitrionId);
-            return ResponseEntity.status(HttpStatus.CREATED).body(alojamiento);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                .body(AlojamientoResponseDTO.fromEntity(alojamiento));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<Alojamiento>> getAlojamientos() {
+    public ResponseEntity<List<AlojamientoResponseDTO>> getAlojamientos() {
         List<Alojamiento> alojamientos = alojamientoService.getAlojamientos();
-        return ResponseEntity.ok(alojamientos);
+        List<AlojamientoResponseDTO> response = alojamientos.stream()
+            .map(AlojamientoResponseDTO::fromEntity)
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/getAlojamiento/{id}")
     public ResponseEntity<?> getAlojamientoById(@PathVariable Long id) {
         try {
             Alojamiento alojamiento = alojamientoService.getAlojamientoById(id);
-            return ResponseEntity.ok(alojamiento);
+            return ResponseEntity.ok(AlojamientoResponseDTO.fromEntity(alojamiento));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
     @GetMapping("/anfitrion/{anfitrionId}")
-    public ResponseEntity<List<Alojamiento>> getAlojamientosPorAnfitrion(
+    public ResponseEntity<List<AlojamientoResponseDTO>> getAlojamientosPorAnfitrion(
             @PathVariable Long anfitrionId) {
         List<Alojamiento> alojamientos = alojamientoService.getAlojamientosPorAnfitrion(anfitrionId);
-        return ResponseEntity.ok(alojamientos);
+        List<AlojamientoResponseDTO> response = alojamientos.stream()
+            .map(AlojamientoResponseDTO::fromEntity)
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{alojamientoId}/disponibilidad")
@@ -64,7 +73,7 @@ public class AlojamientoController {
     }
 
     @GetMapping("/buscar")
-    public ResponseEntity<List<Alojamiento>> buscarDisponibles(
+    public ResponseEntity<List<AlojamientoResponseDTO>> buscarDisponibles(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkin,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkout,
             @RequestParam(required = false) Integer capacidadMin,
@@ -72,7 +81,10 @@ public class AlojamientoController {
             @RequestParam(required = false) Long ciudadId) {
         List<Alojamiento> disponibles = alojamientoService.buscarDisponibles(
             checkin, checkout, capacidadMin, precioMax, ciudadId);
-        return ResponseEntity.ok(disponibles);
+        List<AlojamientoResponseDTO> response = disponibles.stream()
+            .map(AlojamientoResponseDTO::fromEntity)
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}/actualizarAlojamiento")
@@ -82,15 +94,16 @@ public class AlojamientoController {
             @RequestParam Long anfitrionId) {
         try {
             Alojamiento alojamiento = alojamientoService.actualizarAlojamiento(id, dto, anfitrionId);
-            return ResponseEntity.ok(alojamiento);
+            return ResponseEntity.ok(AlojamientoResponseDTO.fromEntity(alojamiento));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminarAlojamiento(
             @PathVariable Long id,
-            @RequestParam Long anfitrionId) { 
+            @RequestParam Long anfitrionId) {
         try {
             alojamientoService.eliminarAlojamiento(id, anfitrionId);
             return ResponseEntity.ok("Alojamiento eliminado exitosamente");
