@@ -1,19 +1,19 @@
-// Función principal de registro
+const API_URL_REGISTRO = "http://localhost:8080/autenticacion/registro";
+
 async function register(event) {
   event.preventDefault();
 
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+  const email = document.getElementById("email").value;
   const nombre = document.getElementById("nombre").value;
   const apellido = document.getElementById("apellido").value;
-  const username = document.getElementById("username").value;
-  const email = document.getElementById("email").value;
+  const telefono = document.getElementById("telefono").value;
+  const dni = document.getElementById("dni").value;
   const fechaNacimiento = document.getElementById("fechaNacimiento").value;
-  const password = document.getElementById("password").value;
 
-  if (!validatePassword(password)) {
-    showError(
-      document.getElementById("password"),
-      "La contraseña debe tener al menos 6 caracteres"
-    );
+  if (password.length < 6) {
+    alert("La contraseña debe tener al menos 6 caracteres");
     return;
   }
 
@@ -24,32 +24,40 @@ async function register(event) {
   button.disabled = true;
 
   try {
-    const registroData = {
-      nombre,
-      apellido,
-      username,
-      email,
-      fechaNacimiento,
-      password,
-    };
+    const response = await fetch(API_URL_REGISTRO, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username,
+        password,
+        email,
+        nombre,
+        apellido,
+        telefono,
+        dni,
+        fechaNacimiento,
+      }),
+    });
 
-    const data = await apiService.register(registroData);
+    if (!response.ok) throw new Error("Error en el registro");
 
-    showSuccess("Registrado correctamente");
+    showSuccess("Registro exitoso, redirigiendo...");
 
     setTimeout(() => {
-      window.location.href = "/pages/perfil/perfil.html";
+      window.location.href = "/pages/autenticacion/login/login.html";
     }, 2000);
   } catch (error) {
     console.error("Error en registro:", error);
-    showError(
-      document.getElementById("username"),
-      error.message || "Error en autenticación"
-    );
+    alert("Error al registrarse: " + (error.message || ""));
     button.textContent = originalText;
     button.disabled = false;
   }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.querySelector(".register-form");
+  if (form) form.addEventListener("submit", register);
+});
 
 // Validación mínima de contraseña
 function validatePassword(password) {

@@ -1,42 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/components/header/header.css">
-    <link rel="stylesheet" href="/components/footer/footer.css">
-    <link rel="stylesheet" href="perfil.css">
-    <title>Nombre de usuario</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/components/header/header.css">
+  <link rel="stylesheet" href="/components/footer/footer.css">
+  <link rel="stylesheet" href="perfil.css">
+  <title>Perfil de usuario</title>
 </head>
 <body>
-    <header class="header"></header>
-    <div class="main-perfil">
-        <section class="informacion-usuario">
-            <div class="user-profile-pic">
-                <div class="profile-pic"></div>
-                <Button class="nav-btn" data-target="#">Cambiar foto</Button>
-                <Button class="nav-btn logout" data-target="#">Cerrar sesion</Button>
-                <Button class="nav-btn" data-target="/pages/perfil/historial/historial.html">Ver historial</Button>
-            </div>
-            <p>Nombre del usuario</p>
-            <p>Descripcion</p>
-        </section>
-        <section class="propiedades" id="vista-anfitrion" style="display: none;">
-            <div class="propiedad-foto">FOTO</div>
-            <div class="propiedad-foto">FOTO</div>
-            <div class="propiedad-foto">FOTO</div>
-        </section>
-        <section class="reseñas">
-            <div class="reviews-box"></div>
-        </section>
-    </div>
-    <footer class="footer"></footer>
+  <header class="header"></header>
 
-    <script src="/services/apiService.js"></script>
-    <script src="/components/header/header.js"></script>
-    <script src="/components/footer/footer.js"></script>
-    <script src="/services/enrutador.js"></script>
-    <script src="/services/userRoleManager.js"></script>
-    <script src="perfil.js"></script>
+  <main class="main-perfil">
+    <section class="informacion-usuario">
+      <div class="user-profile-pic">
+        <div class="profile-pic"></div>
+        <button class="nav-btn" id="btn-cambiar-foto">Cambiar foto</button>
+        <button class="nav-btn logout">Cerrar sesión</button>
+        <button class="nav-btn" data-target="/pages/perfil/historial/historial.html">Ver historial</button>
+      </div>
+
+      <div class="user-info">
+        <p class="username">Nombre del usuario</p>
+        <p class="descripcion">Descripción del usuario</p>
+      </div>
+    </section>
+
+    <section class="propiedades" id="vista-anfitrion" style="display: none;">
+      <h3>Tus propiedades</h3>
+      <div class="propiedades-lista">
+        <!--propiedades -->
+      </div>
+    </section>
+
+    <section class="reseñas">
+      <h3>Reseñas recibidas</h3>
+      <div class="reviews-box">
+        <!--reseñas-->
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer"></footer>
+  
+  <script src="/components/header/header.js"></script>
+  <script src="/components/footer/footer.js"></script>
+  <script src="/services/enrutador.js"></script>
+  <script src="/services/userRoleManager.js"></script>
+  <script src="perfil.js"></script>
 </body>
 </html>

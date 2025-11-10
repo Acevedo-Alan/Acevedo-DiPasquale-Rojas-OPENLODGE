@@ -1,13 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
-  let rol = localStorage.getItem("rol");
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
 
-  if (!rol) {
+  if (!usuario || !usuario.rol) {
     window.location.href = "/pages/autenticacion/login/login.html";
     return;
   }
 
-  rol = rol.trim().toUpperCase();
-
+  const rol = usuario.rol.trim().toUpperCase();
   console.log("Rol en userrolManager:", rol);
 
   if (rol !== "ANFITRION" && rol !== "HUESPED") {
@@ -32,15 +31,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// Funcionalidad de logout
+// Logout
 document.addEventListener("DOMContentLoaded", () => {
   const logoutButtons = document.querySelectorAll(".logout");
 
   logoutButtons.forEach((button) => {
     button.addEventListener("click", () => {
-      localStorage.removeItem("rol");
-      localStorage.removeItem("userId");
-      localStorage.removeItem("username");
+      localStorage.removeItem("usuario");
       window.location.href = "/pages/autenticacion/login/login.html";
     });
   });

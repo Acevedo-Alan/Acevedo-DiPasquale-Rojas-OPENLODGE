@@ -1,164 +1,95 @@
-// index.js - Actualizado para campos correctos del backend
+const API_URL_ALOJAMIENTOS = "<URL_GET_ALOJAMIENTOS>"; // Ej: http://localhost:8080/api/alojamientos
+const API_URL_BUSQUEDA = "<URL_BUSQUEDA>"; // Ej: http://localhost:8080/api/alojamientos/buscar
+
 document.addEventListener("DOMContentLoaded", async () => {
   await cargarPropiedades();
   setupBusqueda();
 });
 
 async function cargarPropiedades() {
-  const destinationsGrid = document.querySelector(".destinations-grid");
+  const grid = document.querySelector(".destinations-grid");
+  if (!grid) return;
 
-  if (!destinationsGrid) return;
+  grid.innerHTML = "<p>Cargando propiedades...</p>";
 
   try {
-    // Mostrar loading
-    destinationsGrid.innerHTML =
-      '<p style="text-align:center;grid-column:1/-1;">Cargando propiedades...</p>';
+    const response = await fetch(API_URL_ALOJAMIENTOS);
+    const alojamientos = await response.json();
 
-    const alojamientos = await apiService.getAlojamientos();
+    grid.innerHTML = "";
 
-    if (!alojamientos || alojamientos.length === 0) {
-      destinationsGrid.innerHTML =
-        '<p style="text-align:center;grid-column:1/-1;">No hay propiedades disponibles</p>';
+    if (!alojamientos.length) {
+      grid.innerHTML = "<p>No hay propiedades disponibles</p>";
       return;
     }
 
-    // Limpiar y renderizar propiedades
-    destinationsGrid.innerHTML = "";
-
-    // Tomar las primeras 6 propiedades para mostrar
-    const propiedadesDestacadas = alojamientos.slice(0, 6);
-
-    propiedadesDestacadas.forEach((alojamiento, index) => {
-      const card = crearTarjetaPropiedad(alojamiento, index);
-      destinationsGrid.appendChild(card);
+    alojamientos.slice(0, 6).forEach((a, i) => {
+      const card = crearTarjetaPropiedad(a, i);
+      grid.appendChild(card);
     });
   } catch (error) {
     console.error("Error al cargar propiedades:", error);
-    destinationsGrid.innerHTML =
-      '<p style="text-align:center;grid-column:1/-1;color:red;">Error al cargar propiedades</p>';
+    grid.innerHTML = "<p>Error al cargar propiedades</p>";
   }
 }
 
-function crearTarjetaPropiedad(alojamiento, index) {
+function crearTarjetaPropiedad(a, index) {
   const card = document.createElement("div");
   card.className = "destination-card";
-
-  // Definir badges según el índice
-  const badges = [
-    "Más Popular",
-    "Oferta Especial",
-    "Lujo",
-    "Nuevo",
-    "Destacado",
-    "Recomendado",
-  ];
-  const badge = badges[index % badges.length];
-
-  // Usar el campo imagen (URL única)
-  const imagenUrl = alojamiento.imagen || "img/hotel5.jpg";
-
-  // Extraer ubicación de direccion.ciudad
-  let ubicacion = "Ciudad";
-  if (alojamiento.direccion?.ciudad) {
-    ubicacion = `${alojamiento.direccion.ciudad.nombre || "Ciudad"}, ${
-      alojamiento.direccion.ciudad.pais || "País"
-    }`;
-  }
+  const imagen = a.imagen || "img/hotel5.jpg";
+  const ubicacion = a.direccion?.ciudad?.nombre || "Ciudad desconocida";
 
   card.innerHTML = `
-    <div class="destination-image" style="background-image: url(${imagenUrl});">
-      <span class="destination-badge">${badge}</span>
+    <div class="destination-image" style="background-image:url(${imagen});">
+      <span class="destination-badge">Destacado</span>
     </div>
     <div class="destination-content">
-      <div class="destination-header">
-        <h3 class="destination-title">${alojamiento.nombre || "Propiedad"}</h3>
-        <div class="rating">
-          <span class="stars">★★★★★</span>
-          <span>${alojamiento.calificacion || "4.8"}</span>
-        </div>
-      </div>
-      <p style="color: var(--gray-medium);">${ubicacion}</p>
-      <div class="destination-price">
-        $${alojamiento.precioNoche || "0"} <span>/ noche</span>
-      </div>
-      <button class="btn btn-primary" style="width: 100%;" onclick="irAPropiedad(${
-        alojamiento.id
-      })">Ver detalles</button>
-    </div>
-  `;
-
+      <h3>${a.nombre}</h3>
+      <p>${ubicacion}</p>
+      <p>$${a.precioNoche} / noche</p>
+      <button class="btn btn-primary" onclick="irAPropiedad(${a.id})">Ver detalles</button>
+    </div>`;
   return card;
 }
 
 function setupBusqueda() {
-  const searchBtn = document.querySelector(".search-btn");
+  const btn = document.querySelector(".search-btn");
+  if (!btn) return;
 
-  if (!searchBtn) return;
-
-  searchBtn.addEventListener("click", async () => {
-    const destino = document.getElementById("destination").value;
+  btn.addEventListener("click", async () => {
     const checkin = document.getElementById("checkin").value;
     const checkout = document.getElementById("checkout").value;
     const huespedes = document.getElementById("guests").value;
 
-    const params = {};
-    if (checkin) params.checkin = checkin;
-    if (checkout) params.checkout = checkout;
-    if (huespedes) params.capacidadMin = parseInt(huespedes);
+    const params = new URLSearchParams({ checkin, checkout, huespedes });
 
     try {
-      searchBtn.textContent = "Buscando...";
-      searchBtn.disabled = true;
+      btn.textContent = "Buscando...";
+      btn.disabled = true;
 
-      const resultados = await apiService.buscarAlojamientos(params);
-
-      // Guardar resultados en sessionStorage
-      sessionStorage.setItem("busquedaResultados", JSON.stringify(resultados));
-      sessionStorage.setItem("busquedaParams", JSON.stringify(params));
-
-      // Actualizar la vista con los resultados
+      const response = await fetch(`${API_URL_BUSQUEDA}?${params}`);
+      const resultados = await response.json();
       mostrarResultadosBusqueda(resultados);
-
-      searchBtn.textContent = "Buscar";
-      searchBtn.disabled = false;
     } catch (error) {
-      console.error("Error en la búsqueda:", error);
-      alert("Error al buscar propiedades");
-      searchBtn.textContent = "Buscar";
-      searchBtn.disabled = false;
+      alert("Error en la búsqueda");
+    } finally {
+      btn.textContent = "Buscar";
+      btn.disabled = false;
     }
   });
 }
 
 function mostrarResultadosBusqueda(resultados) {
-  const destinationsGrid = document.querySelector(".destinations-grid");
-
-  if (!destinationsGrid) return;
-
-  if (!resultados || resultados.length === 0) {
-    destinationsGrid.innerHTML = `
-      <p style="text-align:center;grid-column:1/-1;">
-        No se encontraron propiedades con esos criterios.
-        <button onclick="location.reload()" class="btn btn-primary" style="margin-top:1rem;">Ver todas las propiedades</button>
-      </p>
-    `;
+  const grid = document.querySelector(".destinations-grid");
+  grid.innerHTML = "";
+  if (!resultados.length) {
+    grid.innerHTML = "<p>No se encontraron resultados</p>";
     return;
   }
-
-  destinationsGrid.innerHTML = "";
-
-  resultados.forEach((alojamiento, index) => {
-    const card = crearTarjetaPropiedad(alojamiento, index);
-    destinationsGrid.appendChild(card);
-  });
-
-  // Scroll a los resultados
-  destinationsGrid.scrollIntoView({ behavior: "smooth" });
+  resultados.forEach((a, i) => grid.appendChild(crearTarjetaPropiedad(a, i)));
 }
 
-// Función global para navegar a una propiedad
 window.irAPropiedad = function (id) {
-  // Guardar el ID en sessionStorage
   sessionStorage.setItem("alojamientoId", id);
   window.location.href = "/pages/alojamiento/alojamiento.html";
 };
