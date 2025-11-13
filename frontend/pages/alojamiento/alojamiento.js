@@ -120,7 +120,7 @@ async function verificarDisponibilidad(alojamientoId) {
     if (response.ok) {
       const reservas = await response.json();
       const disponibilidadText =
-        reservas.length === 0 ? "Disponible" : "Ver calendario";
+        reservas.length === 0 ? "Disponible" : "Reservado";
       document.querySelectorAll("#disponibilidad").forEach((elem) => {
         elem.textContent = `Estado: ${disponibilidadText}`;
       });

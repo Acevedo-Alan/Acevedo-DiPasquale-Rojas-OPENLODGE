@@ -2,7 +2,7 @@ const API_URL_PROPIEDADES_ANFITRION =
   "http://localhost:8080/alojamientos/getAlojamiento/anfitrion";
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const usuario = JSON.parse(localStorage.getItem("usuario"));
+  const usuario = JSON.parse(localStorage.getItem("usuario")); // ✅ localStorage
 
   if (!usuario) {
     window.location.href = "/pages/autenticacion/login/login.html";
@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (usuario.rol === "ANFITRION") {
     document.getElementById("vista-anfitrion").style.display = "block";
-    await cargarPropiedadesAnfitrion(usuario.id);
+    await cargarPropiedadesAnfitrion(usuario.id); // ✅ Usar 'id', no 'userId'
   }
 
   // Botón cerrar sesión
@@ -28,7 +28,6 @@ async function cargarPropiedadesAnfitrion(anfitrionId) {
   if (!lista) return;
 
   try {
-
     const response = await fetch(
       `${API_URL_PROPIEDADES_ANFITRION}/${anfitrionId}`,
       {
