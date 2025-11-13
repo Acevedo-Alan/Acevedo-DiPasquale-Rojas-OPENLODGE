@@ -1,7 +1,11 @@
-// alojamiento.js - Carga dinámica de detalles del alojamiento
-// Actualizado para los campos correctos del backend
+const API_BASE_URL_ALOJ = "http://localhost:8080";
+
+let alojamientoActual = null;
+let usuarioActual = null;
+
 document.addEventListener("DOMContentLoaded", async () => {
-  const alojamientoId = sessionStorage.getItem("alojamientoId");
+  const urlParams = new URLSearchParams(window.location.search);
+  const alojamientoId = urlParams.get("id");
 
   if (!alojamientoId) {
     alert("No se especificó un alojamiento");
@@ -9,191 +13,181 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  await cargarDetallesAlojamiento(alojamientoId);
-  setupEliminarPropiedad(alojamientoId);
+  await cargarUsuarioActual();
+  await cargarAlojamiento(alojamientoId);
 });
 
-async function cargarDetallesAlojamiento(id) {
+async function cargarUsuarioActual() {
+  const userData = localStorage.getItem("usuario");
+  if (userData) {
+    usuarioActual = JSON.parse(userData);
+  }
+}
+
+async function cargarAlojamiento(id) {
   try {
-    const alojamiento = await apiService.getAlojamientoById(id);
-    const userId = localStorage.getItem("userId");
-    const rol = localStorage.getItem("rol")?.trim().toUpperCase();
-
-    // Determinar si el usuario es el anfitrión de esta propiedad
-    const esAnfitrion =
-      rol === "ANFITRION" && alojamiento.anfitrion?.id == userId;
-
-    // Mostrar la vista apropiada
-    if (esAnfitrion) {
-      document.getElementById("vista-anfitrion").style.display = "block";
-      document.getElementById("vista-huesped").style.display = "none";
-    } else {
-      document.getElementById("vista-huesped").style.display = "block";
-      document.getElementById("vista-anfitrion").style.display = "none";
-    }
-
-    // Renderizar detalles en ambas vistas
-    renderizarDetalles(alojamiento);
-  } catch (error) {
-    console.error("Error al cargar alojamiento:", error);
-    alert("Error al cargar los detalles del alojamiento");
-    window.location.href = "/pages/index/index.html";
-  }
-}
-
-function renderizarDetalles(alojamiento) {
-  // Actualizar título en ambas vistas
-  document.querySelectorAll("#nombre-propiedad").forEach((el) => {
-    el.textContent = alojamiento.nombre || "Propiedad";
-  });
-
-  // Actualizar localidad - usando direccion.ciudad
-  document.querySelectorAll("#localidad").forEach((el) => {
-    if (alojamiento.direccion?.ciudad) {
-      el.textContent = `${alojamiento.direccion.ciudad.nombre || ""}, ${
-        alojamiento.direccion.ciudad.pais || ""
-      }`;
-    } else {
-      el.textContent = "Ubicación no disponible";
-    }
-  });
-
-  // Actualizar dirección completa
-  document.querySelectorAll("#direccion").forEach((el) => {
-    if (alojamiento.direccion) {
-      const dir = alojamiento.direccion;
-      el.textContent = `${dir.calle || ""} ${dir.numero || ""}, ${
-        dir.barrio || ""
-      }`;
-    } else {
-      el.textContent = "Dirección no disponible";
-    }
-  });
-
-  // Actualizar anfitrión
-  document.querySelectorAll("#nombre-anfitrion").forEach((el) => {
-    el.textContent = `Anfitrión: ${
-      alojamiento.anfitrion?.nombre || "No disponible"
-    } ${alojamiento.anfitrion?.apellido || ""}`;
-  });
-
-  // Actualizar precio - usando precioNoche
-  document.querySelectorAll("#precio-propiedad").forEach((el) => {
-    el.textContent = `$${alojamiento.precioNoche || "0"} / noche`;
-  });
-
-  // Actualizar disponibilidad
-  document.querySelectorAll("#disponibilidad").forEach((el) => {
-    el.textContent = `Disponible: ${alojamiento.disponible ? "Sí" : "No"}`;
-  });
-
-  // Renderizar servicios
-  renderizarServicios(alojamiento.servicios);
-
-  // Actualizar carrusel de imágenes - usando campo imagen (URL única)
-  if (alojamiento.imagen) {
-    actualizarCarrusel([alojamiento.imagen]);
-  }
-
-  // Actualizar capacidad - usando capacidadHuespedes
-  if (alojamiento.capacidadHuespedes) {
-    const capacidadEl = document.createElement("h3");
-    capacidadEl.textContent = `Capacidad máxima: ${alojamiento.capacidadHuespedes} huéspedes`;
-    document.querySelectorAll(".carrusel-alojamiento").forEach((el) => {
-      el.appendChild(capacidadEl.cloneNode(true));
-    });
-  }
-
-  // Mostrar descripción si existe
-  if (alojamiento.descripcion) {
-    const descripcionEl = document.createElement("p");
-    descripcionEl.textContent = alojamiento.descripcion;
-    descripcionEl.style.cssText = "margin-top: 10px; color: #666;";
-    document.querySelectorAll(".carrusel-alojamiento").forEach((el) => {
-      el.appendChild(descripcionEl.cloneNode(true));
-    });
-  }
-}
-
-function renderizarServicios(servicios) {
-  const contenedores = document.querySelectorAll("#servicios-alojamiento");
-
-  contenedores.forEach((contenedor) => {
-    contenedor.innerHTML = "";
-
-    if (!servicios || servicios.length === 0) {
-      contenedor.innerHTML = "<p>No hay servicios disponibles</p>";
-      return;
-    }
-
-    servicios.forEach((servicio) => {
-      const servicioDiv = document.createElement("div");
-      servicioDiv.className = "carrusel-servicios";
-      servicioDiv.textContent = servicio.nombre || servicio;
-      contenedor.appendChild(servicioDiv);
-    });
-  });
-}
-
-function actualizarCarrusel(imagenes) {
-  const carruseles = document.querySelectorAll(".carrusel");
-
-  carruseles.forEach((carrusel) => {
-    carrusel.innerHTML = "";
-
-    imagenes.forEach((imagen, index) => {
-      const img = document.createElement("img");
-      img.src = imagen;
-      img.alt = `Imagen ${index + 1}`;
-      img.style.width = "100%";
-      img.style.height = "400px";
-      img.style.objectFit = "cover";
-      img.style.borderRadius = "8px";
-
-      if (index === 0) {
-        carrusel.appendChild(img);
+    const response = await fetch(
+      `${API_BASE_URL_ALOJ}/alojamientos/getAlojamiento/${id}`,
+      {
+        method: "GET",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
       }
-    });
-  });
-}
-
-function setupEliminarPropiedad(alojamientoId) {
-  const btnEliminar = document.querySelector(".eliminar-popup");
-
-  if (!btnEliminar) return;
-
-  btnEliminar.addEventListener("click", async (e) => {
-    e.preventDefault();
-
-    const confirmacion = confirm(
-      "¿Estás seguro de que deseas eliminar esta propiedad?"
     );
 
-    if (!confirmacion) return;
+    if (!response.ok) throw new Error("Alojamiento no encontrado");
 
-    try {
-      await apiService.eliminarAlojamiento(alojamientoId);
-      alert("Propiedad eliminada exitosamente");
-      window.location.href = "/pages/perfil/perfil.html";
-    } catch (error) {
-      console.error("Error al eliminar propiedad:", error);
-      alert("Error al eliminar la propiedad: " + error.message);
-    }
-  });
+    alojamientoActual = await response.json();
+    mostrarAlojamiento(alojamientoActual);
+    await verificarDisponibilidad(id);
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Error al cargar el alojamiento");
+    window.location.href = "/index.html";
+  }
 }
 
-// Setup botones de reserva
-document.addEventListener("DOMContentLoaded", () => {
-  const botonesReservar = document.querySelectorAll(
-    'button[data-target*="formularioReserva"]'
-  );
+function mostrarAlojamiento(alojamiento) {
+  const esAnfitrion =
+    usuarioActual && usuarioActual.id === alojamiento.anfitrionId;
+  const vistaAnfitrion = document.getElementById("vista-anfitrion");
+  const vistaHuesped = document.getElementById("vista-huesped");
 
-  botonesReservar.forEach((boton) => {
-    boton.addEventListener("click", () => {
-      // El alojamientoId ya está en sessionStorage
-      // Solo navegar a la página de reserva
-      window.location.href =
-        "/pages/alojamiento/formularioReserva/formularioReserva.html";
+  if (esAnfitrion) {
+    vistaAnfitrion.style.display = "block";
+    vistaHuesped.style.display = "none";
+    llenarDatosVista(vistaAnfitrion, alojamiento);
+  } else {
+    vistaHuesped.style.display = "block";
+    vistaAnfitrion.style.display = "none";
+    llenarDatosVista(vistaHuesped, alojamiento);
+  }
+
+  configurarBotones(esAnfitrion);
+}
+
+function llenarDatosVista(vista, alojamiento) {
+  const direccion = alojamiento.direccion;
+  const ciudad = direccion?.ciudad?.nombre || "";
+  const pais = direccion?.ciudad?.pais?.nombre || "";
+  const calle = direccion?.calle || "";
+  const numero = direccion?.numero || "";
+
+  vista.querySelector("#nombre-propiedad").textContent = alojamiento.nombre;
+  vista.querySelector("#localidad").textContent = `${ciudad}${
+    pais ? ", " + pais : ""
+  }`;
+  vista.querySelector("#direccion").textContent = `${calle} ${numero}`;
+  vista.querySelector(
+    "#nombre-anfitrion"
+  ).textContent = `Anfitrión: ${alojamiento.anfitrionNombre} ${alojamiento.anfitrionApellido}`;
+  vista.querySelector(
+    "#precio-propiedad"
+  ).textContent = `${alojamiento.precioNoche} / noche`;
+
+  const serviciosContainer = vista.querySelector("#servicios-alojamiento");
+  serviciosContainer.innerHTML = "";
+
+  if (alojamiento.servicios && alojamiento.servicios.length > 0) {
+    alojamiento.servicios.forEach((servicio) => {
+      const div = document.createElement("div");
+      div.className = "servicio-item";
+      div.textContent = servicio.nombre;
+      serviciosContainer.appendChild(div);
     });
-  });
-});
+  } else {
+    serviciosContainer.innerHTML = "<p>No hay servicios disponibles</p>";
+  }
+
+  const carrusel = vista.querySelector(".carrusel");
+  if (carrusel && alojamiento.imagen) {
+    carrusel.innerHTML = `<img src="${alojamiento.imagen}" alt="${alojamiento.nombre}" 
+                              style="width: 100%; max-height: 400px; object-fit: cover;">`;
+  }
+}
+
+async function verificarDisponibilidad(alojamientoId) {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL_ALOJ}/alojamientos/getAlojamiento/disponibilidad/${alojamientoId}`,
+      {
+        method: "GET",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    if (response.ok) {
+      const reservas = await response.json();
+      const disponibilidadText =
+        reservas.length === 0 ? "Disponible" : "Ver calendario";
+      document.querySelectorAll("#disponibilidad").forEach((elem) => {
+        elem.textContent = `Estado: ${disponibilidadText}`;
+      });
+    }
+  } catch (error) {
+    console.error("Error al verificar disponibilidad:", error);
+  }
+}
+
+function configurarBotones(esAnfitrion) {
+  if (esAnfitrion) {
+    const btnEliminar = document.querySelector(".eliminar-popup");
+    if (btnEliminar) {
+      btnEliminar.addEventListener("click", eliminarAlojamiento);
+    }
+
+    const btnModificar = document.querySelector(
+      '[data-target="/pages/alojamiento/modificarReserva/modificarReserva.html"]'
+    );
+    if (btnModificar) {
+      btnModificar.textContent = "Modificar alojamiento";
+      btnModificar.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.location.href = `/pages/modificarPropiedad/modificarPropiedad.html?id=${alojamientoActual.id}`;
+      });
+    }
+  } else {
+    const btnReservar = document.querySelector(
+      '[data-target="/pages/alojamiento/formularioReserva/formularioReserva.html"]'
+    );
+    if (btnReservar) {
+      btnReservar.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (!usuarioActual) {
+          alert("Debes iniciar sesión para reservar");
+          window.location.href = "/pages/autenticacion/login/login.html";
+        } else {
+          window.location.href = `/pages/alojamiento/formularioReserva/formularioReserva.html?alojamientoId=${alojamientoActual.id}`;
+        }
+      });
+    }
+  }
+}
+
+async function eliminarAlojamiento() {
+  if (!confirm("¿Estás seguro de eliminar este alojamiento?")) return;
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL_ALOJ}/alojamientos/eliminarAlojamiento/${alojamientoActual.id}?anfitrionId=${usuarioActual.id}`,
+      {
+        method: "DELETE",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error);
+    }
+
+    alert("Alojamiento eliminado exitosamente");
+    window.location.href = "/pages/index/index.html";
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Error al eliminar el alojamiento: " + error.message);
+  }
+}
+

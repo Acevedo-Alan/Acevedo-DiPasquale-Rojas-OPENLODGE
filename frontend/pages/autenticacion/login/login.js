@@ -1,3 +1,4 @@
+// login.js - Corregido con debugging
 const API_URL = "http://localhost:8080/autenticacion/login";
 
 async function login(event) {
@@ -15,29 +16,45 @@ async function login(event) {
   try {
     const response = await fetch(API_URL, {
       method: "POST",
+      credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
     });
 
-    if (!response.ok) throw new Error("Credenciales incorrectas");
+    if (!response.ok) {
+      throw new Error("Credenciales incorrectas");
+    }
 
     const data = await response.json();
 
     const usuario = {
-      userId: data.userId,
-      username: data.username,
-      rol: data.rol,
+      id: data.userId || data.id || null,
+      username: data.username || username,
+      rol: data.rol || "HUESPED",
+      nombre: data.nombre || username,
+      apellido: data.apellido || "",
+      email: data.email || "",
     };
+
+    if (!usuario.id) {
+      console.error("El servidor no devolvió un ID:", data);
+      throw new Error(
+        "Error: El servidor no devolvió datos completos del usuario"
+      );
+    }
+
     localStorage.setItem("usuario", JSON.stringify(usuario));
 
     showSuccess("Sesión iniciada correctamente");
 
     setTimeout(() => {
       window.location.href = "/pages/index/index.html";
-    }, 2000);
+    }, 1000);
   } catch (error) {
-    console.error("Error en login:", error);
-    alert("Error de autenticación: " + (error.message || ""));
+    console.error("Error en autenticar:", error);
+    alert(
+      "Error de autenticación: " + (error.message || "Credenciales incorrectas")
+    );
     button.textContent = originalText;
     button.disabled = false;
   }
@@ -45,9 +62,8 @@ async function login(event) {
 
 document.addEventListener("DOMContentLoaded", () => {
   setupEntranceAnimation();
-  const form = document.querySelector(".login-form");
-  if (form) form.addEventListener("submit", login);
 
+  // Verificar si ya está logueado
   if (localStorage.getItem("usuario")) {
     window.location.href = "/pages/index/index.html";
   }

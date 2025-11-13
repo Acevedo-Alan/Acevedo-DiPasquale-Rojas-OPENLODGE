@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="/components/header/header.css" />
   <link rel="stylesheet" href="/components/footer/footer.css" />
-  <link rel="stylesheet" href="agregarPropiedad.css" />
-  <title>Registrar Alojamiento</title>
+  <link rel="stylesheet" href="/pages/modificarPropiedad/modificarPropiedad.css" />
+  <title>Modificar Alojamiento</title>
 </head>
 <body>
   <header class="header"></header>
 
   <main class="main-agregar-prop">
     <div class="form-container">
-      <h2>Registrar Alojamiento</h2>
-      <form id="form-registrar-propiedad">
+      <h2>Modificar Alojamiento</h2>
+      <form id="form-editar-propiedad">
         
         <!-- DATOS PRINCIPALES -->
         <h3>Datos del alojamiento</h3>
@@ -41,26 +41,21 @@
         <label for="numero">Número</label>
         <input type="text" id="numero" name="numero" required placeholder="Ej: 1234">
 
-        <label for="depto">Departamento</label>
-        <input type="text" id="depto" name="depto" placeholder="Opcional">
-
-        <label for="piso">Piso</label>
-        <input type="number" id="piso" name="piso" placeholder="Opcional">
-
         <label for="ciudad">Ciudad</label>
         <input type="text" id="ciudad" name="ciudad" required placeholder="Ej: Santa Fe">
 
         <label for="pais">País</label>
         <input type="text" id="pais" name="pais" required placeholder="Ej: Argentina">
 
-        <button type="submit" class="btn-primary">Registrar alojamiento</button>
+        <button type="submit" class="btn-primary">Guardar cambios</button>
+        <button type="button" class="btn-secondary" onclick="window.history.back()">Cancelar</button>
       </form>
     </div>
   </main>
 
   <footer class="footer"></footer>
 
-  <script src="agregarPropiedad.js"></script>
+  <script src="modifcarPropiedad.js"></script>
   <script src="/services/enrutador.js"></script>
   <script src="/services/userRoleManager.js"></script>
   <script src="/components/header/header.js"></script>

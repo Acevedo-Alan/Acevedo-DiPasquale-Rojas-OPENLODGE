@@ -8,7 +8,10 @@
       {
         "ignore": [
           "backdrop-filter",
-          "user-select"
+          "user-select",
+          "mask-size",
+          "mask-repeat",
+          "mask-image"
         ]
       }
     ],

@@ -1,194 +1,130 @@
-document.addEventListener("DOMContentLoaded", async () => {
-  const alojamientoId = sessionStorage.getItem("alojamientoId");
-  const userId = localStorage.getItem("userId");
+const API_BASE_URL_RESERVA = "http://localhost:8080";
 
-  if (!alojamientoId) {
-    alert("No se especificó un alojamiento para reservar");
-    window.location.href = "/pages/index/index.html";
-    return;
-  }
+let alojamientoId = null;
+let usuarioActual = null;
 
-  if (!userId) {
-    alert("Debes iniciar sesión para hacer una reserva");
+document.addEventListener("DOMContentLoaded", () => {
+  cargarUsuarioActual();
+
+  if (!usuarioActual) {
+    alert("Debes iniciar sesión para reservar");
     window.location.href = "/pages/autenticacion/login/login.html";
     return;
   }
 
-  await cargarServiciosDisponibles(alojamientoId);
-  setupFormulario(alojamientoId, userId);
-  setupValidacionFechas();
+  const urlParams = new URLSearchParams(window.location.search);
+  alojamientoId = urlParams.get("alojamientoId");
+
+  if (!alojamientoId) {
+    alert("No se especificó un alojamiento");
+    window.location.href = "/index.html";
+    return;
+  }
+
+  configurarFormulario();
+  configurarValidacionFechas();
 });
 
-async function cargarServiciosDisponibles(alojamientoId) {
-  try {
-    const alojamiento = await apiService.getAlojamientoById(alojamientoId);
-    const contenedorServicios = document.querySelector(".servicios");
-
-    if (!contenedorServicios) return;
-
-    contenedorServicios.innerHTML = "";
-
-    if (!alojamiento.servicios || alojamiento.servicios.length === 0) {
-      contenedorServicios.innerHTML =
-        "<p>No hay servicios adicionales disponibles</p>";
-      return;
-    }
-
-    alojamiento.servicios.forEach((servicio) => {
-      const label = document.createElement("label");
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.name = "servicios";
-      checkbox.value = servicio.id || servicio.nombre;
-
-      label.appendChild(checkbox);
-      label.appendChild(document.createTextNode(` ${servicio.nombre}`));
-      label.appendChild(document.createElement("br"));
-
-      contenedorServicios.appendChild(label);
-    });
-  } catch (error) {
-    console.error("Error al cargar servicios:", error);
+function cargarUsuarioActual() {
+  const userData = localStorage.getItem("usuario");
+  if (userData) {
+    usuarioActual = JSON.parse(userData);
   }
 }
 
-function setupFormulario(alojamientoId, userId) {
+function configurarFormulario() {
   const form = document.getElementById("form-reserva");
+  form.addEventListener("submit", handleSubmit);
 
-  if (!form) return;
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const fechaInicio = document.getElementById("fecha-inicio").value;
-    const fechaFin = document.getElementById("fecha-fin").value;
-    const huespedes = parseInt(document.getElementById("huespedes").value);
-    const terminos = document.getElementById("terminos").checked;
-
-    if (!terminos) {
-      alert("Debes aceptar los términos y condiciones");
-      return;
-    }
-
-    // Validar fechas
-    if (new Date(fechaFin) <= new Date(fechaInicio)) {
-      alert("La fecha de fin debe ser posterior a la fecha de inicio");
-      return;
-    }
-
-    // Verificar disponibilidad
-    try {
-      const disponibilidad = await apiService.verificarDisponibilidad(
-        alojamientoId,
-        fechaInicio,
-        fechaFin
-      );
-
-      if (!disponibilidad.disponible) {
-        alert("El alojamiento no está disponible en las fechas seleccionadas");
-        return;
-      }
-    } catch (error) {
-      console.error("Error al verificar disponibilidad:", error);
-      alert("Error al verificar disponibilidad");
-      return;
-    }
-
-    // Obtener servicios seleccionados
-    const serviciosSeleccionados = Array.from(
-      document.querySelectorAll('input[name="servicios"]:checked')
-    ).map((cb) => cb.value);
-
-    const reservaData = {
-      alojamientoId: parseInt(alojamientoId),
-      fechaInicio: fechaInicio,
-      fechaFin: fechaFin,
-      cantidadHuespedes: huespedes,
-      servicios: serviciosSeleccionados,
-    };
-
-    try {
-      const submitBtn = form.querySelector('button[type="submit"]');
-      submitBtn.textContent = "Procesando...";
-      submitBtn.disabled = true;
-
-      await apiService.crearReserva(userId, reservaData);
-
-      mostrarPopup("¡Reserva realizada con éxito!");
-
-      setTimeout(() => {
-        window.location.href = "/pages/alojamiento/alojamiento.html";
-      }, 2000);
-    } catch (error) {
-      console.error("Error al crear reserva:", error);
-      alert("Error al crear la reserva: " + error.message);
-
-      const submitBtn = form.querySelector('button[type="submit"]');
-      submitBtn.textContent = "Reservar";
-      submitBtn.disabled = false;
-    }
-  });
+  const hoy = new Date().toISOString().split("T")[0];
+  document.getElementById("fecha-inicio").min = hoy;
+  document.getElementById("fecha-fin").min = hoy;
 }
 
-function setupValidacionFechas() {
+function configurarValidacionFechas() {
   const fechaInicio = document.getElementById("fecha-inicio");
   const fechaFin = document.getElementById("fecha-fin");
 
-  if (!fechaInicio || !fechaFin) return;
-
-  const hoy = new Date().toISOString().split("T")[0];
-  fechaInicio.min = hoy;
-  fechaFin.min = hoy;
-
   fechaInicio.addEventListener("change", () => {
     fechaFin.min = fechaInicio.value;
+    if (fechaFin.value && fechaFin.value <= fechaInicio.value) {
+      fechaFin.value = "";
+    }
   });
 }
 
-function mostrarPopup(mensaje) {
-  const overlay = document.createElement("div");
-  overlay.style.cssText = `
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  `;
+async function handleSubmit(e) {
+  e.preventDefault();
 
-  const popup = document.createElement("div");
-  popup.style.cssText = `
-    background: #fff;
-    padding: 25px 35px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    text-align: center;
-    font-family: Arial, sans-serif;
-  `;
+  const fechaInicio = document.getElementById("fecha-inicio").value;
+  const fechaFin = document.getElementById("fecha-fin").value;
+  const huespedes = parseInt(document.getElementById("huespedes").value);
+  const terminos = document.getElementById("terminos").checked;
 
-  popup.innerHTML = `
-    <h2 style="color:#059669; margin-bottom:10px;">${mensaje}</h2>
-    <p>Gracias por tu reserva.</p>
-    <button id="cerrar-popup" style="
-      margin-top:15px;
-      background-color:#059669;
-      color:white;
-      border:none;
-      padding:10px 20px;
-      border-radius:8px;
-      cursor:pointer;
-      font-size:16px;
-    ">Aceptar</button>
-  `;
+  if (!terminos) {
+    alert("Debes aceptar los términos y condiciones");
+    return;
+  }
 
-  overlay.appendChild(popup);
-  document.body.appendChild(overlay);
+  if (new Date(fechaFin) <= new Date(fechaInicio)) {
+    alert("La fecha de salida debe ser posterior a la fecha de entrada");
+    return;
+  }
 
-  document.getElementById("cerrar-popup").addEventListener("click", () => {
-    overlay.remove();
-  });
+  const disponible = await verificarDisponibilidad(fechaInicio, fechaFin);
+  if (!disponible) {
+    alert("El alojamiento no está disponible en las fechas seleccionadas");
+    return;
+  }
+
+  const reservaData = {
+    alojamientoId: parseInt(alojamientoId),
+    checkin: fechaInicio,
+    checkout: fechaFin,
+    huespedes: huespedes,
+  };
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL_RESERVA}/reservas/crearReserva/usuario/${usuarioActual.id}`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(reservaData),
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error);
+    }
+
+    alert("¡Reserva creada exitosamente!");
+    window.location.href = `/pages/alojamiento/modificarReserva/modificarReserva.html?alojamientoId=${alojamientoId}`;
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Error al crear la reserva: " + error.message);
+  }
+}
+
+async function verificarDisponibilidad(checkin, checkout) {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL_RESERVA}/reservas/disponibilidad/${alojamientoId}?checkin=${checkin}&checkout=${checkout}`,
+      {
+        method: "GET",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    if (!response.ok) throw new Error("Error al verificar disponibilidad");
+
+    const resultado = await response.json();
+    return resultado.disponible;
+  } catch (error) {
+    console.error("Error:", error);
+    return false;
+  }
 }
