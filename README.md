@@ -5,47 +5,47 @@
 # Maven version: 4.0.0
 # Spring-boot version: 3.5.6
 # Estructura del proyecto:
-OpenLodge/
- ├── backend/
- │   ├── .mvn/
- │   ├── src/
- │   │   ├── main/
- │   │   │   ├── java/com/backend/
- │   │   │   │   ├── config/
- │   │   │   │   ├── Controllers/
- │   │   │   │   ├── dtos/
- │   │   │   │   ├── Entities/
- │   │   │   │   ├── enums/
- │   │   │   │   ├── Repositories/
- │   │   │   │   ├── Services/
- │   │   │   │   └── BackendApplication.java
- │   │   │   └── resources/
- │   │   └── test/
- │   ├── target/
- │   └── pom.xml
- │
- └── frontend/
-    ├── components/
-    │   ├── carrusel/
-    │   ├── FeedPropiedades/
-    │   ├── footer/
-    │   ├── header/
-    │   └── popup/
-    │
-    ├── pages/
-    │   ├── agregarPropiedad/
-    │   ├── alojamiento/
-    │   │   ├── formularioReserva/
-    │   │   └── modificarReserva/
-    │   │
-    │   ├── autenticacion/
-    │   │   ├── login/
-    │   │   └──registro/
-    │   ├── index/
-    │   ├── modificarPropiedad/
-    │   └── perfil/
-    │        └── historial/
-    └── services/
+# OpenLodge/
+# ├── backend/
+# │   ├── .mvn/
+# │   ├── src/
+# │   │   ├── main/
+# │   │   │   ├── java/com/backend/
+# │   │   │   │   ├── config/
+# │   │   │   │   ├── Controllers/
+# │   │   │   │   ├── dtos/
+# │   │   │   │   ├── Entities/
+# │   │   │   │   ├── enums/
+# │   │   │   │   ├── Repositories/
+# │   │   │   │   ├── Services/
+# │   │   │   │   └── BackendApplication.java
+# │   │   │   └── resources/
+# │   │   └── test/
+# │   ├── target/
+# │   └── pom.xml
+# │
+# └── frontend/
+#     ├── components/
+#     │   ├── carrusel/
+#     │   ├── FeedPropiedades/
+#     │   ├── footer/
+#     │   ├── header/
+#     │   └── popup/
+#     │
+#     ├── pages/
+#     │   ├── agregarPropiedad/
+#     │   ├── alojamiento/
+#     │   │   ├── formularioReserva/
+#     │   │   └── modificarReserva/
+#     │   │
+#     │   ├── autenticacion/
+#     │   │   ├── login/
+#     │   │   └──registro/
+#     │   ├── index/
+#     │   ├── modificarPropiedad/
+#     │   └── perfil/
+#     │        └── historial/
+#     └── services/
 
 # Pasos para levantar el proyecto:
 # BACKEND:
