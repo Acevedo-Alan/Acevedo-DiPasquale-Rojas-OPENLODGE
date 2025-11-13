@@ -172,6 +172,13 @@ const apiService = {
     return this.handleResponse(response);
   },
 
+  async obtenerDisponibilidadAlojamiento(alojamientoId) {
+    const response = await fetch(
+      `${API_BASE_URL}/api/alojamientos/${alojamientoId}/disponibilidad`
+    );
+    return this.handleResponse(response);
+  },
+
   // SERVICIOS
   async getServicios() {
     const response = await fetch(`${API_BASE_URL}/api/servicios`);

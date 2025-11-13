@@ -89,6 +89,8 @@ async function cargarHistorialReservas(userId) {
       container.addEventListener("click", () => {
         if (reserva.alojamiento?.id) {
           sessionStorage.setItem("alojamientoId", reserva.alojamiento.id);
+          // Guardar la reserva completa para que ModifyReservation pueda usarla
+          sessionStorage.setItem("reservaActual", JSON.stringify(reserva));
 
           // Si la reserva está activa, ir a modificar reserva
           if (checkout >= ahora) {

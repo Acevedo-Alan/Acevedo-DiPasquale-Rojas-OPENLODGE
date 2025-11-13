@@ -17,14 +17,33 @@ async function cargarDetallesReserva(alojamientoId, userId) {
     // Cargar detalles del alojamiento
     const alojamiento = await apiService.getAlojamientoById(alojamientoId);
 
-    // Cargar historial de reservas del usuario para encontrar la reserva actual
-    const reservas = await apiService.obtenerHistorialUsuario(userId);
+    // Verificar si hay una reserva guardada en sessionStorage
+    let reservaActual = null;
+    const reservaGuardada = sessionStorage.getItem("reservaActual");
+    
+    if (reservaGuardada) {
+      try {
+        reservaActual = JSON.parse(reservaGuardada);
+        // Verificar que la reserva guardada corresponde al alojamiento actual
+        if (reservaActual.alojamiento?.id != alojamientoId) {
+          reservaActual = null;
+        }
+      } catch (e) {
+        console.error("Error al parsear reserva guardada:", e);
+      }
+    }
 
-    // Buscar la reserva activa para este alojamiento
-    const reservaActual = reservas.find(
-      (r) =>
-        r.alojamiento?.id == alojamientoId && new Date(r.checkout) >= new Date()
-    );
+    // Si no hay reserva guardada, buscar en el historial
+    if (!reservaActual) {
+      // Cargar historial de reservas del usuario para encontrar la reserva actual
+      const reservas = await apiService.obtenerHistorialUsuario(userId);
+
+      // Buscar la reserva activa para este alojamiento
+      reservaActual = reservas.find(
+        (r) =>
+          r.alojamiento?.id == alojamientoId && new Date(r.checkout) >= new Date()
+      );
+    }
 
     if (!reservaActual) {
       alert("No se encontró una reserva activa para este alojamiento");
@@ -34,12 +53,13 @@ async function cargarDetallesReserva(alojamientoId, userId) {
 
     // Guardar la reserva en sessionStorage para uso posterior
     sessionStorage.setItem("reservaActual", JSON.stringify(reservaActual));
+    sessionStorage.setItem("alojamientoId", alojamientoId);
 
     // Renderizar información
     renderizarInformacion(alojamiento, reservaActual);
   } catch (error) {
     console.error("Error al cargar detalles de la reserva:", error);
-    alert("Error al cargar la información de la reserva");
+    alert("Error al cargar la información de la reserva: " + error.message);
     window.location.href = "/pages/perfil/historial/historial.html";
   }
 }

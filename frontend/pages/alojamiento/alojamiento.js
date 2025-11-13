@@ -23,6 +23,20 @@ async function cargarDetallesAlojamiento(id) {
     const esAnfitrion =
       rol === "ANFITRION" && alojamiento.anfitrion?.id == userId;
 
+    // Verificar si el usuario tiene una reserva activa para este alojamiento
+    let tieneReservaActiva = false;
+    if (userId && !esAnfitrion) {
+      try {
+        const reservas = await apiService.obtenerHistorialUsuario(userId);
+        tieneReservaActiva = reservas.some(
+          (r) =>
+            r.alojamiento?.id == id && new Date(r.checkout) >= new Date()
+        );
+      } catch (error) {
+        console.error("Error al verificar reservas:", error);
+      }
+    }
+
     // Mostrar la vista apropiada
     if (esAnfitrion) {
       document.getElementById("vista-anfitrion").style.display = "block";
@@ -33,7 +47,7 @@ async function cargarDetallesAlojamiento(id) {
     }
 
     // Renderizar detalles en ambas vistas
-    renderizarDetalles(alojamiento);
+    renderizarDetalles(alojamiento, tieneReservaActiva);
   } catch (error) {
     console.error("Error al cargar alojamiento:", error);
     alert("Error al cargar los detalles del alojamiento");
@@ -41,7 +55,7 @@ async function cargarDetallesAlojamiento(id) {
   }
 }
 
-function renderizarDetalles(alojamiento) {
+function renderizarDetalles(alojamiento, tieneReservaActiva = false) {
   // Actualizar título en ambas vistas
   document.querySelectorAll("#nombre-propiedad").forEach((el) => {
     el.textContent = alojamiento.nombre || "Propiedad";
@@ -113,6 +127,86 @@ function renderizarDetalles(alojamiento) {
       el.appendChild(descripcionEl.cloneNode(true));
     });
   }
+
+  // Ocultar botón "Modificar reserva" si no hay reserva activa
+  const botonesModificar = document.querySelectorAll(
+    'button[data-target*="modificarReserva"]'
+  );
+  botonesModificar.forEach((boton) => {
+    if (!tieneReservaActiva) {
+      boton.style.display = "none";
+    } else {
+      boton.style.display = "";
+    }
+  });
+
+  // Configurar botón de calendario para ambas vistas
+  setupCalendarioDisponibilidad(alojamiento.id);
+  setupCalendarioDisponibilidadAnfitrion(alojamiento.id);
+}
+
+function setupCalendarioDisponibilidad(alojamientoId) {
+  const btnCalendario = document.getElementById("btn-ver-calendario");
+  const containerCalendario = document.getElementById("calendario-container");
+
+  if (!btnCalendario || !containerCalendario) return;
+
+  let calendario = null;
+  let visible = false;
+
+  btnCalendario.addEventListener("click", async () => {
+    if (!visible) {
+      // Mostrar calendario
+      containerCalendario.style.display = "block";
+      btnCalendario.textContent = "Ocultar calendario";
+
+      if (!calendario) {
+        calendario = new ReservationCalendar("calendario-container", alojamientoId);
+        await calendario.init();
+      } else {
+        calendario.render();
+      }
+
+      visible = true;
+    } else {
+      // Ocultar calendario
+      containerCalendario.style.display = "none";
+      btnCalendario.textContent = "Ver calendario de disponibilidad";
+      visible = false;
+    }
+  });
+}
+
+function setupCalendarioDisponibilidadAnfitrion(alojamientoId) {
+  const btnCalendario = document.getElementById("btn-ver-calendario-anfitrion");
+  const containerCalendario = document.getElementById("calendario-container-anfitrion");
+
+  if (!btnCalendario || !containerCalendario) return;
+
+  let calendario = null;
+  let visible = false;
+
+  btnCalendario.addEventListener("click", async () => {
+    if (!visible) {
+      // Mostrar calendario
+      containerCalendario.style.display = "block";
+      btnCalendario.textContent = "Ocultar calendario";
+
+      if (!calendario) {
+        calendario = new ReservationCalendar("calendario-container-anfitrion", alojamientoId);
+        await calendario.init();
+      } else {
+        calendario.render();
+      }
+
+      visible = true;
+    } else {
+      // Ocultar calendario
+      containerCalendario.style.display = "none";
+      btnCalendario.textContent = "Ver calendario de disponibilidad";
+      visible = false;
+    }
+  });
 }
 
 function renderizarServicios(servicios) {

@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const alojamientoId = sessionStorage.getItem("alojamientoId");
   const userId = localStorage.getItem("userId");
+  const modificandoReserva = sessionStorage.getItem("modificandoReserva") === "true";
 
   if (!alojamientoId) {
     alert("No se especificó un alojamiento para reservar");
@@ -14,9 +15,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
+  // Cargar datos del alojamiento para validaciones
+  let alojamiento = null;
+  try {
+    alojamiento = await apiService.getAlojamientoById(alojamientoId);
+  } catch (error) {
+    console.error("Error al cargar alojamiento:", error);
+  }
+
   await cargarServiciosDisponibles(alojamientoId);
-  setupFormulario(alojamientoId, userId);
+  setupFormulario(alojamientoId, userId, modificandoReserva, alojamiento);
   setupValidacionFechas();
+  
+  // Si estamos modificando, precargar datos de la reserva
+  if (modificandoReserva) {
+    await precargarDatosReserva(alojamientoId, userId);
+  }
 });
 
 async function cargarServiciosDisponibles(alojamientoId) {
@@ -52,7 +66,42 @@ async function cargarServiciosDisponibles(alojamientoId) {
   }
 }
 
-function setupFormulario(alojamientoId, userId) {
+async function precargarDatosReserva(alojamientoId, userId) {
+  try {
+    const reservaGuardada = sessionStorage.getItem("reservaActual");
+    if (!reservaGuardada) return;
+
+    const reserva = JSON.parse(reservaGuardada);
+    
+    // Verificar que la reserva corresponde al alojamiento
+    if (reserva.alojamiento?.id != alojamientoId) return;
+
+    // Prellenar campos del formulario
+    const fechaInicio = document.getElementById("fecha-inicio");
+    const fechaFin = document.getElementById("fecha-fin");
+    const huespedes = document.getElementById("huespedes");
+
+    if (fechaInicio && reserva.checkin) {
+      fechaInicio.value = reserva.checkin.split("T")[0];
+    }
+    if (fechaFin && reserva.checkout) {
+      fechaFin.value = reserva.checkout.split("T")[0];
+    }
+    if (huespedes && reserva.huespedes) {
+      huespedes.value = reserva.huespedes;
+    }
+
+    // Cambiar texto del botón
+    const submitBtn = document.querySelector('button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.textContent = "Modificar Reserva";
+    }
+  } catch (error) {
+    console.error("Error al precargar datos de reserva:", error);
+  }
+}
+
+function setupFormulario(alojamientoId, userId, modificandoReserva = false, alojamiento = null) {
   const form = document.getElementById("form-reserva");
 
   if (!form) return;
@@ -70,13 +119,22 @@ function setupFormulario(alojamientoId, userId) {
       return;
     }
 
-    // Validar fechas
-    if (new Date(fechaFin) <= new Date(fechaInicio)) {
-      alert("La fecha de fin debe ser posterior a la fecha de inicio");
+    // Validar fechas usando helper compartido
+    const validationResult = validationHelpers.validateReservationData(
+      {
+        fechaInicio: fechaInicio,
+        fechaFin: fechaFin,
+        huespedes: huespedes,
+      },
+      alojamiento // pasar alojamiento para validar capacidad
+    );
+
+    if (!validationResult.valid) {
+      alert(validationResult.errors.join("\n"));
       return;
     }
 
-    // Verificar disponibilidad
+    // Verificar disponibilidad (excepto si estamos modificando la misma reserva)
     try {
       const disponibilidad = await apiService.verificarDisponibilidad(
         alojamientoId,
@@ -99,50 +157,58 @@ function setupFormulario(alojamientoId, userId) {
       document.querySelectorAll('input[name="servicios"]:checked')
     ).map((cb) => cb.value);
 
-    const reservaData = {
-      alojamientoId: parseInt(alojamientoId),
-      fechaInicio: fechaInicio,
-      fechaFin: fechaFin,
-      cantidadHuespedes: huespedes,
-      servicios: serviciosSeleccionados,
-    };
-
     try {
       const submitBtn = form.querySelector('button[type="submit"]');
-      submitBtn.textContent = "Procesando...";
+      submitBtn.textContent = modificandoReserva ? "Modificando..." : "Procesando...";
       submitBtn.disabled = true;
 
-      await apiService.crearReserva(userId, reservaData);
+      if (modificandoReserva) {
+        // Modificar reserva existente
+        await apiService.modificarReserva(userId, alojamientoId, {
+          nuevoCheckin: fechaInicio,
+          nuevoCheckout: fechaFin,
+          nuevosHuespedes: huespedes,
+        });
 
-      mostrarPopup("¡Reserva realizada con éxito!");
+        mostrarPopup("¡Reserva modificada con éxito!");
+        sessionStorage.removeItem("modificandoReserva");
+        sessionStorage.removeItem("reservaActual");
 
-      setTimeout(() => {
-        window.location.href = "/pages/alojamiento/alojamiento.html";
-      }, 2000);
+        setTimeout(() => {
+          window.location.href = "/pages/alojamiento/modificarReserva/modificarReserva.html";
+        }, 2000);
+      } else {
+        // Crear nueva reserva
+        const reservaData = {
+          alojamientoId: parseInt(alojamientoId),
+          fechaInicio: fechaInicio,
+          fechaFin: fechaFin,
+          cantidadHuespedes: huespedes,
+          servicios: serviciosSeleccionados,
+        };
+
+        await apiService.crearReserva(userId, reservaData);
+
+        mostrarPopup("¡Reserva realizada con éxito!");
+
+        setTimeout(() => {
+          window.location.href = "/pages/alojamiento/alojamiento.html";
+        }, 2000);
+      }
     } catch (error) {
-      console.error("Error al crear reserva:", error);
-      alert("Error al crear la reserva: " + error.message);
+      console.error("Error al procesar reserva:", error);
+      alert("Error: " + error.message);
 
       const submitBtn = form.querySelector('button[type="submit"]');
-      submitBtn.textContent = "Reservar";
+      submitBtn.textContent = modificandoReserva ? "Modificar Reserva" : "Reservar";
       submitBtn.disabled = false;
     }
   });
 }
 
 function setupValidacionFechas() {
-  const fechaInicio = document.getElementById("fecha-inicio");
-  const fechaFin = document.getElementById("fecha-fin");
-
-  if (!fechaInicio || !fechaFin) return;
-
-  const hoy = new Date().toISOString().split("T")[0];
-  fechaInicio.min = hoy;
-  fechaFin.min = hoy;
-
-  fechaInicio.addEventListener("change", () => {
-    fechaFin.min = fechaInicio.value;
-  });
+  // Usar helper compartido para validación de fechas
+  validationHelpers.setupDateValidation("fecha-inicio", "fecha-fin");
 }
 
 function mostrarPopup(mensaje) {
