@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 function cargarUsuarioActual() {
-  const userData = localStorage.getItem("usuario"); // ✅ CAMBIADO a localStorage
+  const userData = localStorage.getItem("usuario");
   if (userData) {
     usuarioActualMod = JSON.parse(userData);
   }

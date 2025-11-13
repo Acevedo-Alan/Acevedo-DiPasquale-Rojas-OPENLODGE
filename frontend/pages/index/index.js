@@ -101,7 +101,6 @@ async function buscarAlojamientos() {
   if (checkin) params.append("checkin", checkin);
   if (checkout) params.append("checkout", checkout);
   if (guests) params.append("capacidadMin", guests);
-  // Note: destination search would need ciudad mapping in real implementation
 
   try {
     const url = `${API_BASE_URL}/alojamientos/buscar${

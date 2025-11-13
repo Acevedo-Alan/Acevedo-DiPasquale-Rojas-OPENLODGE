@@ -1,4 +1,3 @@
-// login.js - Corregido con debugging
 const API_URL = "http://localhost:8080/autenticacion/login";
 
 async function login(event) {

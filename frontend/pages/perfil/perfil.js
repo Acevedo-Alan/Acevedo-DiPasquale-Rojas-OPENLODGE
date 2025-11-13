@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (usuario.rol === "ANFITRION") {
     document.getElementById("vista-anfitrion").style.display = "block";
-    await cargarPropiedadesAnfitrion(usuario.id); // ✅ Usar 'id', no 'userId'
+    await cargarPropiedadesAnfitrion(usuario.id);
   }
 
   // Botón cerrar sesión
