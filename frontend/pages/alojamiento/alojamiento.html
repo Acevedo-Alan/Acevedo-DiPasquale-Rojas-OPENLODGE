@@ -33,8 +33,7 @@
                     <div class="carrusel-servicios">servicio*</div>
                 </div>
                 <p id="disponibilidad">Disponible: si/no</p>
-                <button class="calendario-disponibilidad nav-btn" id="btn-ver-calendario-anfitrion">Ver calendario de disponibilidad</button>
-                <div id="calendario-container-anfitrion" style="display: none; margin: 20px 0;"></div>
+                <button class="calendario-disponibilidad nav-btn" data-target="#">Ver calendario de disponibilidad</button>
                 <button class="nav-btn" data-target="/pages/alojamiento/modificarReserva/modificarReserva.html">Modificar alojamiento</button>
                 <button class="eliminar-popup">Eliminar alojamiento</button>
                 <button class="nav-btn" data-target="/pages/alojamiento/modificarReserva/modificarReserva.html">Modificar reserva</button>
@@ -68,8 +67,7 @@
                     <div class="carrusel-servicios">servicio*</div>
                 </div>
                 <p id="disponibilidad">Disponible: si/no</p>
-                <button class="calendario-disponibilidad nav-btn" id="btn-ver-calendario">Ver calendario de disponibilidad</button>
-                <div id="calendario-container" style="display: none; margin: 20px 0;"></div>
+                <button class="calendario-disponibilidad nav-btn" data-target="#">Ver calendario de disponibilidad</button>
                 <button class="nav-btn" data-target="/pages/alojamiento/formularioReserva/formularioReserva.html">Reservar ahora</button>
                 <button class="nav-btn" data-target="/pages/alojamiento/modificarReserva/modificarReserva.html">Modificar reserva</button>
             </section>
@@ -84,7 +82,6 @@
     <footer class="footer"> </footer>
 
     <script src="/services/apiService.js"></script>
-    <script src="/components/ReservationCalendar/ReservationCalendar.js"></script>
     <script src="alojamiento.js"></script>
     <script src="/services/enrutador.js"></script>
     <script src="/services/userRoleManager.js"></script>

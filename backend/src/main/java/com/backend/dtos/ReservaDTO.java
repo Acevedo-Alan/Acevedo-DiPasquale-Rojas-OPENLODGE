@@ -6,10 +6,18 @@ import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ReservaDTO {
 
-    @NotNull()
+    @NotNull(message = "El ID del alojamiento es obligatorio")
     private Long alojamientoId;
 
     @NotNull(message = "La fecha de check-in es obligatoria")
@@ -23,46 +31,4 @@ public class ReservaDTO {
     @NotNull(message = "La cantidad de huéspedes es obligatoria")
     @Min(value = 1, message = "Debe haber al menos 1 huésped")
     private Integer huespedes;
-
-    public ReservaDTO() {
-    }
-
-    public ReservaDTO(Long alojamientoId, LocalDate checkin, LocalDate checkout, Integer huespedes) {
-        this.alojamientoId = alojamientoId;
-        this.checkin = checkin;
-        this.checkout = checkout;
-        this.huespedes = huespedes;
-    }
-
-    public Long getAlojamientoId() {
-        return alojamientoId;
-    }
-
-    public void setAlojamientoId(Long alojamientoId) {
-        this.alojamientoId = alojamientoId;
-    }
-
-    public LocalDate getCheckin() {
-        return checkin;
-    }
-
-    public void setCheckin(LocalDate checkin) {
-        this.checkin = checkin;
-    }
-
-    public LocalDate getCheckout() {
-        return checkout;
-    }
-
-    public void setCheckout(LocalDate checkout) {
-        this.checkout = checkout;
-    }
-
-    public Integer getHuespedes() {
-        return huespedes;
-    }
-
-    public void setHuespedes(Integer huespedes) {
-        this.huespedes = huespedes;
-    }
 }

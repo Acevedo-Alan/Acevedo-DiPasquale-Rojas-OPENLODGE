@@ -15,37 +15,45 @@
         
         <form class="register-form">
             <div class="form-row">
-                <div class="form-group">
-                    <label for="nombre">Nombre</label>
-                    <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="apellido">Apellido</label>
-                    <input type="text" id="apellido" name="apellido" placeholder="Tu apellido" required>
-                </div>
-            </div>
-            
             <div class="form-group">
                 <label for="username">Usuario</label>
                 <input type="text" id="username" name="username" placeholder="Ingresa tu usuario" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="email">Correo electrónico</label>
-                <input type="email" id="email" name="email" placeholder="tu@email.com" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="fechaNacimiento">Fecha de nacimiento</label>
-                <input type="date" id="fechaNacimiento" name="fechaNacimiento" required>
             </div>
 
             <div class="form-group">
                 <label for="password">Contraseña</label>
                 <input type="password" id="password" name="password" placeholder="Mínimo 6 caracteres" required>
+            </div>   
+
+            <div class="form-group">
+                <label for="email">Correo electrónico</label>
+                <input type="email" id="email" name="email" placeholder="tu@email.com" required>
             </div>
 
+            <div class="form-group">
+                <label for="nombre">Nombre</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="apellido">Apellido</label>
+                <input type="text" id="apellido" name="apellido" placeholder="Tu apellido" required>
+            </div>
+            </div>
+            <div class="form-group">
+                <label for="telefono">Numero telefonico</label>
+                <input type="text" id="telefono" name="telefono" required>
+            </div>           
+            <div class="form-group">
+                <label for="dni">DNI</label>
+                <input type="number" id="dni" name="dni" required>
+            </div>            
+            
+            <div class="form-group">
+                <label for="fechaNacimiento">Fecha de nacimiento</label>
+                <input type="date" id="fechaNacimiento" name="fechaNacimiento" required>
+            </div>
+         
             <button type="submit" class="btn-primary">Crear Cuenta</button>
             
             <div class="divider"><span>o</span></div>
@@ -56,6 +64,7 @@
         </form>
     </div>
 
+    <script src="/services/apiService.js"></script>
     <script src="registro.js"></script>
 </body>
 </html>

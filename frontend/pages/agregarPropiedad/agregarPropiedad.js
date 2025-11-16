@@ -1,333 +1,284 @@
-const api = "http://localhost:8080";
+const API_BASE_URL = "http://localhost:8080";
 
-// Array para almacenar servicios seleccionados
-let serviciosSeleccionados = [];
+let modoEdicion = false;
+let alojamientoId = null;
+let usuarioActual = null;
+let serviciosDisponibles = [];
 
-async function register(event) {
-  event.preventDefault();
-
-  const nombre = document.getElementById("nombre").value.trim();
-  const descripcion = document.getElementById("descripcion").value.trim();
-  const imagen = document.getElementById("imagen").value.trim();
-  const precioNoche = parseFloat(document.getElementById("precioNoche").value);
-  const capacidadHuespedes = parseInt(
-    document.getElementById("capacidadHuespedes").value
-  );
-  const calle = document.getElementById("calle").value.trim();
-  const numero = parseInt(document.getElementById("numero").value);
-  const ciudadNombre = document.getElementById("ciudad").value.trim();
-  const provinciaNombre = document.getElementById("provincia").value.trim();
-  const paisNombre = document.getElementById("pais").value.trim();
-
-  const button = event.target.querySelector(".btn-primary");
-  const originalText = button.textContent;
-  button.textContent = "Registrando...";
-  button.disabled = true;
-
-  try {
-    // 1. Obtener o crear servicios
-    const serviciosEntidades = await obtenerOCrearServicios(
-      serviciosSeleccionados
-    );
-
-    // 2. Crear o buscar País
-    let pais = await buscarOCrearPais(paisNombre);
-
-    // 3. Crear o buscar Ciudad
-    let ciudad = await buscarOCrearCiudad(ciudadNombre, pais.id);
-
-    // 4. Validar que ciudad y país tengan ID
-    if (!ciudad.id || !pais.id) {
-      throw new Error("Error al crear la ubicación. Intenta nuevamente.");
-    }
-
-    // 5. Crear Dirección con solo el ID de la ciudad
-    const direccion = {
-      calle: calle,
-      numero: numero,
-      ciudad: {
-        id: ciudad.id,
-      },
-    };
-
-    // 5. Crear el alojamiento
-    const registroData = {
-      nombre,
-      descripcion,
-      imagen,
-      precioNoche,
-      capacidadHuespedes,
-      direccion: direccion,
-      servicios: serviciosEntidades,
-    };
-
-    const response = await fetch(`${api}/api/alojamientos/crearAlojamiento`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-      },
-      body: JSON.stringify(registroData),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.text();
-      throw new Error(errorData || "Error al registrar alojamiento");
-    }
-
-    const data = await response.json();
-    showSuccess("Alojamiento registrado correctamente");
-
-    setTimeout(() => {
-      window.location.href = "/pages/perfil/perfil.html";
-    }, 2000);
-  } catch (error) {
-    console.error("Error en registro:", error);
-    showError(document.getElementById("nombre"), error.message);
-  } finally {
-    button.textContent = originalText;
-    button.disabled = false;
-  }
-}
-
-// Función para obtener o crear servicios
-async function obtenerOCrearServicios(nombresServicios) {
-  const serviciosEntidades = [];
-
-  for (const nombreServicio of nombresServicios) {
-    try {
-      // Intentar buscar el servicio primero
-      let response = await fetch(
-        `${api}/api/servicios/nombre/${encodeURIComponent(nombreServicio)}`
-      );
-
-      if (response.ok) {
-        const servicio = await response.json();
-        serviciosEntidades.push(servicio);
-      } else {
-        // Si no existe, crearlo
-        response = await fetch(
-          `${api}/api/servicios?nombre=${encodeURIComponent(nombreServicio)}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (response.ok) {
-          const nuevoServicio = await response.json();
-          serviciosEntidades.push(nuevoServicio);
-        }
-      }
-    } catch (error) {
-      console.error(`Error con servicio ${nombreServicio}:`, error);
-    }
+document.addEventListener("DOMContentLoaded", async () => {
+  const userData = localStorage.getItem("usuario");
+  if (userData) {
+    usuarioActual = JSON.parse(userData);
   }
 
-  return serviciosEntidades;
-}
-
-// Función para buscar o crear país (necesitarás crear estos endpoints en el backend)
-async function buscarOCrearPais(nombrePais) {
-  try {
-    // Intenta buscar el país primero
-    let response = await fetch(
-      `${api}/api/paises/nombre/${encodeURIComponent(nombrePais)}`
-    );
-
-    if (response.ok) {
-      return await response.json();
-    } else {
-      // Si no existe, créalo
-      response = await fetch(`${api}/api/paises`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre: nombrePais }),
-      });
-
-      if (response.ok) {
-        return await response.json();
-      }
-    }
-  } catch (error) {
-    console.error("Error al buscar/crear país:", error);
+  // userRoleManager.js ya maneja la verificación de rol
+  if (!usuarioActual || usuarioActual.rol !== "ANFITRION") {
+    alert("No puedes crear un alojamiento");
+    window.location.href = "/pages/index/index.html";
+    return;
   }
 
-  // Si falla, retorna un objeto temporal
-  return { id: null, nombre: nombrePais };
-}
+  const urlParams = new URLSearchParams(window.location.search);
+  alojamientoId = urlParams.get("id");
 
-// Función para buscar o crear ciudad
-async function buscarOCrearCiudad(nombreCiudad, paisId) {
-  try {
-    // Intenta buscar la ciudad primero
-    let response = await fetch(
-      `${api}/api/ciudades/nombre/${encodeURIComponent(
-        nombreCiudad
-      )}/pais/${paisId}`
-    );
-
-    if (response.ok) {
-      return await response.json();
-    } else {
-      // Si no existe, créala
-      response = await fetch(`${api}/api/ciudades`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre: nombreCiudad, paisId: paisId }),
-      });
-
-      if (response.ok) {
-        return await response.json();
-      }
-    }
-  } catch (error) {
-    console.error("Error al buscar/crear ciudad:", error);
+  if (alojamientoId) {
+    modoEdicion = true;
+    document.querySelector("h2").textContent = "Modificar Alojamiento";
+    await cargarDatosAlojamiento(alojamientoId);
   }
 
-  return { id: null, nombre: nombreCiudad };
-}
-
-// Manejo de servicios en la UI
-function agregarServicio() {
-  const input = document.getElementById("nuevoServicio");
-  const nombreServicio = input.value.trim();
-
-  if (nombreServicio && !serviciosSeleccionados.includes(nombreServicio)) {
-    serviciosSeleccionados.push(nombreServicio);
-    renderizarServicios();
-    input.value = "";
-  }
-}
-
-function eliminarServicio(index) {
-  serviciosSeleccionados.splice(index, 1);
-  renderizarServicios();
-}
-
-function renderizarServicios() {
-  const lista = document.getElementById("lista-servicios");
-  lista.innerHTML = serviciosSeleccionados
-    .map(
-      (servicio, index) => `
-        <div class="servicio-tag">
-          <span>${servicio}</span>
-          <button type="button" onclick="eliminarServicio(${index})">×</button>
-        </div>
-      `
-    )
-    .join("");
-}
-
-// Mostrar error en un input
-function showError(field, message) {
-  clearError(field);
-  const errorElement = document.createElement("div");
-  errorElement.className = "error-message";
-  errorElement.textContent = message;
-  errorElement.style.cssText = "color:#e53e3e;font-size:12px;margin-top:4px;";
-  field.parentElement.appendChild(errorElement);
-  field.style.borderColor = "#e53e3e";
-  setTimeout(() => clearError(field), 4000);
-}
-
-function clearError(field) {
-  const errorMessage = field.parentElement.querySelector(".error-message");
-  if (errorMessage) errorMessage.remove();
-  field.style.borderColor = "#e5e7eb";
-}
-
-function showSuccess(message) {
-  const existing = document.querySelector(".success-message");
-  if (existing) existing.remove();
-  const successElement = document.createElement("div");
-  successElement.className = "success-message";
-  successElement.textContent = message;
-  successElement.style.cssText = `
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #10b981;
-    color: white;
-    padding: 15px 25px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-    z-index: 10000;
-    animation: slideIn 0.3s ease;
-  `;
-  document.body.appendChild(successElement);
-  setTimeout(() => successElement.remove(), 3000);
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-  const form = document.getElementById("form-registrar-propiedad");
-  if (form) form.addEventListener("submit", register);
-
-  const btnAgregar = document.getElementById("agregarServicioBtn");
-  if (btnAgregar) btnAgregar.addEventListener("click", agregarServicio);
-
-  const inputServicio = document.getElementById("nuevoServicio");
-  if (inputServicio) {
-    inputServicio.addEventListener("keypress", function (e) {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        agregarServicio();
-      }
-    });
-  }
+  await cargarServicios();
+  configurarFormulario();
 });
 
-// Animación CSS
-if (!document.querySelector("#login-animations")) {
-  const style = document.createElement("style");
-  style.id = "login-animations";
-  style.textContent = `
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
+async function cargarServicios() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/servicios/getAll`, {
+      method: "GET",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (response.ok) {
+      serviciosDisponibles = await response.json();
+      mostrarServiciosEnFormulario();
     }
-    .servicio-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: #e0e7ff;
-      color: #005834ff;
-      padding: 6px 12px;
-      border-radius: 6px;
-      margin: 4px;
-      font-size: 14px;
+  } catch (error) {
+    console.error("Error al cargar servicios:", error);
+    // Si no hay endpoint de servicios, usar servicios predefinidos
+    serviciosDisponibles = [
+      { id: 1, nombre: "WiFi" },
+      { id: 2, nombre: "Aire acondicionado" },
+      { id: 3, nombre: "Calefacción" },
+      { id: 4, nombre: "Cocina" },
+      { id: 5, nombre: "Estacionamiento" },
+      { id: 6, nombre: "Piscina" },
+      { id: 7, nombre: "Gimnasio" },
+      { id: 8, nombre: "Lavandería" },
+    ];
+    mostrarServiciosEnFormulario();
+  }
+}
+
+function mostrarServiciosEnFormulario() {
+  const form = document.getElementById("form-registrar-propiedad");
+
+  // Buscar si ya existe la sección de servicios
+  let serviciosSection = document.getElementById("servicios-section");
+
+  if (!serviciosSection) {
+    serviciosSection = document.createElement("div");
+    serviciosSection.id = "servicios-section";
+    serviciosSection.innerHTML = "<h3>Servicios disponibles</h3>";
+
+    const serviciosContainer = document.createElement("div");
+    serviciosContainer.id = "servicios-container";
+    serviciosContainer.style.cssText = `
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.75rem;
+      margin: 1rem 0;
+    `;
+
+    serviciosDisponibles.forEach((servicio) => {
+      const label = document.createElement("label");
+      label.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+      `;
+
+      label.innerHTML = `
+        <input type="checkbox" 
+               name="servicios" 
+               value="${servicio.id}" 
+               data-nombre="${servicio.nombre}"
+               style="width: 18px; height: 18px; cursor: pointer;">
+        <span>${servicio.nombre}</span>
+      `;
+
+      const checkbox = label.querySelector("input");
+      checkbox.addEventListener("change", () => {
+        if (checkbox.checked) {
+          label.style.background = "#ebf8ff";
+          label.style.borderColor = "#4299e1";
+        } else {
+          label.style.background = "";
+          label.style.borderColor = "#e2e8f0";
+        }
+      });
+
+      serviciosContainer.appendChild(label);
+    });
+
+    serviciosSection.appendChild(serviciosContainer);
+
+    // Insertar antes del botón de submit
+    const submitBtn = form.querySelector('button[type="submit"]');
+    form.insertBefore(serviciosSection, submitBtn);
+  }
+}
+
+async function cargarDatosAlojamiento(id) {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/alojamientos/getAlojamiento/${id}`,
+      {
+        method: "GET",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+
+    if (!response.ok) throw new Error("Error al cargar alojamiento");
+
+    const alojamiento = await response.json();
+
+    // Verificar permisos
+    if (alojamiento.anfitrionId !== usuarioActual.id) {
+      alert("No tienes permiso para editar este alojamiento");
+      window.location.href = `/pages/alojamiento/alojamiento.html?id=${id}`;
+      return;
     }
-    .servicio-tag button {
-      background: none;
-      border: none;
-      color: #00d624ff;
-      font-size: 20px;
-      cursor: pointer;
-      padding: 0;
-      line-height: 1;
+
+    llenarFormulario(alojamiento);
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Error al cargar los datos del alojamiento");
+  }
+}
+
+function llenarFormulario(alojamiento) {
+  document.getElementById("nombre").value = alojamiento.nombre || "";
+  document.getElementById("descripcion").value = alojamiento.descripcion || "";
+  document.getElementById("imagen").value = alojamiento.imagen || "";
+  document.getElementById("precioNoche").value = alojamiento.precioNoche || "";
+  document.getElementById("capacidadHuespedes").value =
+    alojamiento.capacidadHuespedes || "";
+
+  if (alojamiento.direccion) {
+    document.getElementById("calle").value = alojamiento.direccion.calle || "";
+    document.getElementById("numero").value =
+      alojamiento.direccion.numero || "";
+
+    const deptoInput = document.getElementById("depto");
+    const pisoInput = document.getElementById("piso");
+    if (deptoInput) deptoInput.value = alojamiento.direccion.depto || "";
+    if (pisoInput) pisoInput.value = alojamiento.direccion.piso || "";
+
+    if (alojamiento.direccion.ciudad) {
+      document.getElementById("ciudad").value =
+        alojamiento.direccion.ciudad.nombre || "";
+
+      if (alojamiento.direccion.ciudad.pais) {
+        document.getElementById("pais").value =
+          alojamiento.direccion.ciudad.pais.nombre || "";
+      }
     }
-    .servicios { margin: 15px 0; }
-    .add-servicio {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
+  }
+
+  // Marcar servicios seleccionados
+  if (alojamiento.servicios && alojamiento.servicios.length > 0) {
+    const serviciosIds = alojamiento.servicios.map((s) => s.id);
+    document.querySelectorAll('input[name="servicios"]').forEach((checkbox) => {
+      if (serviciosIds.includes(parseInt(checkbox.value))) {
+        checkbox.checked = true;
+        checkbox.parentElement.style.background = "#ebf8ff";
+        checkbox.parentElement.style.borderColor = "#4299e1";
+      }
+    });
+  }
+}
+
+function configurarFormulario() {
+  const form = document.getElementById("form-registrar-propiedad");
+  form.addEventListener("submit", handleSubmit);
+}
+
+async function handleSubmit(e) {
+  e.preventDefault();
+
+  const formData = obtenerDatosFormulario();
+
+  try {
+    let response;
+
+    if (modoEdicion) {
+      response = await fetch(
+        `${API_BASE_URL}/alojamientos/actualizarAlojamiento/${alojamientoId}/?anfitrionId=${usuarioActual.id}`,
+        {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
+    } else {
+      response = await fetch(
+        `${API_BASE_URL}/alojamientos/crearAlojamiento?anfitrionId=${usuarioActual.id}`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
     }
-    .add-servicio input {
-      flex: 1;
-      padding: 8px;
-      border: 1px solid #e5e7eb;
-      border-radius: 6px;
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error);
     }
-    .add-servicio button {
-      padding: 8px 16px;
-      background: #4f46e5;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-  `;
-  document.head.appendChild(style);
+
+    const resultado = await response.json();
+    alert(
+      modoEdicion
+        ? "Alojamiento actualizado exitosamente"
+        : "Alojamiento registrado exitosamente"
+    );
+    window.location.href = `/pages/alojamiento/alojamiento.html?id=${resultado.id}`;
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Error al guardar el alojamiento: " + error.message);
+  }
+}
+
+function obtenerDatosFormulario() {
+  // Obtener servicios seleccionados
+  const serviciosSeleccionados = Array.from(
+    document.querySelectorAll('input[name="servicios"]:checked')
+  ).map((checkbox) => ({
+    id: parseInt(checkbox.value),
+    nombre: checkbox.dataset.nombre,
+  }));
+
+  return {
+    nombre: document.getElementById("nombre").value.trim(),
+    descripcion: document.getElementById("descripcion").value.trim(),
+    imagen: document.getElementById("imagen").value.trim() || null,
+    precioNoche: parseFloat(document.getElementById("precioNoche").value),
+    capacidadHuespedes: parseInt(
+      document.getElementById("capacidadHuespedes").value
+    ),
+    direccion: {
+      calle: document.getElementById("calle").value.trim(),
+      numero: parseInt(document.getElementById("numero").value),
+      depto: document.getElementById("depto")?.value.trim() || null,
+      piso: document.getElementById("piso")?.value
+        ? parseInt(document.getElementById("piso").value)
+        : null,
+      ciudad: {
+        nombre: document.getElementById("ciudad").value.trim(),
+        pais: {
+          nombre: document.getElementById("pais").value.trim(),
+        },
+      },
+    },
+    servicios: serviciosSeleccionados,
+  };
 }

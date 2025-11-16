@@ -1,92 +1,72 @@
 package com.backend.Services;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.Entities.Usuario;
 import com.backend.Repositories.IUsuarioRepository;
-import com.backend.Security.JwtUtil;
 import com.backend.dtos.LoginRequest;
-import com.backend.dtos.LoginResponse;
 import com.backend.dtos.RegisterRequest;
 import com.backend.enums.Roles;
+
+import jakarta.validation.Valid;
 
 @Service
 public class AutenticacionService {
 
     @Autowired
-    private IUsuarioRepository repository;
-    
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    
-    @Autowired
-    private JwtUtil jwtUtil;
+    private IUsuarioRepository usuarioRepository;
 
-    @Transactional
-    public void registroService(RegisterRequest request) {
-        if (repository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException("El nombre de usuario ya está en uso");
+    public ResponseEntity<?> login(LoginRequest request) {
+        Usuario usuario = usuarioRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (!usuario.getPassword().equals(request.getPassword())) {
+            return ResponseEntity.badRequest().body("Credenciales inválidas");
         }
 
-        if (repository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("El correo electrónico ya está registrado");
-        }
-        validarFormatoPassword(request.getPassword());
+        Map<String, Object> response = new HashMap<>();
+        response.put("userId", usuario.getId());
+        response.put("username", usuario.getUsername());
+        response.put("rol", usuario.getRol().name());
 
-        Usuario usuario = new Usuario();
-        usuario.setUsername(request.getUsername());
-        usuario.setPassword(passwordEncoder.encode(request.getPassword()));
-        usuario.setEmail(request.getEmail());
-        usuario.setNombre(request.getNombre());
-        usuario.setApellido(request.getApellido());
-        usuario.setFechaNacimiento(request.getFechaNacimiento());
-        usuario.setFechaCreacion(LocalDate.now()); 
-        usuario.setRol(Roles.HUESPED);
-        
-        repository.save(usuario);
+        return ResponseEntity.ok(response);
     }
 
-    public LoginResponse loginService(LoginRequest request) {
-        Usuario usuario = repository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("Usuario o contraseña inválidos"));
-        if (!passwordEncoder.matches(request.getPassword(), usuario.getPassword())) {
-            throw new IllegalArgumentException("Usuario o contraseña inválidos");
+    public ResponseEntity<?> registro(@Valid RegisterRequest request) {
+        if (usuarioRepository.findByUsername(request.getUsername()).isPresent()) {
+            return ResponseEntity.badRequest().body("El username ya está en uso");
         }
-        
-        String token = jwtUtil.generarToken(usuario.getUsername(), usuario.getRol().name());
-        
-        return new LoginResponse(
-            token, 
-            usuario.getUsername(), 
-            usuario.getNombre(), 
-            usuario.getRol().name()
-        );
-    }
-
-    // Validar formato de contraseña
-    private void validarFormatoPassword(String password) {
-        if (password == null || password.length() < 8) {
-            throw new IllegalArgumentException(
-                "La contraseña debe tener al menos 8 caracteres"
-            );
+        if (usuarioRepository.findByEmail(request.getEmail()).isPresent()) {
+            return ResponseEntity.badRequest().body("El email ya está registrado");
         }
 
-        boolean tieneMayuscula = password.chars().anyMatch(Character::isUpperCase);
-        boolean tieneMinuscula = password.chars().anyMatch(Character::isLowerCase);
-        boolean tieneNumero = password.chars().anyMatch(Character::isDigit);
-        boolean tieneEspecial = password.chars()
-            .anyMatch(c -> "!@#$%^&*()_+-=[]{}|;:,.<>?".indexOf(c) >= 0);
+        Usuario nuevoUsuario = new Usuario();
+        nuevoUsuario.setUsername(request.getUsername());
+        nuevoUsuario.setPassword(request.getPassword());
+        nuevoUsuario.setEmail(request.getEmail());
+        nuevoUsuario.setNombre(request.getNombre());
+        nuevoUsuario.setApellido(request.getApellido());
+        nuevoUsuario.setTelefono(request.getTelefono());
+        nuevoUsuario.setDni(request.getDni());
+        nuevoUsuario.setFechaNacimiento(request.getFechaNacimiento());
+        nuevoUsuario.setFechaCreacion(LocalDate.now());
+        nuevoUsuario.setRol(Roles.HUESPED);
 
-        if (!tieneMayuscula || !tieneMinuscula || !tieneNumero || !tieneEspecial) {
-            throw new IllegalArgumentException(
-                "La contraseña debe contener al menos: una mayúscula, " +
-                "una minúscula, un número y un carácter especial"
-            );
-        }
+        Usuario usuarioGuardado = usuarioRepository.save(nuevoUsuario);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("mensaje", "Usuario registrado exitosamente");
+        response.put("userId", usuarioGuardado.getId());
+        response.put("username", usuarioGuardado.getUsername());
+        response.put("rol", usuarioGuardado.getRol().name());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

@@ -3,6 +3,7 @@ package com.backend.Entities;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -32,10 +33,11 @@ public class Ciudad {
     private String nombre;
 
     @OneToMany(mappedBy = "ciudad", cascade = CascadeType.ALL)
-    private List<Direccion> direcciones;
+    @JsonManagedReference("ciudad-direcciones") 
+    private List<Direccion> direccion;
 
     @ManyToOne
     @JoinColumn(name = "id_pais", referencedColumnName = "id")
-    @JsonBackReference
+    @JsonBackReference("pais-ciudades")
     private Pais pais;
 }
