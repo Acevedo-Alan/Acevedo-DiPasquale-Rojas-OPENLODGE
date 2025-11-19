@@ -1,72 +1,63 @@
 package com.backend.Services;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.backend.Entities.Usuario;
 import com.backend.Repositories.IUsuarioRepository;
+import com.backend.Security.JwtUtil;
 import com.backend.dtos.LoginRequest;
+import com.backend.dtos.LoginResponse;
 import com.backend.dtos.RegisterRequest;
 import com.backend.enums.Roles;
-
 import jakarta.validation.Valid;
 
 @Service
 public class AutenticacionService {
-
     @Autowired
     private IUsuarioRepository usuarioRepository;
+    @Autowired
+    private JwtUtil jwtUtil;
+    @Autowired
+    private AuthenticationManager authManager;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    public ResponseEntity<?> login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
+        authManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                    request.getUsername(), request.getPassword()
+            )
+        );
         Usuario usuario = usuarioRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        if (!usuario.getPassword().equals(request.getPassword())) {
-            return ResponseEntity.badRequest().body("Credenciales inválidas");
-        }
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("userId", usuario.getId());
-        response.put("username", usuario.getUsername());
-        response.put("rol", usuario.getRol().name());
-
-        return ResponseEntity.ok(response);
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado")
+        );
+        String token = jwtUtil.generateToken(usuario);
+        return LoginResponse.builder().rol(usuario.getRol().name()).token(token).build();
     }
 
-    public ResponseEntity<?> registro(@Valid RegisterRequest request) {
-        if (usuarioRepository.findByUsername(request.getUsername()).isPresent()) {
-            return ResponseEntity.badRequest().body("El username ya está en uso");
-        }
-        if (usuarioRepository.findByEmail(request.getEmail()).isPresent()) {
-            return ResponseEntity.badRequest().body("El email ya está registrado");
-        }
+    public LoginResponse registro(@Valid RegisterRequest request) {
+       if (usuarioRepository.findByUsername(request.getUsername())
+                            .isPresent()) throw new RuntimeException("Ya existe");
+        Usuario usuario = Usuario.builder()
+                .username(request.getUsername())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .email(request.getEmail())
+                .nombre(request.getNombre())
+                .apellido(request.getApellido())
+                .telefono(request.getTelefono())
+                .dni(request.getDni())
+                .fechaNacimiento(request.getFechaNacimiento())
+                .fechaCreacion(LocalDate.now())
+                .rol(Roles.HUESPED)
+                .build();
+        usuarioRepository.save(usuario);
 
-        Usuario nuevoUsuario = new Usuario();
-        nuevoUsuario.setUsername(request.getUsername());
-        nuevoUsuario.setPassword(request.getPassword());
-        nuevoUsuario.setEmail(request.getEmail());
-        nuevoUsuario.setNombre(request.getNombre());
-        nuevoUsuario.setApellido(request.getApellido());
-        nuevoUsuario.setTelefono(request.getTelefono());
-        nuevoUsuario.setDni(request.getDni());
-        nuevoUsuario.setFechaNacimiento(request.getFechaNacimiento());
-        nuevoUsuario.setFechaCreacion(LocalDate.now());
-        nuevoUsuario.setRol(Roles.HUESPED);
-
-        Usuario usuarioGuardado = usuarioRepository.save(nuevoUsuario);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("mensaje", "Usuario registrado exitosamente");
-        response.put("userId", usuarioGuardado.getId());
-        response.put("username", usuarioGuardado.getUsername());
-        response.put("rol", usuarioGuardado.getRol().name());
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        String token = jwtUtil.generateToken(usuario);
+        return LoginResponse.builder().rol(usuario.getRol().name()).token(token).build();
     }
 }
