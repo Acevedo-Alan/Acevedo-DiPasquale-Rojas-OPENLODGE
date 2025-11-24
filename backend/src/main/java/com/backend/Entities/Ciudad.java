@@ -1,30 +1,27 @@
 package com.backend.Entities;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "ciudad")
+@EqualsAndHashCode(exclude = {"direcciones", "pais"})
+@ToString(exclude = {"direcciones", "pais"})
 public class Ciudad {
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,12 +29,12 @@ public class Ciudad {
     @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
 
-    @OneToMany(mappedBy = "ciudad", cascade = CascadeType.ALL)
-    @JsonManagedReference("ciudad-direcciones") 
-    private List<Direccion> direccion;
-
-    @ManyToOne
+    @OneToMany(mappedBy = "ciudad", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Direccion> direcciones = new ArrayList<>();
+    
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_pais", referencedColumnName = "id")
-    @JsonBackReference("pais-ciudades")
+    @JsonIgnoreProperties({"ciudades"})
     private Pais pais;
 }

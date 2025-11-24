@@ -2,39 +2,37 @@ package com.backend.Entities;
 
 import java.time.LocalDate;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "reserva")
+@EqualsAndHashCode(exclude = {"usuario", "alojamiento"})
+@ToString(exclude = {"usuario", "alojamiento"})
 public class Reserva {
 
     @EmbeddedId
     private ReservaId id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("usuarioId")
     @JoinColumn(name = "id_usuario")
-    @JsonBackReference("usuario-reservas")
+    @JsonIgnoreProperties({"reservas", "alojamientos", "password", "email"})
     private Usuario usuario;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("alojamientoId")
     @JoinColumn(name = "id_alojamiento")
-    @JsonBackReference("alojamiento-reservas")
+    @JsonIgnoreProperties({"reservas", "anfitrion", "servicios"})
     private Alojamiento alojamiento;
 
     @Column(name = "fecha_checkin", nullable = false)

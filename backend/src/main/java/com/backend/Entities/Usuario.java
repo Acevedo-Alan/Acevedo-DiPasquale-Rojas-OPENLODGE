@@ -10,7 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.backend.enums.Roles;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -60,17 +60,19 @@ public class Usuario implements UserDetails {
     @Column(name = "rol", nullable = false, length = 50)
     private Roles rol;
 
-    @OneToMany(mappedBy = "usuario", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JsonManagedReference("usuario-reservas")
-    private List<Reserva> reservas = new ArrayList<>();
-
-    @OneToMany(mappedBy = "anfitrion", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JsonManagedReference("alojamiento-usuario")
+    @Builder.Default
+    @OneToMany(mappedBy = "anfitrion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"anfitrion"})
     private List<Alojamiento> alojamientos = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"usuario"})
+    private List<Reserva> reservas = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities(){
-        return List.of(new SimpleGrantedAuthority(rol.name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + rol.name()));
     }
 
     @Override
