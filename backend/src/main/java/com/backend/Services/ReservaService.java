@@ -6,18 +6,20 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.backend.Entities.*;
 import com.backend.Repositories.*;
 import com.backend.dtos.ReservaDTO;
-import jakarta.transaction.Transactional;
 
 @Service
 public class ReservaService {
 
     @Autowired
     private IReservaRepository reservaRepo;
+    
     @Autowired
     private IUsuarioRepository usuarioRepo;
+    
     @Autowired
     private IAlojamientoRepository alojamientoRepo;
 
@@ -29,9 +31,13 @@ public class ReservaService {
         Alojamiento alojamiento = alojamientoRepo.findById(dto.getAlojamientoId())
             .orElseThrow(() -> new RuntimeException("Alojamiento no encontrado"));
 
+        if (alojamiento.getAnfitrion().getId().equals(usuarioId)) {
+            throw new RuntimeException("No puedes reservar tu propio alojamiento");
+        }
+
         ReservaId reservaId = new ReservaId(usuarioId, dto.getAlojamientoId());
         if (reservaRepo.existsById(reservaId)) {
-            throw new RuntimeException("Ya existe una reserva activa para este usuario en este alojamiento");
+            throw new RuntimeException("Ya tienes una reserva activa para este alojamiento");
         }
 
         validarFechas(dto.getCheckin(), dto.getCheckout());
@@ -72,8 +78,9 @@ public class ReservaService {
             throw new RuntimeException("No tienes permiso para modificar esta reserva");
         }
 
+        validarAnticipacionModificacion(reserva.getFechaCreacion());
+
         validarFechas(nuevoCheckin, nuevoCheckout);
-        validarAnticipacion(reserva.getCheckin());
         validarCapacidad(nuevosHuespedes, reserva.getAlojamiento().getCapacidadHuespedes());
 
         List<Reserva> conflictos = reservaRepo.findReservasEnRango(
@@ -105,9 +112,68 @@ public class ReservaService {
         if (!reserva.getUsuario().getId().equals(usuarioId)) {
             throw new RuntimeException("No tienes permiso para cancelar esta reserva");
         }
-
-        validarAnticipacion(reserva.getCheckin());
+        validarAnticipacionModificacion(reserva.getFechaCreacion());
         reservaRepo.delete(reserva);
+    }
+    @Transactional(readOnly = true)
+    public List<Reserva> obtenerHistorialUsuario(Long usuarioId) {
+        List<Reserva> reservas = reservaRepo.findByUsuarioId(usuarioId);
+        
+        // Forzar carga de relaciones LAZY
+        reservas.forEach(r -> {
+            r.getAlojamiento().getNombre();
+            r.getUsuario().getNombre();
+        });
+        
+        return reservas;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Reserva> obtenerHistorialAlojamiento(Long alojamientoId, Long anfitrionId) {
+        Alojamiento alojamiento = alojamientoRepo.findById(alojamientoId)
+            .orElseThrow(() -> new RuntimeException("Alojamiento no encontrado"));
+        
+        if (!alojamiento.getAnfitrion().getId().equals(anfitrionId)) {
+            throw new RuntimeException("No tienes permiso para ver las reservas de este alojamiento");
+        }
+        
+        List<Reserva> reservas = reservaRepo.findByAlojamientoId(alojamientoId);
+        
+        // Forzar carga de relaciones LAZY
+        reservas.forEach(r -> {
+            r.getAlojamiento().getNombre();
+            r.getUsuario().getNombre();
+        });
+        
+        return reservas;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Reserva> obtenerReservasPasadas(Long usuarioId) {
+        List<Reserva> reservas = reservaRepo.findReservasPasadas(usuarioId, LocalDate.now());
+        
+        // Forzar carga de relaciones LAZY
+        reservas.forEach(r -> {
+            r.getAlojamiento().getNombre();
+            r.getUsuario().getNombre();
+        });
+        
+        return reservas;
+    }
+
+    @Transactional(readOnly = true)
+    public boolean verificarDisponibilidad(Long alojamientoId, LocalDate checkin, LocalDate checkout) {
+        // Validar que el alojamiento existe
+        if (!alojamientoRepo.existsById(alojamientoId)) {
+            throw new RuntimeException("Alojamiento no encontrado");
+        }
+        
+        // Validar fechas
+        validarFechas(checkin, checkout);
+        
+        // Buscar conflictos
+        List<Reserva> conflictos = reservaRepo.findReservasEnRango(alojamientoId, checkin, checkout);
+        return conflictos.isEmpty();
     }
 
     private void validarFechas(LocalDate checkin, LocalDate checkout) {
@@ -123,6 +189,9 @@ public class ReservaService {
         if (huespedes > capacidadMaxima) {
             throw new RuntimeException("Excede la capacidad del alojamiento (" + capacidadMaxima + " personas)");
         }
+        if (huespedes < 1) {
+            throw new RuntimeException("Debe haber al menos 1 huésped");
+        }
     }
 
     private void validarDisponibilidad(Long alojamientoId, LocalDate checkin, LocalDate checkout) {
@@ -132,30 +201,13 @@ public class ReservaService {
         }
     }
 
-    private void validarAnticipacion(LocalDate checkin) {
+    private void validarAnticipacionModificacion(LocalDate fechaCreacion) {
         LocalDateTime ahora = LocalDateTime.now();
-        LocalDateTime checkinDateTime = checkin.atStartOfDay();
-        long horasRestantes = ChronoUnit.HOURS.between(ahora, checkinDateTime);
+        LocalDateTime fechaCreacionDateTime = fechaCreacion.atStartOfDay();
+        long horasDesdeCreacion = ChronoUnit.HOURS.between(fechaCreacionDateTime, ahora);
         
-        if (horasRestantes < 48) {
-            throw new RuntimeException("Se requiere al menos 48 horas de anticipación");
+        if (horasDesdeCreacion > 48) {
+            throw new RuntimeException("El plazo de 48 horas para modificar o cancelar la reserva ha expirado");
         }
-    }
-
-    public List<Reserva> obtenerHistorialUsuario(Long usuarioId) {
-        return reservaRepo.findByUsuarioId(usuarioId);
-    }
-
-    public List<Reserva> obtenerHistorialAlojamiento(Long alojamientoId) {
-        return reservaRepo.findByAlojamientoId(alojamientoId);
-    }
-
-    public List<Reserva> obtenerReservasPasadas(Long usuarioId) {
-        return reservaRepo.findReservasPasadas(usuarioId, LocalDate.now());
-    }
-
-    public boolean verificarDisponibilidad(Long alojamientoId, LocalDate checkin, LocalDate checkout) {
-        List<Reserva> conflictos = reservaRepo.findReservasEnRango(alojamientoId, checkin, checkout);
-        return conflictos.isEmpty();
     }
 }

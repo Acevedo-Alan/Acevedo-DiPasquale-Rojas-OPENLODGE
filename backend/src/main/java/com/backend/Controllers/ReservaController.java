@@ -8,9 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import com.backend.Entities.Reserva;
+import com.backend.Entities.Usuario;
 import com.backend.Services.ReservaService;
 import com.backend.dtos.ReservaDTO;
 import com.backend.dtos.ReservaResponseDTO;
@@ -25,29 +28,73 @@ public class ReservaController {
     @Autowired
     private ReservaService reservaService;
 
-    @PostMapping("/crearReserva/usuario/{usuarioId}")
-    public ResponseEntity<?> crearReserva(
-            @PathVariable Long usuarioId,
-            @Valid @RequestBody ReservaDTO dto) {
+    // ========== ENDPOINTS PÚBLICOS ==========
+
+    @GetMapping("/disponibilidad/{alojamientoId}")
+    public ResponseEntity<?> verificarDisponibilidad(
+            @PathVariable Long alojamientoId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkin,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkout) {
         try {
+            boolean disponible = reservaService.verificarDisponibilidad(alojamientoId, checkin, checkout);
+            return ResponseEntity.ok(new DisponibilidadResponse(disponible));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // ========== ENDPOINTS PROTEGIDOS ==========
+
+    @PostMapping("/crearReserva")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> crearReserva(
+            @Valid @RequestBody ReservaDTO dto,
+            Authentication authentication) {
+        try {
+            Usuario usuario = (Usuario) authentication.getPrincipal();
+            Long usuarioId = usuario.getId();
+
             Reserva reserva = reservaService.crearReserva(dto, usuarioId);
             ReservaResponseDTO response = ReservaResponseDTO.fromEntity(reserva);
+            
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    @PutMapping("/modificarReserva/usuario/{usuarioId}/alojamiento/{alojamientoId}")
+    @GetMapping("/historial/usuario")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<ReservaResponseDTO>> obtenerHistorialUsuario(
+            Authentication authentication) {
+        
+        Usuario usuario = (Usuario) authentication.getPrincipal();
+        Long usuarioId = usuario.getId();
+
+        List<ReservaResponseDTO> reservas = reservaService.obtenerHistorialUsuario(usuarioId)
+                .stream()
+                .map(ReservaResponseDTO::fromEntity)
+                .collect(Collectors.toList());
+        
+        return ResponseEntity.ok(reservas);
+    }
+
+
+    @PutMapping("/modificarReserva/alojamiento/{alojamientoId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> modificarReserva(
-            @PathVariable Long usuarioId,
             @PathVariable Long alojamientoId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate nuevoCheckin,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate nuevoCheckout,
-            @RequestParam Integer nuevosHuespedes) {
+            @RequestParam Integer nuevosHuespedes,
+            Authentication authentication) {
         try {
+            Usuario usuario = (Usuario) authentication.getPrincipal();
+            Long usuarioId = usuario.getId();
+
             Reserva reserva = reservaService.modificarReserva(
                     usuarioId, alojamientoId, nuevoCheckin, nuevoCheckout, nuevosHuespedes);
+            
             ReservaResponseDTO response = ReservaResponseDTO.fromEntity(reserva);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
@@ -55,11 +102,15 @@ public class ReservaController {
         }
     }
 
-    @DeleteMapping("/cancelarReserva/usuario/{usuarioId}/alojamiento/{alojamientoId}")
+    @DeleteMapping("/cancelarReserva/alojamiento/{alojamientoId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> cancelarReserva(
-            @PathVariable Long usuarioId,
-            @PathVariable Long alojamientoId) {
+            @PathVariable Long alojamientoId,
+            Authentication authentication) {
         try {
+            Usuario usuario = (Usuario) authentication.getPrincipal();
+            Long usuarioId = usuario.getId();
+
             reservaService.cancelarReserva(usuarioId, alojamientoId);
             return ResponseEntity.ok("Reserva cancelada exitosamente");
         } catch (RuntimeException e) {
@@ -67,35 +118,28 @@ public class ReservaController {
         }
     }
 
-    @GetMapping("/historial/usuario/{usuarioId}")
-    public ResponseEntity<List<ReservaResponseDTO>> obtenerHistorialUsuario(@PathVariable Long usuarioId) {
-        List<ReservaResponseDTO> reservas = reservaService.obtenerHistorialUsuario(usuarioId)
-                .stream().map(ReservaResponseDTO::fromEntity).collect(Collectors.toList());
-        return ResponseEntity.ok(reservas);
-    }
-
     @GetMapping("/historial/alojamiento/{alojamientoId}")
-    public ResponseEntity<List<ReservaResponseDTO>> obtenerHistorialAlojamiento(@PathVariable Long alojamientoId) {
-        List<ReservaResponseDTO> reservas = reservaService.obtenerHistorialAlojamiento(alojamientoId)
-                .stream().map(ReservaResponseDTO::fromEntity).collect(Collectors.toList());
-        return ResponseEntity.ok(reservas);
-    }
-
-    @GetMapping("/reservasPasadas/usuario/{usuarioId}")
-    public ResponseEntity<List<ReservaResponseDTO>> obtenerReservasPasadas(@PathVariable Long usuarioId) {
-        List<ReservaResponseDTO> reservas = reservaService.obtenerReservasPasadas(usuarioId)
-                .stream().map(ReservaResponseDTO::fromEntity).collect(Collectors.toList());
-        return ResponseEntity.ok(reservas);
-    }
-
-    @GetMapping("/disponibilidad/{alojamientoId}")
-    public ResponseEntity<?> verificarDisponibilidad(
+    @PreAuthorize("hasAuthority('ANFITRION')")
+    public ResponseEntity<?> obtenerHistorialAlojamiento(
             @PathVariable Long alojamientoId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkin,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkout) {
-        boolean disponible = reservaService.verificarDisponibilidad(alojamientoId, checkin, checkout);
-        return ResponseEntity.ok(new DisponibilidadResponse(disponible));
+            Authentication authentication) {
+        try {
+            Usuario usuario = (Usuario) authentication.getPrincipal();
+            
+            // Verificar que el alojamiento pertenezca al anfitrión
+            List<Reserva> reservas = reservaService.obtenerHistorialAlojamiento(
+                    alojamientoId, usuario.getId());
+            
+            List<ReservaResponseDTO> response = reservas.stream()
+                    .map(ReservaResponseDTO::fromEntity)
+                    .collect(Collectors.toList());
+            
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
+
 
     private static class DisponibilidadResponse {
         private boolean disponible;
