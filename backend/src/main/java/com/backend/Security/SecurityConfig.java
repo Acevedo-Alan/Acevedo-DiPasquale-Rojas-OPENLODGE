@@ -20,6 +20,7 @@ public class SecurityConfig {
 
     @Autowired
     private AuthenticationProvider authProvider;
+    
     @Autowired
     @Qualifier("handlerExceptionResolver")
     private HandlerExceptionResolver handlerExceptionResolver;
@@ -31,11 +32,26 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-            .authorizeHttpRequests().requestMatchers("/autenticacion/**").permitAll()
-            .anyRequest().authenticated().and().sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authenticationProvider(authProvider)
+        http
+            .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.configure(http))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/autenticacion/**").permitAll()
+                .requestMatchers("/alojamientos/getAlojamientos").permitAll()
+                .requestMatchers("/alojamientos/{id}").permitAll()
+                .requestMatchers("/alojamientos/buscar").permitAll()
+                .requestMatchers("/alojamientos/buscar/**").permitAll()
+                .requestMatchers("/alojamientos/disponibilidad/**").permitAll()
+                .requestMatchers("/servicios/getAll").permitAll()
+                .requestMatchers("/servicios/{id}").permitAll()
+                .anyRequest().authenticated()
+            )
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .authenticationProvider(authProvider)
             .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);
+            
         return http.build();
     }
 }

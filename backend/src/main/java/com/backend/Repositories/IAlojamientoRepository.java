@@ -28,10 +28,4 @@ public interface IAlojamientoRepository extends JpaRepository<Alojamiento, Long>
     );
     
     List<Alojamiento> findByNombre(String nombre);
-
-    // Buscar alojamientos por precio máximo
-    List<Alojamiento> findByPrecioNocheLessThanEqual(Double precioMax);
-    
-    // Buscar por capacidad mínima de huéspedes
-    List<Alojamiento> findByCapacidadHuespedesGreaterThanEqual(Integer capacidad);
 }
