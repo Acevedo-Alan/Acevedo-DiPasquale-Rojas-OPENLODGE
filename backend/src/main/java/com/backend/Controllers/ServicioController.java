@@ -6,12 +6,13 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.backend.Entities.Servicio;
 import com.backend.Services.ServicioService;
 import com.backend.dtos.ServicioDTO;
-import com.backend.dtos.ServicioSimpleDTO;
+import com.backend.dtos.ServicioResponseDTO;
 
 import jakarta.validation.Valid;
 
@@ -23,49 +24,56 @@ public class ServicioController {
     @Autowired
     private ServicioService servicioService;
 
+    // ========== ENDPOINTS PÚBLICOS ==========
+
     @GetMapping("/getAll")
-    public ResponseEntity<List<ServicioSimpleDTO>> obtenerTodosLosServicios() {
+    public ResponseEntity<List<ServicioResponseDTO>> obtenerTodosLosServicios() {
         List<Servicio> servicios = servicioService.obtenerTodosLosServicios();
-        List<ServicioSimpleDTO> response = servicios.stream()
-            .map(ServicioSimpleDTO::fromEntity)
+        List<ServicioResponseDTO> response = servicios.stream()
+            .map(ServicioResponseDTO::fromEntity)
             .collect(Collectors.toList());
         return ResponseEntity.ok(response);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<?> obtenerServicioPorId(@PathVariable Long id) {
         try {
             Servicio servicio = servicioService.obtenerServicioPorId(id);
-            return ResponseEntity.ok(ServicioSimpleDTO.fromEntity(servicio));
+            return ResponseEntity.ok(ServicioResponseDTO.fromEntity(servicio));
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
+    // ========== ENDPOINTS PROTEGIDOS (SOLO ADMINISTRADOR) ==========
     @PostMapping("/crear")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> crearServicio(@Valid @RequestBody ServicioDTO dto) {
         try {
             Servicio servicio = servicioService.crearServicio(dto);
             return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ServicioSimpleDTO.fromEntity(servicio));
+                .body(ServicioResponseDTO.fromEntity(servicio));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @PutMapping("/actualizar/{id}")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> actualizarServicio(
             @PathVariable Long id,
             @Valid @RequestBody ServicioDTO dto) {
         try {
             Servicio servicio = servicioService.actualizarServicio(id, dto);
-            return ResponseEntity.ok(ServicioSimpleDTO.fromEntity(servicio));
+            return ResponseEntity.ok(ServicioResponseDTO.fromEntity(servicio));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @DeleteMapping("/eliminar/{id}")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<?> eliminarServicio(@PathVariable Long id) {
         try {
             servicioService.eliminarServicio(id);

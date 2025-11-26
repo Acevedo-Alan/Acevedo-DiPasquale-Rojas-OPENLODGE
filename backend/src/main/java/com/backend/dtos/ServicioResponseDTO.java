@@ -10,12 +10,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ServicioSimpleDTO {
+public class ServicioResponseDTO {
+    
     private Long id;
     private String nombre;
     
-    public static ServicioSimpleDTO fromEntity(Servicio servicio) {
-        return ServicioSimpleDTO.builder()
+    public static ServicioResponseDTO fromEntity(Servicio servicio) {
+        if (servicio == null) return null;
+        
+        return ServicioResponseDTO.builder()
             .id(servicio.getId())
             .nombre(servicio.getNombre())
             .build();

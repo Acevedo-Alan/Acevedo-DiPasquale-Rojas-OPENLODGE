@@ -31,7 +31,7 @@ public class AlojamientoResponseDTO {
     private DireccionDTO direccion;
     
     // Servicios
-    private Set<ServicioSimpleDTO> servicios;
+    private Set<ServicioResponseDTO> servicios;
    
     public static AlojamientoResponseDTO fromEntity(Alojamiento alojamiento) {
         return AlojamientoResponseDTO.builder()
@@ -48,7 +48,7 @@ public class AlojamientoResponseDTO {
             .anfitrionApellido(alojamiento.getAnfitrion().getApellido())
             .direccion(DireccionDTO.fromEntity(alojamiento.getDireccion()))
             .servicios(alojamiento.getServicios().stream()
-                .map(ServicioSimpleDTO::fromEntity)
+                .map(ServicioResponseDTO::fromEntity)
                 .collect(Collectors.toSet()))
             .build();
     }
