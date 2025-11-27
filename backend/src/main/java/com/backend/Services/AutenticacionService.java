@@ -37,7 +37,16 @@ public class AutenticacionService {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado")
         );
         String token = jwtUtil.generateToken(usuario);
-        return LoginResponse.builder().rol(usuario.getRol().name()).token(token).build();
+        return LoginResponse.builder()
+                .id(usuario.getId())
+                .username(usuario.getUsername())
+                .nombre(usuario.getNombre())
+                .apellido(usuario.getApellido())
+                .telefono(usuario.getTelefono())
+                .dni(usuario.getDni())
+                .email(usuario.getEmail())
+                .rol(usuario.getRol().name())
+                .token(token).build();
     }
 
     public LoginResponse registro(@Valid RegisterRequest request) {
@@ -58,6 +67,15 @@ public class AutenticacionService {
         usuarioRepository.save(usuario);
 
         String token = jwtUtil.generateToken(usuario);
-        return LoginResponse.builder().rol(usuario.getRol().name()).token(token).build();
+        return LoginResponse.builder()
+                .id(usuario.getId())
+                .username(usuario.getUsername())
+                .nombre(usuario.getNombre())
+                .apellido(usuario.getApellido())
+                .telefono(usuario.getTelefono())
+                .dni(usuario.getDni())
+                .email(usuario.getEmail())
+                .rol(usuario.getRol().name())
+                .token(token).build();
     }
 }

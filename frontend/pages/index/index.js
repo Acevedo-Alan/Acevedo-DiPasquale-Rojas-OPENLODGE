@@ -10,12 +10,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 // Cargar todos los alojamientos
 async function cargarAlojamientos() {
   try {
-    const response = await fetch(`${API_BASE_URL}/alojamientos/getAll`, {
+    // Obtener el token si el usuario está autenticado
+    const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
+    const headers = {
+      "Content-Type": "application/json",
+    };
+    
+    if (usuario.token) {
+      headers["Authorization"] = `Bearer ${usuario.token}`;
+    }
+
+    const response = await fetch(`${API_BASE_URL}/alojamientos/getAlojamientos`, {
       method: "GET",
       credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: headers,
     });
 
     if (!response.ok) {
@@ -52,28 +60,23 @@ function crearTarjetaAlojamiento(alojamiento) {
   div.className = "destination-card";
   div.style.cursor = "pointer";
 
-  const ciudad =
-    alojamiento.direccion?.ciudad?.nombre || "Ciudad no especificada";
-  const pais = alojamiento.direccion?.ciudad?.pais?.nombre || "";
+  const ciudad = alojamiento.direccion?.ciudad || "Ciudad no especificada";
+  const pais = alojamiento.direccion?.pais || "";
 
   div.innerHTML = `
-        <img src="${
-          alojamiento.imagen || "https://via.placeholder.com/400x300"
-        }" 
-             alt="${alojamiento.nombre}"
-             onerror="this.src='https://via.placeholder.com/400x300'">
-        <div class="destination-info">
-            <h3>${alojamiento.nombre}</h3>
-            <p class="location">${ciudad}${pais ? ", " + pais : ""}</p>
-            <p class="description">${alojamiento.descripcion}</p>
-            <div class="destination-details">
-                <span class="capacity">Hasta ${
-                  alojamiento.capacidadHuespedes
-                } huéspedes</span>
-                <span class="price">$${alojamiento.precioNoche}/noche</span>
-            </div>
-        </div>
-    `;
+    <img src="${alojamiento.imagen || "https://via.placeholder.com/400x300"}" 
+         alt="${alojamiento.nombre}"
+         onerror="this.src='https://via.placeholder.com/400x300'">
+    <div class="destination-info">
+      <h3>${alojamiento.nombre}</h3>
+      <p class="location">${ciudad}${pais ? ", " + pais : ""}</p>
+      <p class="description">${alojamiento.descripcion}</p>
+      <div class="destination-details">
+        <span class="capacity">Hasta ${alojamiento.capacidadHuespedes} huéspedes</span>
+        <span class="price">$${alojamiento.precioNoche}/noche</span>
+      </div>
+    </div>
+  `;
 
   // Navegar al detalle del alojamiento
   div.addEventListener("click", () => {
@@ -86,15 +89,16 @@ function crearTarjetaAlojamiento(alojamiento) {
 // Configurar el buscador
 function configurarBuscador() {
   const searchBtn = document.querySelector(".search-btn");
-  searchBtn.addEventListener("click", buscarAlojamientos);
+  if (searchBtn) {
+    searchBtn.addEventListener("click", buscarAlojamientos);
+  }
 }
 
 // Buscar alojamientos con filtros
 async function buscarAlojamientos() {
-  const checkin = document.getElementById("checkin").value;
-  const checkout = document.getElementById("checkout").value;
-  const guests = document.getElementById("guests").value;
-  const destination = document.getElementById("destination").value;
+  const checkin = document.getElementById("checkin")?.value;
+  const checkout = document.getElementById("checkout")?.value;
+  const guests = document.getElementById("guests")?.value;
 
   // Construir URL con parámetros de búsqueda
   const params = new URLSearchParams();
@@ -103,15 +107,23 @@ async function buscarAlojamientos() {
   if (guests) params.append("capacidadMin", guests);
 
   try {
+    // Obtener el token si el usuario está autenticado
+    const usuario = JSON.parse(localStorage.getItem("usuario") || "{}");
+    const headers = {
+      "Content-Type": "application/json",
+    };
+    
+    if (usuario.token) {
+      headers["Authorization"] = `Bearer ${usuario.token}`;
+    }
+
     const url = `${API_BASE_URL}/alojamientos/buscar${
       params.toString() ? "?" + params.toString() : ""
     }`;
     const response = await fetch(url, {
       method: "GET",
       credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: headers,
     });
 
     if (!response.ok) {

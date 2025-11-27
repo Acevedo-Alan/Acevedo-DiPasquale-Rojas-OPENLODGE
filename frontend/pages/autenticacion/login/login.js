@@ -25,14 +25,22 @@ async function login(event) {
       throw new Error(errorData.message || "Credenciales incorrectas");
     }
 
+
     const data = await response.json();
 
-    // El backend solo devuelve rol y token
     const usuario = {
-      rol: data.rol || "HUESPED",
-      token: data.token,
-      username: username // Guardamos el username del formulario
+      id: data.id,
+      username: data.username,
+      nombre: data.nombre,
+      apellido: data.apellido,
+      telefono: data.telefono,
+      dni: data.dni,
+      email: data.email,
+      rol: data.rol,
+      token: data.token
     };
+
+    console.log("Usuario autenticado:", usuario);
 
     localStorage.setItem("usuario", JSON.stringify(usuario));
 

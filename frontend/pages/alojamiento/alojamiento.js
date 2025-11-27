@@ -27,12 +27,21 @@ async function cargarUsuarioActual() {
 
 async function cargarAlojamiento(id) {
   try {
+    // Obtener el token si está autenticado
+    const headers = {
+      "Content-Type": "application/json"
+    };
+    
+    if (usuarioActual && usuarioActual.token) {
+      headers["Authorization"] = `Bearer ${usuarioActual.token}`;
+    }
+
     const response = await fetch(
-      `${API_BASE_URL_ALOJ}/alojamientos/getAlojamiento/${id}`,
+      `${API_BASE_URL_ALOJ}/alojamientos/${id}`,
       {
         method: "GET",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: headers,
       }
     );
 
@@ -40,8 +49,12 @@ async function cargarAlojamiento(id) {
 
     alojamientoActual = await response.json();
 
+    console.log("Alojamiento cargado:", alojamientoActual);
+    console.log("Usuario actual:", usuarioActual);
+    console.log("¿Es anfitrión?", usuarioActual?.id === alojamientoActual.anfitrionId);
+
     // Verificar si el usuario tiene una reserva activa
-    if (usuarioActual) {
+    if (usuarioActual && usuarioActual.id) {
       await verificarReservaUsuario(usuarioActual.id, id);
     }
 
@@ -51,18 +64,26 @@ async function cargarAlojamiento(id) {
   } catch (error) {
     console.error("Error:", error);
     alert("Error al cargar el alojamiento");
-    window.location.href = "/index.html";
+    window.location.href = "/pages/index/index.html";
   }
 }
 
 async function verificarReservaUsuario(usuarioId, alojamientoId) {
   try {
+    const headers = {
+      "Content-Type": "application/json"
+    };
+    
+    if (usuarioActual && usuarioActual.token) {
+      headers["Authorization"] = `Bearer ${usuarioActual.token}`;
+    }
+
     const response = await fetch(
       `${API_BASE_URL_ALOJ}/reservas/historial/usuario/${usuarioId}`,
       {
         method: "GET",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: headers,
       }
     );
 
@@ -81,17 +102,23 @@ async function verificarReservaUsuario(usuarioId, alojamientoId) {
 
 function mostrarAlojamiento(alojamiento) {
   const esAnfitrion =
-    usuarioActual && usuarioActual.id === alojamiento.anfitrionId;
+    usuarioActual && 
+    usuarioActual.id && 
+    alojamiento.anfitrionId && 
+    usuarioActual.id === alojamiento.anfitrionId;
+  
+  console.log("Mostrando alojamiento. Es anfitrión:", esAnfitrion);
+  
   const vistaAnfitrion = document.getElementById("vista-anfitrion");
   const vistaHuesped = document.getElementById("vista-huesped");
 
   if (esAnfitrion) {
-    vistaAnfitrion.style.display = "block";
-    vistaHuesped.style.display = "none";
+    if (vistaAnfitrion) vistaAnfitrion.style.display = "block";
+    if (vistaHuesped) vistaHuesped.style.display = "none";
     llenarDatosVista(vistaAnfitrion, alojamiento);
   } else {
-    vistaHuesped.style.display = "block";
-    vistaAnfitrion.style.display = "none";
+    if (vistaHuesped) vistaHuesped.style.display = "block";
+    if (vistaAnfitrion) vistaAnfitrion.style.display = "none";
     llenarDatosVista(vistaHuesped, alojamiento);
   }
 
@@ -100,8 +127,8 @@ function mostrarAlojamiento(alojamiento) {
 
 function llenarDatosVista(vista, alojamiento) {
   const direccion = alojamiento.direccion;
-  const ciudad = direccion?.ciudad?.nombre || "";
-  const pais = direccion?.ciudad?.pais?.nombre || "";
+  const ciudad = direccion?.ciudad || "";
+  const pais = direccion?.pais || "";
   const calle = direccion?.calle || "";
   const numero = direccion?.numero || "";
 
@@ -141,7 +168,7 @@ function llenarDatosVista(vista, alojamiento) {
 async function verificarDisponibilidad(alojamientoId) {
   try {
     const response = await fetch(
-      `${API_BASE_URL_ALOJ}/alojamientos/getAlojamiento/disponibilidad/${alojamientoId}`,
+      `${API_BASE_URL_ALOJ}/alojamientos/disponibilidad/${alojamientoId}`,
       {
         method: "GET",
         credentials: "include",
@@ -165,7 +192,7 @@ async function verificarDisponibilidad(alojamientoId) {
 async function mostrarCalendarioDisponibilidad(alojamientoId) {
   try {
     const response = await fetch(
-      `${API_BASE_URL_ALOJ}/alojamientos/getAlojamiento/disponibilidad/${alojamientoId}`,
+      `${API_BASE_URL_ALOJ}/alojamientos/disponibilidad/${alojamientoId}`,
       {
         method: "GET",
         credentials: "include",
@@ -251,15 +278,24 @@ function mostrarModalCalendario(reservas) {
 }
 
 function configurarBotones(esAnfitrion) {
+  console.log("Configurando botones. Es anfitrión:", esAnfitrion);
+  
   if (esAnfitrion) {
+    // Configurar botón eliminar
     const btnEliminar = document.querySelector(".eliminar-popup");
+    console.log("Botón eliminar encontrado:", btnEliminar);
     if (btnEliminar) {
       btnEliminar.addEventListener("click", eliminarAlojamiento);
     }
 
+    // Configurar botón modificar - buscar por diferentes selectores
     const btnModificar = document.querySelector(
       '#vista-anfitrion [data-target="/pages/alojamiento/modificarReserva/modificarReserva.html"]'
-    );
+    ) || document.querySelector('#vista-anfitrion .btn-modificar') 
+       || document.querySelector('#vista-anfitrion button[type="button"]');
+    
+    console.log("Botón modificar encontrado:", btnModificar);
+    
     if (btnModificar) {
       btnModificar.textContent = "Modificar alojamiento";
       btnModificar.removeAttribute("data-target");
@@ -269,13 +305,14 @@ function configurarBotones(esAnfitrion) {
       });
     }
   } else {
+    // Configuración para huéspedes
     const btnReservar = document.querySelector(
       '[data-target="/pages/alojamiento/formularioReserva/formularioReserva.html"]'
     );
     if (btnReservar) {
       btnReservar.addEventListener("click", (e) => {
         e.preventDefault();
-        if (!usuarioActual) {
+        if (!usuarioActual || !usuarioActual.id) {
           alert("Debes iniciar sesión para reservar");
           window.location.href = "/pages/autenticacion/login/login.html";
         } else {
@@ -308,11 +345,14 @@ async function eliminarAlojamiento() {
 
   try {
     const response = await fetch(
-      `${API_BASE_URL_ALOJ}/alojamientos/eliminarAlojamiento/${alojamientoActual.id}?anfitrionId=${usuarioActual.id}`,
+      `${API_BASE_URL_ALOJ}/alojamientos/eliminar/${alojamientoActual.id}`,
       {
         method: "DELETE",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${usuarioActual.token}`
+        },
       }
     );
 
