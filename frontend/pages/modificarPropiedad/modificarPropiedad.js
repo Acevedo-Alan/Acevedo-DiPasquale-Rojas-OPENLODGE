@@ -3,6 +3,7 @@ const API_BASE_URL_EDIT = "http://localhost:8080";
 let alojamientoIdEdit = null;
 let usuarioActualEdit = null;
 let alojamientoOriginal = null;
+let serviciosDisponibles = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
   const userData = localStorage.getItem("usuario");
@@ -25,18 +26,113 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
+  await cargarServicios();
   await cargarDatosAlojamientoEdit(alojamientoIdEdit);
   configurarFormularioEdit();
 });
 
+async function cargarServicios() {
+  try {
+    const response = await fetch(`${API_BASE_URL_EDIT}/servicios/getAll`, {
+      method: "GET",
+      credentials: "include",
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${usuarioActualEdit.token}`
+      },
+    });
+
+    if (response.ok) {
+      serviciosDisponibles = await response.json();
+      mostrarServiciosEnFormulario();
+    }
+  } catch (error) {
+    console.error("Error al cargar servicios:", error);
+    serviciosDisponibles = [
+      { id: 1, nombre: "WiFi" },
+      { id: 2, nombre: "Aire acondicionado" },
+      { id: 3, nombre: "Calefacción" },
+      { id: 4, nombre: "Cocina" },
+      { id: 5, nombre: "Estacionamiento" },
+      { id: 6, nombre: "Piscina" },
+      { id: 7, nombre: "Gimnasio" },
+      { id: 8, nombre: "Lavandería" },
+    ];
+    mostrarServiciosEnFormulario();
+  }
+}
+
+function mostrarServiciosEnFormulario() {
+  const form = document.getElementById("form-editar-propiedad");
+  let serviciosSection = document.getElementById("servicios-section");
+
+  if (!serviciosSection) {
+    serviciosSection = document.createElement("div");
+    serviciosSection.id = "servicios-section";
+    serviciosSection.innerHTML = "<h3>Servicios disponibles</h3>";
+
+    const serviciosContainer = document.createElement("div");
+    serviciosContainer.id = "servicios-container";
+    serviciosContainer.style.cssText = `
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.75rem;
+      margin: 1rem 0;
+    `;
+
+    serviciosDisponibles.forEach((servicio) => {
+      const label = document.createElement("label");
+      label.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+      `;
+
+      label.innerHTML = `
+        <input type="checkbox" 
+               name="servicios" 
+               value="${servicio.id}" 
+               data-nombre="${servicio.nombre}"
+               style="width: 18px; height: 18px; cursor: pointer;">
+        <span>${servicio.nombre}</span>
+      `;
+
+      const checkbox = label.querySelector("input");
+      checkbox.addEventListener("change", () => {
+        if (checkbox.checked) {
+          label.style.background = "#ebf8ff";
+          label.style.borderColor = "#4299e1";
+        } else {
+          label.style.background = "";
+          label.style.borderColor = "#e2e8f0";
+        }
+      });
+
+      serviciosContainer.appendChild(label);
+    });
+
+    serviciosSection.appendChild(serviciosContainer);
+    const submitBtn = form.querySelector('button[type="submit"]');
+    form.insertBefore(serviciosSection, submitBtn);
+  }
+}
+
 async function cargarDatosAlojamientoEdit(id) {
   try {
     const response = await fetch(
-      `${API_BASE_URL_EDIT}/alojamientos/getAlojamiento/${id}`,
+      `${API_BASE_URL_EDIT}/alojamientos/${id}`,
       {
         method: "GET",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${usuarioActualEdit.token}`
+        },
       }
     );
 
@@ -44,7 +140,7 @@ async function cargarDatosAlojamientoEdit(id) {
 
     alojamientoOriginal = await response.json();
 
-    //Verificar que el anfitrión sea el dueño
+    // Verificar que el anfitrión sea el dueño
     if (alojamientoOriginal.anfitrionId !== usuarioActualEdit.id) {
       alert(
         "No tienes permiso para modificar este alojamiento. Solo el propietario puede editarlo."
@@ -73,16 +169,23 @@ function llenarFormularioEdit(alojamiento) {
     document.getElementById("calle").value = alojamiento.direccion.calle || "";
     document.getElementById("numero").value =
       alojamiento.direccion.numero || "";
+    // DireccionDTO tiene ciudad y pais como strings directamente
+    document.getElementById("ciudad").value =
+      alojamiento.direccion.ciudad || "";
+    document.getElementById("pais").value =
+      alojamiento.direccion.pais || "";
+  }
 
-    if (alojamiento.direccion.ciudad) {
-      document.getElementById("ciudad").value =
-        alojamiento.direccion.ciudad.nombre || "";
-
-      if (alojamiento.direccion.ciudad.pais) {
-        document.getElementById("pais").value =
-          alojamiento.direccion.ciudad.pais.nombre || "";
+  // Marcar servicios seleccionados
+  if (alojamiento.servicios && alojamiento.servicios.length > 0) {
+    const serviciosIds = alojamiento.servicios.map((s) => s.id);
+    document.querySelectorAll('input[name="servicios"]').forEach((checkbox) => {
+      if (serviciosIds.includes(parseInt(checkbox.value))) {
+        checkbox.checked = true;
+        checkbox.parentElement.style.background = "#ebf8ff";
+        checkbox.parentElement.style.borderColor = "#4299e1";
       }
-    }
+    });
   }
 }
 
@@ -100,25 +203,25 @@ async function handleSubmitEdit(e) {
 
   try {
     const response = await fetch(
-      `${API_BASE_URL_EDIT}/alojamientos/actualizarAlojamiento/${alojamientoIdEdit}/?anfitrionId=${usuarioActualEdit.id}`,
+      `${API_BASE_URL_EDIT}/alojamientos/actualizar/${alojamientoIdEdit}`,
       {
         method: "PUT",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${usuarioActualEdit.token}`
+        },
         body: JSON.stringify(formData),
       }
     );
 
     if (!response.ok) {
       const error = await response.text();
-
-      // Manejar error específico de permisos
       if (error.includes("permiso") || error.includes("autorizado")) {
         alert("No tienes permiso para modificar este alojamiento");
         window.location.href = `/pages/alojamiento/alojamiento.html?id=${alojamientoIdEdit}`;
         return;
       }
-
       throw new Error(error);
     }
 
@@ -132,29 +235,25 @@ async function handleSubmitEdit(e) {
 }
 
 function obtenerDatosFormularioEdit() {
+  // Obtener servicios seleccionados como array de IDs
+  const serviciosIds = Array.from(
+    document.querySelectorAll('input[name="servicios"]:checked')
+  ).map((checkbox) => parseInt(checkbox.value));
+
   return {
     nombre: document.getElementById("nombre").value.trim(),
     descripcion: document.getElementById("descripcion").value.trim(),
-    imagen: document.getElementById("imagen").value.trim(),
+    imagen: document.getElementById("imagen").value.trim() || null,
     precioNoche: parseFloat(document.getElementById("precioNoche").value),
     capacidadHuespedes: parseInt(
       document.getElementById("capacidadHuespedes").value
     ),
-    direccion: {
-      id: alojamientoOriginal?.direccion?.id,
-      calle: document.getElementById("calle").value.trim(),
-      numero: parseInt(document.getElementById("numero").value),
-      depto: null,
-      piso: null,
-      ciudad: {
-        id: alojamientoOriginal?.direccion?.ciudad?.id,
-        nombre: document.getElementById("ciudad").value.trim(),
-        pais: {
-          id: alojamientoOriginal?.direccion?.ciudad?.pais?.id,
-          nombre: document.getElementById("pais").value.trim(),
-        },
-      },
-    },
-    servicios: alojamientoOriginal?.servicios || [],
+    calle: document.getElementById("calle").value.trim(),
+    numero: parseInt(document.getElementById("numero").value),
+    depto: null,
+    piso: null,
+    ciudad: document.getElementById("ciudad").value.trim(),
+    pais: document.getElementById("pais").value.trim(),
+    serviciosId: serviciosIds,
   };
 }

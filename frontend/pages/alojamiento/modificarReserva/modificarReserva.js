@@ -7,7 +7,7 @@ let reservaActual = null;
 document.addEventListener("DOMContentLoaded", async () => {
   cargarUsuarioActual();
 
-  if (!usuarioActualMod) {
+  if (!usuarioActualMod || !usuarioActualMod.id) {
     alert("Debes iniciar sesión");
     window.location.href = "/pages/autenticacion/login/login.html";
     return;
@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (!alojamientoIdMod) {
     alert("No se especificó un alojamiento");
-    window.location.href = "/index.html";
+    window.location.href = "/pages/index/index.html";
     return;
   }
 
@@ -36,11 +36,14 @@ function cargarUsuarioActual() {
 async function cargarDatosReserva() {
   try {
     const response = await fetch(
-      `${API_BASE_URL_MOD}/reservas/historial/usuario/${usuarioActualMod.id}`,
+      `${API_BASE_URL_MOD}/reservas/historial/usuario`,
       {
         method: "GET",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${usuarioActualMod.token}`
+        },
       }
     );
 
@@ -66,11 +69,14 @@ async function cargarDatosReserva() {
 async function cargarAlojamiento() {
   try {
     const response = await fetch(
-      `${API_BASE_URL_MOD}/alojamientos/getAlojamiento/${alojamientoIdMod}`,
+      `${API_BASE_URL_MOD}/alojamientos/${alojamientoIdMod}`,
       {
         method: "GET",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${usuarioActualMod.token}`
+        },
       }
     );
 
@@ -85,16 +91,17 @@ async function cargarAlojamiento() {
 
 function mostrarDatosAlojamiento(alojamiento) {
   const direccion = alojamiento.direccion;
+  // Adaptado a la estructura plana del DireccionDTO
   const direccionCompleta = `${direccion?.calle || ""} ${
     direccion?.numero || ""
-  }, ${direccion?.ciudad?.nombre || ""}`;
+  }, ${direccion?.ciudad || ""}`;
 
   document.querySelector(".propiedad-nombre").textContent = alojamiento.nombre;
   document.querySelector(".propiedad-direccion").textContent =
     direccionCompleta;
   document.querySelector(
     ".propiedad-precio"
-  ).textContent = `$${alojamiento.precioNoche} / noche`;
+  ).textContent = `${alojamiento.precioNoche} / noche`;
   document.querySelector(
     ".propiedad-dueño"
   ).textContent = `Anfitrión: ${alojamiento.anfitrionNombre} ${alojamiento.anfitrionApellido}`;
@@ -169,11 +176,14 @@ async function cancelarReserva(e) {
 
   try {
     const response = await fetch(
-      `${API_BASE_URL_MOD}/reservas/cancelarReserva/usuario/${usuarioActualMod.id}/alojamiento/${alojamientoIdMod}`,
+      `${API_BASE_URL_MOD}/reservas/cancelarReserva/alojamiento/${alojamientoIdMod}`,
       {
         method: "DELETE",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${usuarioActualMod.token}`
+        },
       }
     );
 

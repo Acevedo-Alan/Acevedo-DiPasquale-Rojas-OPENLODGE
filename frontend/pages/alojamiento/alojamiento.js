@@ -2,7 +2,6 @@ const API_BASE_URL_ALOJ = "http://localhost:8080";
 
 let alojamientoActual = null;
 let usuarioActual = null;
-let reservaActual = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search);
@@ -27,7 +26,6 @@ async function cargarUsuarioActual() {
 
 async function cargarAlojamiento(id) {
   try {
-    // Obtener el token si está autenticado
     const headers = {
       "Content-Type": "application/json"
     };
@@ -53,50 +51,15 @@ async function cargarAlojamiento(id) {
     console.log("Usuario actual:", usuarioActual);
     console.log("¿Es anfitrión?", usuarioActual?.id === alojamientoActual.anfitrionId);
 
-    // Verificar si el usuario tiene una reserva activa
-    if (usuarioActual && usuarioActual.id) {
-      await verificarReservaUsuario(usuarioActual.id, id);
-    }
-
+    // Primero mostrar el alojamiento (esto hace visible la vista)
     mostrarAlojamiento(alojamientoActual);
-    await verificarDisponibilidad(id);
-    await mostrarCalendarioDisponibilidad(id);
+    
+    // DESPUÉS configurar el calendario (cuando los botones ya son visibles)
+    await configurarCalendarioDisponibilidad(id);
   } catch (error) {
     console.error("Error:", error);
     alert("Error al cargar el alojamiento");
     window.location.href = "/pages/index/index.html";
-  }
-}
-
-async function verificarReservaUsuario(usuarioId, alojamientoId) {
-  try {
-    const headers = {
-      "Content-Type": "application/json"
-    };
-    
-    if (usuarioActual && usuarioActual.token) {
-      headers["Authorization"] = `Bearer ${usuarioActual.token}`;
-    }
-
-    const response = await fetch(
-      `${API_BASE_URL_ALOJ}/reservas/historial/usuario/${usuarioId}`,
-      {
-        method: "GET",
-        credentials: "include",
-        headers: headers,
-      }
-    );
-
-    if (response.ok) {
-      const reservas = await response.json();
-      // Buscar reserva activa para este alojamiento
-      reservaActual = reservas.find(
-        (r) =>
-          r.alojamientoId == alojamientoId && new Date(r.checkout) >= new Date()
-      );
-    }
-  } catch (error) {
-    console.error("Error al verificar reserva:", error);
   }
 }
 
@@ -165,60 +128,72 @@ function llenarDatosVista(vista, alojamiento) {
   }
 }
 
-async function verificarDisponibilidad(alojamientoId) {
+async function configurarCalendarioDisponibilidad(alojamientoId) {
   try {
+    const headers = {
+      "Content-Type": "application/json"
+    };
+    
+    if (usuarioActual && usuarioActual.token) {
+      headers["Authorization"] = `Bearer ${usuarioActual.token}`;
+    }
+
     const response = await fetch(
       `${API_BASE_URL_ALOJ}/alojamientos/disponibilidad/${alojamientoId}`,
       {
         method: "GET",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: headers,
       }
     );
 
-    if (response.ok) {
-      const reservas = await response.json();
-      const disponibilidadText =
-        reservas.length === 0 ? "Disponible" : "Reservado";
-      document.querySelectorAll("#disponibilidad").forEach((elem) => {
-        elem.textContent = `Estado: ${disponibilidadText}`;
-      });
+    if (!response.ok) {
+      console.error("Error al cargar disponibilidad:", response.status);
+      // Aún así configuramos los botones con array vacío
+      configurarBotonesCalendario([]);
+      return;
     }
+
+    const reservas = await response.json();
+    console.log("Reservas cargadas:", reservas);
+    
+    // Configurar los botones con las reservas cargadas
+    configurarBotonesCalendario(reservas);
+    
   } catch (error) {
-    console.error("Error al verificar disponibilidad:", error);
+    console.error("Error al cargar calendario:", error);
+    // En caso de error, configuramos con array vacío
+    configurarBotonesCalendario([]);
   }
 }
 
-async function mostrarCalendarioDisponibilidad(alojamientoId) {
-  try {
-    const response = await fetch(
-      `${API_BASE_URL_ALOJ}/alojamientos/disponibilidad/${alojamientoId}`,
-      {
-        method: "GET",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-
-    if (!response.ok) return;
-
-    const reservas = await response.json();
-
-    // Crear elemento de calendario si no existe
-    const calendarioBtn = document.querySelectorAll(
-      ".calendario-disponibilidad"
-    );
-    calendarioBtn.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        mostrarModalCalendario(reservas);
-      });
-    });
-  } catch (error) {
-    console.error("Error al cargar calendario:", error);
+function configurarBotonesCalendario(reservas) {
+  // Ahora los botones ya están visibles porque mostrarAlojamiento() ya se ejecutó
+  const calendarioBtns = document.querySelectorAll(".calendario-disponibilidad");
+  console.log("Botones de calendario encontrados:", calendarioBtns.length);
+  
+  if (calendarioBtns.length === 0) {
+    console.error("⚠️ No se encontraron botones con clase .calendario-disponibilidad");
+    return;
   }
+  
+  calendarioBtns.forEach((btn) => {
+    // Remover listeners previos (por si acaso)
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+    
+    // Agregar nuevo listener
+    newBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      console.log("Click en calendario, mostrando", reservas.length, "reservas");
+      mostrarModalCalendario(reservas);
+    });
+  });
 }
 
 function mostrarModalCalendario(reservas) {
+  console.log("Mostrando modal con", reservas.length, "reservas");
+  
   const modal = document.createElement("div");
   modal.style.cssText = `
     position: fixed;
@@ -241,29 +216,52 @@ function mostrarModalCalendario(reservas) {
     max-width: 600px;
     max-height: 80vh;
     overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   `;
 
-  let html = "<h3>Calendario de Reservas</h3>";
+  let html = "<h3 style='margin-top: 0; color: #2d3748;'>Calendario de Reservas</h3>";
 
-  if (reservas.length === 0) {
-    html += "<p>No hay reservas para este alojamiento</p>";
+  if (!reservas || reservas.length === 0) {
+    html += "<p style='color: #4a5568;'>No hay reservas para este alojamiento. ¡Está completamente disponible!</p>";
   } else {
     html += '<ul style="list-style: none; padding: 0;">';
     reservas.forEach((reserva) => {
-      const checkin = new Date(reserva.checkin).toLocaleDateString("es-ES");
-      const checkout = new Date(reserva.checkout).toLocaleDateString("es-ES");
+      // Manejar diferentes formatos de fecha
+      const checkin = reserva.checkin ? new Date(reserva.checkin).toLocaleDateString("es-ES") : "N/A";
+      const checkout = reserva.checkout ? new Date(reserva.checkout).toLocaleDateString("es-ES") : "N/A";
+      const huespedes = reserva.huespedes || "N/A";
+      
       html += `
-        <li style="padding: 1rem; border-bottom: 1px solid #eee;">
-          <strong>Del ${checkin} al ${checkout}</strong><br>
-          Huéspedes: ${reserva.huespedes}
+        <li style="padding: 1rem; border-bottom: 1px solid #e2e8f0; margin-bottom: 0.5rem;">
+          <strong style="color: #2d3748;">Del ${checkin} al ${checkout}</strong><br>
+          <span style="color: #4a5568;">Huéspedes: ${huespedes}</span>
         </li>
       `;
     });
     html += "</ul>";
   }
 
-  html +=
-    '<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Cerrar</button>';
+  html += `
+    <button 
+      onclick="this.closest('div[style*=fixed]').remove()" 
+      style="
+        margin-top: 1rem; 
+        padding: 0.75rem 1.5rem; 
+        background: #3182ce; 
+        color: white; 
+        border: none; 
+        border-radius: 6px; 
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: background 0.2s;
+      "
+      onmouseover="this.style.background='#2c5282'"
+      onmouseout="this.style.background='#3182ce'"
+    >
+      Cerrar
+    </button>
+  `;
 
   contenido.innerHTML = html;
   modal.appendChild(contenido);
@@ -281,18 +279,17 @@ function configurarBotones(esAnfitrion) {
   console.log("Configurando botones. Es anfitrión:", esAnfitrion);
   
   if (esAnfitrion) {
-    // Configurar botón eliminar
-    const btnEliminar = document.querySelector(".eliminar-popup");
+    // BOTONES PARA ANFITRIÓN
+    const btnEliminar = document.querySelector("#vista-anfitrion .eliminar-popup");
     console.log("Botón eliminar encontrado:", btnEliminar);
     if (btnEliminar) {
       btnEliminar.addEventListener("click", eliminarAlojamiento);
     }
 
-    // Configurar botón modificar - buscar por diferentes selectores
+    // Buscar todos los botones posibles para modificar
     const btnModificar = document.querySelector(
       '#vista-anfitrion [data-target="/pages/alojamiento/modificarReserva/modificarReserva.html"]'
-    ) || document.querySelector('#vista-anfitrion .btn-modificar') 
-       || document.querySelector('#vista-anfitrion button[type="button"]');
+    );
     
     console.log("Botón modificar encontrado:", btnModificar);
     
@@ -304,10 +301,20 @@ function configurarBotones(esAnfitrion) {
         window.location.href = `/pages/modificarPropiedad/modificarPropiedad.html?id=${alojamientoActual.id}`;
       });
     }
+
+    // Ocultar botón "Modificar reserva" en vista anfitrión
+    const btnModificarReservaAnfitrion = document.querySelectorAll(
+      '#vista-anfitrion [data-target="/pages/alojamiento/modificarReserva/modificarReserva.html"]'
+    );
+    btnModificarReservaAnfitrion.forEach(btn => {
+      if (btn.textContent.includes("Modificar reserva")) {
+        btn.style.display = "none";
+      }
+    });
   } else {
-    // Configuración para huéspedes
+    // BOTONES PARA HUÉSPED
     const btnReservar = document.querySelector(
-      '[data-target="/pages/alojamiento/formularioReserva/formularioReserva.html"]'
+      '#vista-huesped [data-target="/pages/alojamiento/formularioReserva/formularioReserva.html"]'
     );
     if (btnReservar) {
       btnReservar.addEventListener("click", (e) => {
@@ -321,21 +328,21 @@ function configurarBotones(esAnfitrion) {
       });
     }
 
-    // Mostrar/ocultar botón "Modificar reserva" según si tiene reserva activa
+    // El botón "Modificar reserva" ahora redirige directamente
     const btnModificarReserva = document.querySelector(
       '#vista-huesped [data-target="/pages/alojamiento/modificarReserva/modificarReserva.html"]'
     );
 
     if (btnModificarReserva) {
-      if (reservaActual) {
-        btnModificarReserva.style.display = "inline-block";
-        btnModificarReserva.addEventListener("click", (e) => {
-          e.preventDefault();
+      btnModificarReserva.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (!usuarioActual || !usuarioActual.id) {
+          alert("Debes iniciar sesión");
+          window.location.href = "/pages/autenticacion/login/login.html";
+        } else {
           window.location.href = `/pages/alojamiento/modificarReserva/modificarReserva.html?alojamientoId=${alojamientoActual.id}`;
-        });
-      } else {
-        btnModificarReserva.style.display = "none";
-      }
+        }
+      });
     }
   }
 }

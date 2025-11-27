@@ -2,11 +2,12 @@ const API_BASE_URL_RESERVA = "http://localhost:8080";
 
 let alojamientoId = null;
 let usuarioActual = null;
+let serviciosDisponibles = [];
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   cargarUsuarioActual();
 
-  if (!usuarioActual) {
+  if (!usuarioActual || !usuarioActual.id) {
     alert("Debes iniciar sesión para reservar");
     window.location.href = "/pages/autenticacion/login/login.html";
     return;
@@ -17,10 +18,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!alojamientoId) {
     alert("No se especificó un alojamiento");
-    window.location.href = "/index.html";
+    window.location.href = "/pages/index/index.html";
     return;
   }
 
+  await cargarServicios();
   configurarFormulario();
   configurarValidacionFechas();
 });
@@ -30,6 +32,80 @@ function cargarUsuarioActual() {
   if (userData) {
     usuarioActual = JSON.parse(userData);
   }
+}
+
+async function cargarServicios() {
+  try {
+    const response = await fetch(`${API_BASE_URL_RESERVA}/servicios/getAll`, {
+      method: "GET",
+      credentials: "include",
+      headers: { 
+        "Content-Type": "application/json"
+      },
+    });
+
+    if (response.ok) {
+      serviciosDisponibles = await response.json();
+      mostrarServiciosEnFormulario();
+    } else {
+      console.error("Error al cargar servicios desde la base de datos");
+      // Fallback a servicios predefinidos
+      usarServiciosPredefinidos();
+    }
+  } catch (error) {
+    console.error("Error al cargar servicios:", error);
+    usarServiciosPredefinidos();
+  }
+}
+
+function usarServiciosPredefinidos() {
+  serviciosDisponibles = [
+    { id: 1, nombre: "WiFi" },
+    { id: 2, nombre: "Desayuno" },
+    { id: 3, nombre: "Pileta" },
+    { id: 4, nombre: "Cochera" },
+  ];
+  mostrarServiciosEnFormulario();
+}
+
+function mostrarServiciosEnFormulario() {
+  const serviciosContainer = document.querySelector(".servicios");
+  
+  if (!serviciosContainer) {
+    console.error("No se encontró el contenedor de servicios");
+    return;
+  }
+
+  // Limpiar servicios existentes (por si hay HTML estático)
+  serviciosContainer.innerHTML = "";
+
+  if (serviciosDisponibles.length === 0) {
+    serviciosContainer.innerHTML = "<p>No hay servicios disponibles</p>";
+    return;
+  }
+
+  serviciosDisponibles.forEach((servicio) => {
+    const label = document.createElement("label");
+    label.style.cssText = `
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    `;
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.name = "servicios";
+    checkbox.value = servicio.id;
+    checkbox.dataset.nombre = servicio.nombre;
+
+    const span = document.createElement("span");
+    span.textContent = servicio.nombre;
+
+    label.appendChild(checkbox);
+    label.appendChild(span);
+    serviciosContainer.appendChild(label);
+  });
 }
 
 function configurarFormulario() {
@@ -77,20 +153,30 @@ async function handleSubmit(e) {
     return;
   }
 
+  // Obtener servicios seleccionados (opcional, por si quieres enviarlos)
+  const serviciosSeleccionados = Array.from(
+    document.querySelectorAll('input[name="servicios"]:checked')
+  ).map((checkbox) => parseInt(checkbox.value));
+
   const reservaData = {
     alojamientoId: parseInt(alojamientoId),
     checkin: fechaInicio,
     checkout: fechaFin,
     huespedes: huespedes,
+    // Si tu ReservaDTO incluye servicios, descomenta la siguiente línea:
+    // serviciosId: serviciosSeleccionados
   };
 
   try {
     const response = await fetch(
-      `${API_BASE_URL_RESERVA}/reservas/crearReserva/usuario/${usuarioActual.id}`,
+      `${API_BASE_URL_RESERVA}/reservas/crearReserva`,
       {
         method: "POST",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${usuarioActual.token}`
+        },
         body: JSON.stringify(reservaData),
       }
     );
