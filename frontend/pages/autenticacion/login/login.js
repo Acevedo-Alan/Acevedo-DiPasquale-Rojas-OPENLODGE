@@ -21,26 +21,18 @@ async function login(event) {
     });
 
     if (!response.ok) {
-      throw new Error("Credenciales incorrectas");
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || "Credenciales incorrectas");
     }
 
     const data = await response.json();
 
+    // El backend solo devuelve rol y token
     const usuario = {
-      id: data.userId || data.id || null,
-      username: data.username || username,
       rol: data.rol || "HUESPED",
-      nombre: data.nombre || username,
-      apellido: data.apellido || "",
-      email: data.email || "",
+      token: data.token,
+      username: username // Guardamos el username del formulario
     };
-
-    if (!usuario.id) {
-      console.error("El servidor no devolvió un ID:", data);
-      throw new Error(
-        "Error: El servidor no devolvió datos completos del usuario"
-      );
-    }
 
     localStorage.setItem("usuario", JSON.stringify(usuario));
 
