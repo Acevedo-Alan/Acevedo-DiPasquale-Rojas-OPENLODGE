@@ -79,11 +79,6 @@ public class AlojamientoService {
     }
 
     @Transactional(readOnly = true)
-    public List<Reserva> getAlojamientosPorDisponibilidad(Long alojamientoId) {
-        return reservaRepo.findByAlojamientoId(alojamientoId);
-    }
-
-    @Transactional(readOnly = true)
     public List<Alojamiento> buscarDisponibles(LocalDate checkin, LocalDate checkout,
                                                Integer capacidadMin, Double precioMax,
                                                Long ciudadId) {

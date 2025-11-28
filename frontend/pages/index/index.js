@@ -54,14 +54,17 @@ function mostrarAlojamientos(alojamientos) {
   });
 }
 
-// Crear tarjeta de alojamiento
 function crearTarjetaAlojamiento(alojamiento) {
   const div = document.createElement("div");
   div.className = "destination-card";
   div.style.cursor = "pointer";
 
-  const ciudad = alojamiento.direccion?.ciudad || "Ciudad no especificada";
-  const pais = alojamiento.direccion?.pais || "";
+  const direccion = alojamiento.direccion || {};
+  const ciudadObj = direccion.ciudad || {};
+  const paisObj = ciudadObj.pais || {};
+
+  const ciudad = ciudadObj.nombre || "Ciudad no especificada";
+  const pais = paisObj.nombre || "";
 
   div.innerHTML = `
     <img src="${alojamiento.imagen || "https://via.placeholder.com/400x300"}" 
@@ -69,8 +72,11 @@ function crearTarjetaAlojamiento(alojamiento) {
          onerror="this.src='https://via.placeholder.com/400x300'">
     <div class="destination-info">
       <h3>${alojamiento.nombre}</h3>
-      <p class="location">${ciudad}${pais ? ", " + pais : ""}</p>
+
+      <p class="localidad">${ciudad}${pais ? ", " + pais : ""}</p>
+
       <p class="description">${alojamiento.descripcion}</p>
+
       <div class="destination-details">
         <span class="capacity">Hasta ${alojamiento.capacidadHuespedes} huéspedes</span>
         <span class="price">$${alojamiento.precioNoche}/noche</span>
@@ -78,7 +84,6 @@ function crearTarjetaAlojamiento(alojamiento) {
     </div>
   `;
 
-  // Navegar al detalle del alojamiento
   div.addEventListener("click", () => {
     window.location.href = `/pages/alojamiento/alojamiento.html?id=${alojamiento.id}`;
   });

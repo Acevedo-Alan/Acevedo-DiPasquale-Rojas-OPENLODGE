@@ -26,9 +26,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  await cargarServicios();
-  await cargarDatosAlojamientoEdit(alojamientoIdEdit);
-  configurarFormularioEdit();
+  // Mostrar indicador de carga
+  const form = document.getElementById("form-editar-propiedad");
+  if (form) {
+    form.style.opacity = "0.5";
+    form.style.pointerEvents = "none";
+  }
+
+  try {
+    // 1. Primero cargar servicios
+    await cargarServicios();
+    console.log("✓ Servicios cargados");
+    
+    // 2. Luego cargar datos del alojamiento (esto llenará el formulario)
+    await cargarDatosAlojamientoEdit(alojamientoIdEdit);
+    console.log("✓ Datos del alojamiento cargados");
+    
+    // 3. Finalmente configurar el formulario
+    configurarFormularioEdit();
+    console.log("✓ Formulario configurado");
+    
+    // Restaurar el formulario
+    if (form) {
+      form.style.opacity = "1";
+      form.style.pointerEvents = "auto";
+    }
+  } catch (error) {
+    console.error("Error durante la inicialización:", error);
+    alert("Error al cargar el formulario");
+    window.location.href = "/pages/index/index.html";
+  }
 });
 
 async function cargarServicios() {
@@ -136,9 +163,14 @@ async function cargarDatosAlojamientoEdit(id) {
       }
     );
 
-    if (!response.ok) throw new Error("Error al cargar alojamiento");
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Error al cargar alojamiento:", errorText);
+      throw new Error("Error al cargar alojamiento");
+    }
 
     alojamientoOriginal = await response.json();
+    console.log("Alojamiento cargado:", alojamientoOriginal);
 
     // Verificar que el anfitrión sea el dueño
     if (alojamientoOriginal.anfitrionId !== usuarioActualEdit.id) {
@@ -149,15 +181,19 @@ async function cargarDatosAlojamientoEdit(id) {
       return;
     }
 
+    // Llenar el formulario con los datos cargados
     llenarFormularioEdit(alojamientoOriginal);
   } catch (error) {
-    console.error("Error:", error);
-    alert("Error al cargar los datos del alojamiento");
+    console.error("Error completo:", error);
+    alert("Error al cargar los datos del alojamiento: " + error.message);
     window.location.href = "/pages/index/index.html";
   }
 }
 
 function llenarFormularioEdit(alojamiento) {
+  console.log("Llenando formulario con:", alojamiento);
+  
+  // Datos principales del alojamiento
   document.getElementById("nombre").value = alojamiento.nombre || "";
   document.getElementById("descripcion").value = alojamiento.descripcion || "";
   document.getElementById("imagen").value = alojamiento.imagen || "";
@@ -165,28 +201,40 @@ function llenarFormularioEdit(alojamiento) {
   document.getElementById("capacidadHuespedes").value =
     alojamiento.capacidadHuespedes || "";
 
+  // Dirección
   if (alojamiento.direccion) {
     document.getElementById("calle").value = alojamiento.direccion.calle || "";
-    document.getElementById("numero").value =
-      alojamiento.direccion.numero || "";
-    // DireccionDTO tiene ciudad y pais como strings directamente
-    document.getElementById("ciudad").value =
-      alojamiento.direccion.ciudad || "";
-    document.getElementById("pais").value =
-      alojamiento.direccion.pais || "";
+    document.getElementById("numero").value = alojamiento.direccion.numero || "";
+    document.getElementById("ciudad").value = alojamiento.direccion.ciudad || "";
+    document.getElementById("pais").value = alojamiento.direccion.pais || "";
   }
 
-  // Marcar servicios seleccionados
-  if (alojamiento.servicios && alojamiento.servicios.length > 0) {
-    const serviciosIds = alojamiento.servicios.map((s) => s.id);
-    document.querySelectorAll('input[name="servicios"]').forEach((checkbox) => {
-      if (serviciosIds.includes(parseInt(checkbox.value))) {
-        checkbox.checked = true;
-        checkbox.parentElement.style.background = "#ebf8ff";
-        checkbox.parentElement.style.borderColor = "#4299e1";
-      }
-    });
+  // Marcar servicios (los servicios ya están cargados en este punto)
+  marcarServiciosSeleccionados(alojamiento.servicios);
+}
+
+function marcarServiciosSeleccionados(servicios) {
+  if (!servicios || servicios.length === 0) {
+    console.log("No hay servicios para marcar");
+    return;
   }
+
+  const serviciosIds = servicios.map((s) => s.id);
+  console.log("Servicios a marcar:", serviciosIds);
+  
+  const checkboxes = document.querySelectorAll('input[name="servicios"]');
+  console.log("Checkboxes encontrados:", checkboxes.length);
+  
+  
+  checkboxes.forEach((checkbox) => {
+    const checkboxId = parseInt(checkbox.value);
+    if (serviciosIds.includes(checkboxId)) {
+      checkbox.checked = true;
+      checkbox.parentElement.style.background = "#ebf8ff";
+      checkbox.parentElement.style.borderColor = "#4299e1";
+      console.log(`✓ Servicio ${checkboxId} marcado`);
+    }
+  });
 }
 
 function configurarFormularioEdit() {

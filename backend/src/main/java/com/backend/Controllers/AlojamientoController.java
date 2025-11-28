@@ -71,12 +71,6 @@ public class AlojamientoController {
         );
     }
 
-    @GetMapping("/disponibilidad/{alojamientoId}")
-    public ResponseEntity<List<Reserva>> getDisponibilidad(@PathVariable Long alojamientoId) {
-        List<Reserva> reservas = alojamientoService.getAlojamientosPorDisponibilidad(alojamientoId);
-        return ResponseEntity.ok(reservas);
-    }
-
     // ========== ENDPOINTS PROTEGIDOS (ANFITRIÓN) ==========
 
     // Crear alojamiento (solo ANFITRION)

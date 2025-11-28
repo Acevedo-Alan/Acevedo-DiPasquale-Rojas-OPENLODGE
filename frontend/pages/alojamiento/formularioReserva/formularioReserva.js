@@ -196,6 +196,7 @@ async function handleSubmit(e) {
 
 async function verificarDisponibilidad(checkin, checkout) {
   try {
+    // Usar el endpoint público de verificación de disponibilidad
     const response = await fetch(
       `${API_BASE_URL_RESERVA}/reservas/disponibilidad/${alojamientoId}?checkin=${checkin}&checkout=${checkout}`,
       {
@@ -205,12 +206,19 @@ async function verificarDisponibilidad(checkin, checkout) {
       }
     );
 
-    if (!response.ok) throw new Error("Error al verificar disponibilidad");
+    if (!response.ok) {
+      console.error("Error al verificar disponibilidad:", response.status);
+      throw new Error("Error al verificar disponibilidad");
+    }
 
     const resultado = await response.json();
+    console.log("Resultado de disponibilidad:", resultado);
+    
+    // El endpoint devuelve { disponible: boolean }
     return resultado.disponible;
   } catch (error) {
     console.error("Error:", error);
+    // En caso de error, asumir no disponible por seguridad
     return false;
   }
 }

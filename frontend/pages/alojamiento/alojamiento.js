@@ -89,23 +89,24 @@ function mostrarAlojamiento(alojamiento) {
 }
 
 function llenarDatosVista(vista, alojamiento) {
-  const direccion = alojamiento.direccion;
-  const ciudad = direccion?.ciudad || "";
-  const pais = direccion?.pais || "";
-  const calle = direccion?.calle || "";
-  const numero = direccion?.numero || "";
+  const direccion = alojamiento.direccion || {};
+  const ciudadObj = direccion.ciudad || {};
+  const paisObj = ciudadObj.pais || {};
+
+  const ciudad = ciudadObj.nombre || "Ciudad no especificada";
+  const pais = paisObj.nombre || "";
+  const calle = direccion.calle || "";
+  const numero = direccion.numero || "";
 
   vista.querySelector("#nombre-propiedad").textContent = alojamiento.nombre;
-  vista.querySelector("#localidad").textContent = `${ciudad}${
-    pais ? ", " + pais : ""
-  }`;
+  vista.querySelector("#localidad").textContent = `${ciudad}${pais ? ", " + pais : ""}`;
   vista.querySelector("#direccion").textContent = `${calle} ${numero}`;
-  vista.querySelector(
-    "#nombre-anfitrion"
-  ).textContent = `Anfitrión: ${alojamiento.anfitrionNombre} ${alojamiento.anfitrionApellido}`;
-  vista.querySelector(
-    "#precio-propiedad"
-  ).textContent = `$${alojamiento.precioNoche} / noche`;
+
+  vista.querySelector("#nombre-anfitrion").textContent =
+    `Anfitrión: ${alojamiento.anfitrionNombre} ${alojamiento.anfitrionApellido}`;
+
+  vista.querySelector("#precio-propiedad").textContent =
+    `$${alojamiento.precioNoche} / noche`;
 
   const serviciosContainer = vista.querySelector("#servicios-alojamiento");
   serviciosContainer.innerHTML = "";
@@ -123,10 +124,13 @@ function llenarDatosVista(vista, alojamiento) {
 
   const carrusel = vista.querySelector(".carrusel");
   if (carrusel && alojamiento.imagen) {
-    carrusel.innerHTML = `<img src="${alojamiento.imagen}" alt="${alojamiento.nombre}" 
-                              style="width: 100%; max-height: 400px; object-fit: cover;">`;
+    carrusel.innerHTML = `
+      <img src="${alojamiento.imagen}" alt="${alojamiento.nombre}" 
+           style="width: 100%; max-height: 400px; object-fit: cover;">
+    `;
   }
 }
+
 
 async function configurarCalendarioDisponibilidad(alojamientoId) {
   try {
@@ -138,8 +142,9 @@ async function configurarCalendarioDisponibilidad(alojamientoId) {
       headers["Authorization"] = `Bearer ${usuarioActual.token}`;
     }
 
+    // Usar endpoint de reservas en lugar de alojamientos
     const response = await fetch(
-      `${API_BASE_URL_ALOJ}/alojamientos/disponibilidad/${alojamientoId}`,
+      `${API_BASE_URL_ALOJ}/reservas/historial/alojamiento/${alojamientoId}`,
       {
         method: "GET",
         credentials: "include",
@@ -148,14 +153,17 @@ async function configurarCalendarioDisponibilidad(alojamientoId) {
     );
 
     if (!response.ok) {
-      console.error("Error al cargar disponibilidad:", response.status);
-      // Aún así configuramos los botones con array vacío
+      console.error("Error al cargar reservas del alojamiento:", response.status);
+      // Si es 403, significa que no es el anfitrión - mostrar vacío
+      if (response.status === 403) {
+        console.log("No tienes permiso para ver las reservas (no eres el anfitrión)");
+      }
       configurarBotonesCalendario([]);
       return;
     }
 
     const reservas = await response.json();
-    console.log("Reservas cargadas:", reservas);
+    console.log("Reservas cargadas desde /reservas:", reservas);
     
     // Configurar los botones con las reservas cargadas
     configurarBotonesCalendario(reservas);
@@ -173,7 +181,7 @@ function configurarBotonesCalendario(reservas) {
   console.log("Botones de calendario encontrados:", calendarioBtns.length);
   
   if (calendarioBtns.length === 0) {
-    console.error("⚠️ No se encontraron botones con clase .calendario-disponibilidad");
+    console.error("calendario-disponibilidad no funcó");
     return;
   }
   
