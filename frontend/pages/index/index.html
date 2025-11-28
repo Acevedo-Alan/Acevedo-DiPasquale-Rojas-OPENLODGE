@@ -36,7 +36,12 @@
             
             <div class="search-group">
                 <label for="guests">Huéspedes</label>
-                <input type="number" id="guests" class="search-input" placeholder="huespedes" min="1" max="20">
+                <input type="number" id="guests" class="search-input" placeholder="Huéspedes" min="1" max="20">
+            </div>
+            
+            <div class="search-group">
+                <label for="precioMax">Precio máximo</label>
+                <input type="number" id="precioMax" class="search-input" placeholder="$ por noche" min="0" step="100">
             </div>
             
             <button class="search-btn">
@@ -55,8 +60,6 @@
             <!-- Las propiedades se cargan dinámicamente aca -->
         </div>
     </section>
-
-
 
     <footer class="footer"></footer>
     <script src="/components/header/header.js"></script>

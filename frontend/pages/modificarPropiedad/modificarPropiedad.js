@@ -201,12 +201,23 @@ function llenarFormularioEdit(alojamiento) {
   document.getElementById("capacidadHuespedes").value =
     alojamiento.capacidadHuespedes || "";
 
-  // Dirección
+  // Dirección - Acceder a la estructura anidada correctamente
   if (alojamiento.direccion) {
-    document.getElementById("calle").value = alojamiento.direccion.calle || "";
-    document.getElementById("numero").value = alojamiento.direccion.numero || "";
-    document.getElementById("ciudad").value = alojamiento.direccion.ciudad || "";
-    document.getElementById("pais").value = alojamiento.direccion.pais || "";
+    const direccion = alojamiento.direccion;
+    const ciudadObj = direccion.ciudad || {};
+    const paisObj = ciudadObj.pais || {};
+    
+    document.getElementById("calle").value = direccion.calle || "";
+    document.getElementById("numero").value = direccion.numero || "";
+    document.getElementById("ciudad").value = ciudadObj.nombre || "";
+    document.getElementById("pais").value = paisObj.nombre || "";
+    
+    console.log("Dirección cargada:", {
+      calle: direccion.calle,
+      numero: direccion.numero,
+      ciudad: ciudadObj.nombre,
+      pais: paisObj.nombre
+    });
   }
 
   // Marcar servicios (los servicios ya están cargados en este punto)
@@ -225,6 +236,10 @@ function marcarServiciosSeleccionados(servicios) {
   const checkboxes = document.querySelectorAll('input[name="servicios"]');
   console.log("Checkboxes encontrados:", checkboxes.length);
   
+  if (checkboxes.length === 0) {
+    console.error("⚠️ No se encontraron checkboxes de servicios. Asegúrate de que mostrarServiciosEnFormulario() se ejecutó primero.");
+    return;
+  }
   
   checkboxes.forEach((checkbox) => {
     const checkboxId = parseInt(checkbox.value);

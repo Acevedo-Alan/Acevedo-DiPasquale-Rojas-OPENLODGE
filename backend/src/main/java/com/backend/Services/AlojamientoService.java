@@ -78,45 +78,61 @@ public class AlojamientoService {
         return alojamientos;
     }
 
-    @Transactional(readOnly = true)
-    public List<Alojamiento> buscarDisponibles(LocalDate checkin, LocalDate checkout,
-                                               Integer capacidadMin, Double precioMax,
-                                               Long ciudadId) {
-        List<Alojamiento> disponibles;
+@Transactional(readOnly = true)
+public List<Alojamiento> buscarDisponibles(LocalDate checkin, LocalDate checkout,
+                                           Integer capacidadMin, Double precioMax,
+                                           Long ciudadId) {
+    List<Alojamiento> disponibles;
 
-        if (checkin != null && checkout != null) {
-            disponibles = alojamientoRepo.findDisponiblesEnRango(checkin, checkout);
-        } else {
-            disponibles = alojamientoRepo.findAll();
+    // Si hay fechas, buscar solo disponibles en ese rango
+    if (checkin != null && checkout != null) {
+        // Validar que las fechas sean correctas
+        if (checkout.isBefore(checkin) || checkout.isEqual(checkin)) {
+            throw new RuntimeException("La fecha de checkout debe ser posterior al checkin");
         }
-
-        disponibles.forEach(a -> {
-            a.getAnfitrion().getNombre();
-            a.getDireccion().getCiudad().getPais();
-            a.getServicios().size();
-        });
-
-
-        if (capacidadMin != null) {
-            disponibles = disponibles.stream()
-                .filter(a -> a.getCapacidadHuespedes() >= capacidadMin)
-                .collect(Collectors.toList());
-        }
-
-        if (precioMax != null) {
-            disponibles = disponibles.stream()
-                .filter(a -> a.getPrecioNoche() <= precioMax)
-                .collect(Collectors.toList());
-        }
-
-        if (ciudadId != null) {
-            disponibles = disponibles.stream()
-                .filter(a -> a.getDireccion().getCiudad().getId().equals(ciudadId))
-                .collect(Collectors.toList());
-        }
-
-        return disponibles;
+        
+        disponibles = alojamientoRepo.findDisponiblesEnRango(checkin, checkout);
+    } else {
+        // Si no hay fechas, traer todos
+        disponibles = alojamientoRepo.findAll();
     }
+
+    // Forzar carga de relaciones lazy
+    disponibles.forEach(a -> {
+        if (a.getAnfitrion() != null) a.getAnfitrion().getNombre();
+        if (a.getDireccion() != null && a.getDireccion().getCiudad() != null) {
+            a.getDireccion().getCiudad().getNombre();
+            if (a.getDireccion().getCiudad().getPais() != null) {
+                a.getDireccion().getCiudad().getPais().getNombre();
+            }
+        }
+        if (a.getServicios() != null) a.getServicios().size();
+    });
+
+    // Aplicar filtros: capacidad minima, precio maximo y ciudad
+    if (capacidadMin != null) {
+        disponibles = disponibles.stream()
+            .filter(a -> a.getCapacidadHuespedes() >= capacidadMin)
+            .collect(Collectors.toList());
+    }
+
+    if (precioMax != null) {
+        disponibles = disponibles.stream()
+            .filter(a -> a.getPrecioNoche() <= precioMax)
+            .collect(Collectors.toList());
+    }
+
+    if (ciudadId != null) {
+        disponibles = disponibles.stream()
+            .filter(a -> a.getDireccion() != null && 
+                        a.getDireccion().getCiudad() != null &&
+                        a.getDireccion().getCiudad().getId().equals(ciudadId))
+            .collect(Collectors.toList());
+    }
+
+    return disponibles;
+}
+
     @Transactional
     public Alojamiento crearAlojamiento(AlojamientoDTO dto, Long anfitrionId) {
         Usuario anfitrion = usuarioRepo.findById(anfitrionId)
