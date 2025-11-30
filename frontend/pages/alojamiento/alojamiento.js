@@ -131,76 +131,91 @@ function llenarDatosVista(vista, alojamiento) {
   }
 }
 
+// Reemplazar SOLO estas 3 funciones en alojamiento.js
 
 async function configurarCalendarioDisponibilidad(alojamientoId) {
   try {
-    const headers = {
-      "Content-Type": "application/json"
-    };
+    const esAnfitrion = usuarioActual && 
+                       usuarioActual.id && 
+                       alojamientoActual.anfitrionId && 
+                       usuarioActual.id === alojamientoActual.anfitrionId;
+
+    let reservas = [];
     
-    if (usuarioActual && usuarioActual.token) {
-      headers["Authorization"] = `Bearer ${usuarioActual.token}`;
-    }
+    if (esAnfitrion && usuarioActual.token) {
+      // ANFITRIÓN: obtener información completa con datos de huéspedes
+      const headers = {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${usuarioActual.token}`
+      };
 
-    // Usar endpoint de reservas en lugar de alojamientos
-    const response = await fetch(
-      `${API_BASE_URL_ALOJ}/reservas/historial/alojamiento/${alojamientoId}`,
-      {
-        method: "GET",
-        credentials: "include",
-        headers: headers,
+      const response = await fetch(
+        `${API_BASE_URL_ALOJ}/reservas/historial/alojamiento/${alojamientoId}`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: headers,
+        }
+      );
+
+      if (response.ok) {
+        reservas = await response.json();
+        console.log("Reservas completas (anfitrión):", reservas);
+      } else {
+        console.error("Error al cargar reservas del anfitrión:", response.status);
       }
-    );
+    } else {
+      // HUÉSPED: obtener solo fechas ocupadas (sin datos personales)
+      const response = await fetch(
+        `${API_BASE_URL_ALOJ}/reservas/fechas-ocupadas/${alojamientoId}`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json"
+          },
+        }
+      );
 
-    if (!response.ok) {
-      console.error("Error al cargar reservas del alojamiento:", response.status);
-      // Si es 403, significa que no es el anfitrión - mostrar vacío
-      if (response.status === 403) {
-        console.log("No tienes permiso para ver las reservas (no eres el anfitrión)");
+      if (response.ok) {
+        reservas = await response.json();
+        console.log("Fechas ocupadas (huésped):", reservas);
+      } else {
+        console.error("Error al cargar fechas ocupadas:", response.status);
       }
-      configurarBotonesCalendario([]);
-      return;
     }
-
-    const reservas = await response.json();
-    console.log("Reservas cargadas desde /reservas:", reservas);
     
-    // Configurar los botones con las reservas cargadas
-    configurarBotonesCalendario(reservas);
+    configurarBotonesCalendario(reservas, esAnfitrion);
     
   } catch (error) {
     console.error("Error al cargar calendario:", error);
-    // En caso de error, configuramos con array vacío
-    configurarBotonesCalendario([]);
+    configurarBotonesCalendario([], false);
   }
 }
 
-function configurarBotonesCalendario(reservas) {
-  // Ahora los botones ya están visibles porque mostrarAlojamiento() ya se ejecutó
+function configurarBotonesCalendario(reservas, esAnfitrion) {
   const calendarioBtns = document.querySelectorAll(".calendario-disponibilidad");
   console.log("Botones de calendario encontrados:", calendarioBtns.length);
   
   if (calendarioBtns.length === 0) {
-    console.error("calendario-disponibilidad no funcó");
+    console.error("No se encontraron botones de calendario");
     return;
   }
   
   calendarioBtns.forEach((btn) => {
-    // Remover listeners previos (por si acaso)
     const newBtn = btn.cloneNode(true);
     btn.parentNode.replaceChild(newBtn, btn);
     
-    // Agregar nuevo listener
     newBtn.addEventListener("click", (e) => {
       e.preventDefault();
       console.log("Click en calendario, mostrando", reservas.length, "reservas");
-      mostrarModalCalendario(reservas);
+      mostrarModalCalendario(reservas, esAnfitrion);
     });
   });
 }
 
-function mostrarModalCalendario(reservas) {
-  console.log("Mostrando modal con", reservas.length, "reservas");
+function mostrarModalCalendario(reservas, esAnfitrion) {
+  console.log("Mostrando modal con", reservas.length, "reservas. Es anfitrión:", esAnfitrion);
   
   const modal = document.createElement("div");
   modal.style.cssText = `
@@ -227,24 +242,38 @@ function mostrarModalCalendario(reservas) {
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   `;
 
-  let html = "<h3 style='margin-top: 0; color: #2d3748;'>Calendario de Reservas</h3>";
+  let html = "<h3 style='margin-top: 0; color: #2d3748;'>Calendario de Disponibilidad</h3>";
 
   if (!reservas || reservas.length === 0) {
     html += "<p style='color: #4a5568;'>No hay reservas para este alojamiento. ¡Está completamente disponible!</p>";
   } else {
     html += '<ul style="list-style: none; padding: 0;">';
     reservas.forEach((reserva) => {
-      // Manejar diferentes formatos de fecha
       const checkin = reserva.checkin ? new Date(reserva.checkin).toLocaleDateString("es-ES") : "N/A";
       const checkout = reserva.checkout ? new Date(reserva.checkout).toLocaleDateString("es-ES") : "N/A";
-      const huespedes = reserva.huespedes || "N/A";
       
-      html += `
-        <li style="padding: 1rem; border-bottom: 1px solid #e2e8f0; margin-bottom: 0.5rem;">
-          <strong style="color: #2d3748;">Del ${checkin} al ${checkout}</strong><br>
-          <span style="color: #4a5568;">Huéspedes: ${huespedes}</span>
-        </li>
-      `;
+      if (esAnfitrion) {
+        // Vista anfitrión: mostrar información completa
+        const huespedes = reserva.huespedes || "N/A";
+        const nombreHuesped = reserva.usuarioNombre && reserva.usuarioApellido 
+          ? `${reserva.usuarioNombre} ${reserva.usuarioApellido}` 
+          : "Huésped";
+        
+        html += `
+          <li style="padding: 1rem; border-bottom: 1px solid #e2e8f0; margin-bottom: 0.5rem;">
+            <strong style="color: #2d3748;">Del ${checkin} al ${checkout}</strong><br>
+            <span style="color: #4a5568;">Huésped: ${nombreHuesped}</span><br>
+            <span style="color: #4a5568;">Cantidad de huéspedes: ${huespedes}</span>
+          </li>
+        `;
+      } else {
+        // Vista huésped: solo mostrar fechas ocupadas
+        html += `
+          <li style="padding: 1rem; border-bottom: 1px solid #e2e8f0; margin-bottom: 0.5rem;">
+            <strong style="color: #2d3748;">Ocupado del ${checkin} al ${checkout}</strong>
+          </li>
+        `;
+      }
     });
     html += "</ul>";
   }
