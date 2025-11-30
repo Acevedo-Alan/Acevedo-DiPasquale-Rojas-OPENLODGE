@@ -131,8 +131,6 @@ function llenarDatosVista(vista, alojamiento) {
   }
 }
 
-// Reemplazar SOLO estas 3 funciones en alojamiento.js
-
 async function configurarCalendarioDisponibilidad(alojamientoId) {
   try {
     const esAnfitrion = usuarioActual && 
@@ -185,17 +183,23 @@ async function configurarCalendarioDisponibilidad(alojamientoId) {
       }
     }
     
-    configurarBotonesCalendario(reservas, esAnfitrion);
+    // Usar setTimeout para asegurarse de que el DOM esté completamente renderizado
+    setTimeout(() => {
+      configurarBotonesCalendario(reservas, esAnfitrion);
+    }, 100);
     
   } catch (error) {
     console.error("Error al cargar calendario:", error);
-    configurarBotonesCalendario([], false);
+    setTimeout(() => {
+      configurarBotonesCalendario([], false);
+    }, 100);
   }
 }
 
 function configurarBotonesCalendario(reservas, esAnfitrion) {
   const calendarioBtns = document.querySelectorAll(".calendario-disponibilidad");
   console.log("Botones de calendario encontrados:", calendarioBtns.length);
+  console.log("Botones encontrados:", calendarioBtns);
   
   if (calendarioBtns.length === 0) {
     console.error("No se encontraron botones de calendario");
@@ -203,14 +207,20 @@ function configurarBotonesCalendario(reservas, esAnfitrion) {
   }
   
   calendarioBtns.forEach((btn) => {
-    const newBtn = btn.cloneNode(true);
-    btn.parentNode.replaceChild(newBtn, btn);
+    // Limpiar eventos anteriores
+    const nuevoBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(nuevoBtn, btn);
     
-    newBtn.addEventListener("click", (e) => {
+    // Agregar evento al nuevo botón
+    nuevoBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      console.log("Click en calendario, mostrando", reservas.length, "reservas");
+      e.stopPropagation();
+      console.log("Click en calendario detectado");
+      console.log("Mostrando", reservas.length, "reservas");
       mostrarModalCalendario(reservas, esAnfitrion);
     });
+    
+    console.log("Listener agregado al botón:", nuevoBtn);
   });
 }
 
