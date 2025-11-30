@@ -71,4 +71,27 @@ public class Alojamiento {
     )
     @JsonIgnoreProperties({"alojamientos"})
     private Set<Servicio> servicios = new HashSet<>();
+    
+    // MÉTODOS HELPER PARA SINCRONIZAR RELACIÓN BIDIRECCIONAL
+    
+    public void addServicio(Servicio servicio) {
+        this.servicios.add(servicio);
+        servicio.getAlojamientos().add(this);
+    }
+    
+    public void removeServicio(Servicio servicio) {
+        this.servicios.remove(servicio);
+        servicio.getAlojamientos().remove(this);
+    }
+    
+    public void setServiciosSync(Set<Servicio> nuevosServicios) {
+        // Limpiar servicios anteriores
+        if (this.servicios != null) {
+            new HashSet<>(this.servicios).forEach(this::removeServicio);
+        }
+        // Agregar nuevos servicios
+        if (nuevosServicios != null) {
+            nuevosServicios.forEach(this::addServicio);
+        }
+    }
 }

@@ -143,10 +143,8 @@ public List<Alojamiento> buscarDisponibles(LocalDate checkin, LocalDate checkout
         }
         
         Direccion direccion = procesarDireccionDesdeDTO(dto);
-        
-
         Set<Servicio> servicios = procesarServiciosById(dto.getServiciosId());
-    
+
         Alojamiento alojamiento = new Alojamiento();
         alojamiento.setNombre(dto.getNombre());
         alojamiento.setDescripcion(dto.getDescripcion());
@@ -157,7 +155,9 @@ public List<Alojamiento> buscarDisponibles(LocalDate checkin, LocalDate checkout
         alojamiento.setFechaCreacion(LocalDate.now());
         alojamiento.setFechaModificacion(LocalDate.now());
         alojamiento.setAnfitrion(anfitrion);
-        alojamiento.setServicios(servicios);
+        
+        // Usar método helper para sincronizar servicios
+        alojamiento.setServiciosSync(servicios);
 
         return alojamientoRepo.save(alojamiento);
     }
@@ -172,7 +172,6 @@ public List<Alojamiento> buscarDisponibles(LocalDate checkin, LocalDate checkout
         }
 
         Direccion direccion = procesarDireccionDesdeDTO(dto);
-        
         Set<Servicio> servicios = procesarServiciosById(dto.getServiciosId());
 
         alojamiento.setNombre(dto.getNombre());
@@ -182,7 +181,9 @@ public List<Alojamiento> buscarDisponibles(LocalDate checkin, LocalDate checkout
         alojamiento.setCapacidadHuespedes(dto.getCapacidadHuespedes());
         alojamiento.setDireccion(direccion);
         alojamiento.setFechaModificacion(LocalDate.now());
-        alojamiento.setServicios(servicios);
+        
+        // Usar método helper para sincronizar servicios
+        alojamiento.setServiciosSync(servicios);
 
         return alojamientoRepo.save(alojamiento);
     }
