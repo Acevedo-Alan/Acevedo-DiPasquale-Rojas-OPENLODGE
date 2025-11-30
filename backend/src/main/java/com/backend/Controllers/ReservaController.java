@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import com.backend.Entities.Reserva;
 import com.backend.Entities.Usuario;
 import com.backend.Services.ReservaService;
+import com.backend.dtos.FechasOcupadasDTO;
 import com.backend.dtos.ReservaDTO;
 import com.backend.dtos.ReservaResponseDTO;
 
@@ -38,6 +39,16 @@ public class ReservaController {
         try {
             boolean disponible = reservaService.verificarDisponibilidad(alojamientoId, checkin, checkout);
             return ResponseEntity.ok(new DisponibilidadResponse(disponible));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/fechas-ocupadas/{alojamientoId}")
+    public ResponseEntity<?> obtenerFechasOcupadas(@PathVariable Long alojamientoId) {
+        try {
+            List<FechasOcupadasDTO> fechasOcupadas = reservaService.obtenerFechasOcupadas(alojamientoId);
+            return ResponseEntity.ok(fechasOcupadas);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -79,7 +90,6 @@ public class ReservaController {
         return ResponseEntity.ok(reservas);
     }
 
-
     @PutMapping("/modificarReserva/alojamiento/{alojamientoId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> modificarReserva(
@@ -118,6 +128,7 @@ public class ReservaController {
         }
     }
 
+    // Endpoint para anfitriones con información completa
     @GetMapping("/historial/alojamiento/{alojamientoId}")
     @PreAuthorize("hasAuthority('ANFITRION')")
     public ResponseEntity<?> obtenerHistorialAlojamiento(
@@ -126,7 +137,6 @@ public class ReservaController {
         try {
             Usuario usuario = (Usuario) authentication.getPrincipal();
             
-            // Verificar que el alojamiento pertenezca al anfitrión
             List<Reserva> reservas = reservaService.obtenerHistorialAlojamiento(
                     alojamientoId, usuario.getId());
             
@@ -139,7 +149,6 @@ public class ReservaController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
 
     private static class DisponibilidadResponse {
         private boolean disponible;

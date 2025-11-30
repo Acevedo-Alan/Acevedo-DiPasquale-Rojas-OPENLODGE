@@ -16,7 +16,12 @@ import lombok.NoArgsConstructor;
 public class ReservaResponseDTO {
 
     private Long usuarioId;
+    private String usuarioNombre;
+    private String usuarioApellido;
+    
     private Long alojamientoId;
+    private String alojamientoNombre;
+    
     private LocalDate checkin;
     private LocalDate checkout;
     private Integer huespedes;
@@ -29,7 +34,10 @@ public class ReservaResponseDTO {
 
         return ReservaResponseDTO.builder()
                 .usuarioId(reserva.getUsuario() != null ? reserva.getUsuario().getId() : null)
+                .usuarioNombre(reserva.getUsuario() != null ? reserva.getUsuario().getNombre() : null)
+                .usuarioApellido(reserva.getUsuario() != null ? reserva.getUsuario().getApellido() : null)
                 .alojamientoId(reserva.getAlojamiento() != null ? reserva.getAlojamiento().getId() : null)
+                .alojamientoNombre(reserva.getAlojamiento() != null ? reserva.getAlojamiento().getNombre() : null)
                 .checkin(reserva.getCheckin())
                 .checkout(reserva.getCheckout())
                 .huespedes(reserva.getHuespedes())

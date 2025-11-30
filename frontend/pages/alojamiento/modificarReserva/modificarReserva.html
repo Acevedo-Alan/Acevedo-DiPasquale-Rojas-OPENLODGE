@@ -6,13 +6,13 @@
     <link rel="stylesheet" href="/components/header/header.css">
     <link rel="stylesheet" href="/components/footer/footer.css">
     <link rel="stylesheet" href="modificarReserva.css">
-    <title>Reserva</title>
+    <title>Modificar Reserva</title>
 </head>
 <body>
     <header class="header"></header>
 
     <main class="main-modificar-reserva">
-        <h2>Has reservado esta propiedad</h2>
+        <h2>Modificar tu Reserva</h2>
         
         <div class="propiedad-info">
             <div class="propiedad-imagen">
@@ -20,10 +20,10 @@
             </div>
             
             <div class="propiedad-detalles">
-                <div class="propiedad-nombre">Nombre</div>
-                <div class="propiedad-direccion">Dirección</div>
-                <div class="propiedad-precio">Precio x noche</div>
-                <div class="propiedad-dueño">Dueño</div>
+                <div class="propiedad-nombre">Cargando...</div>
+                <div class="propiedad-direccion">Cargando...</div>
+                <div class="propiedad-precio">Cargando...</div>
+                <div class="propiedad-dueño">Cargando...</div>
                 
                 <div class="rating">
                     <svg class="star" viewBox="0 0 24 24">
@@ -52,22 +52,73 @@
             </div>
         </div>
         
-        <p>Tienes 48 horas para modificar la reserva</p>
+        <div class="mensaje-plazo">
+            <p>Tienes 48 horas para modificar o cancelar la reserva</p>
+        </div>
 
-        <div class="buttons-container">
-            <button class="nav-btn" data-target="/pages/alojamiento/alojamiento.html">Confirmar</button>
-            <button class="nav-btn" data-target="/pages/alojamiento/formularioReserva/formularioReserva.html">Modificar</button>
+        <!-- Detalles actuales de la reserva -->
+        <div class="reserva-actual">
+            <h3>Reserva Actual</h3>
+            <div class="detalles-grid">
+                <div class="detalle-item">
+                    <strong>Check-in:</strong>
+                    <span id="checkin-actual">-</span>
+                </div>
+                <div class="detalle-item">
+                    <strong>Check-out:</strong>
+                    <span id="checkout-actual">-</span>
+                </div>
+                <div class="detalle-item">
+                    <strong>Huéspedes:</strong>
+                    <span id="huespedes-actual">-</span>
+                </div>
+                <div class="detalle-item">
+                    <strong>Importe Total:</strong>
+                    <span id="importe-actual">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario para modificar -->
+        <div class="formulario-modificar">
+            <h3>Nuevos Datos</h3>
+            <form id="form-modificar-reserva">
+                <div class="form-group">
+                    <label for="nuevo-checkin">Nueva fecha de Check-in:</label>
+                    <input type="date" id="nuevo-checkin" name="checkin" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="nuevo-checkout">Nueva fecha de Check-out:</label>
+                    <input type="date" id="nuevo-checkout" name="checkout" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="nuevos-huespedes">Nueva cantidad de huéspedes:</label>
+                    <input type="number" id="nuevos-huespedes" name="huespedes" min="1" required>
+                    <small>Capacidad máxima: <span id="capacidad-maxima">-</span> personas</small>
+                </div>
+
+                <div class="nuevo-importe">
+                    <strong>Nuevo Importe Estimado:</strong>
+                    <span id="nuevo-importe">Seleccione fechas para calcular</span>
+                </div>
+
+                <div class="buttons-container">
+                    <button type="button" class="btn-secundario" id="btn-volver">Volver</button>
+                    <button type="button" class="btn-peligro" id="btn-cancelar">Cancelar Reserva</button>
+                    <button type="submit" class="btn-principal">Guardar Cambios</button>
+                </div>
+            </form>
         </div>
     </main>
 
     <footer class="footer"></footer>
 
-    <script src="/services/apiService.js"></script>
     <script src="modificarReserva.js"></script>
     <script src="/components/header/header.js"></script>
     <script src="/components/footer/footer.js"></script>
     <script src="/services/enrutador.js"></script>
     <script src="/services/userRoleManager.js"></script>
-    <script src="/components/FeedPropiedades/propiedades-feed.js"></script>
 </body>
 </html>

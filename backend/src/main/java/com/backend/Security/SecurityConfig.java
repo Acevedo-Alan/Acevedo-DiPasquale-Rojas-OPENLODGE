@@ -45,6 +45,7 @@ public class SecurityConfig {
                 .requestMatchers("/servicios/getAll").permitAll()
                 .requestMatchers("/servicios/{id}").permitAll()
                 .requestMatchers("/reservas/disponibilidad/**").permitAll()
+                .requestMatchers("/fechas-ocupadas/{alojamientoId}").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

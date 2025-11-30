@@ -4,11 +4,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.backend.Entities.*;
 import com.backend.Repositories.*;
+import com.backend.dtos.FechasOcupadasDTO;
 import com.backend.dtos.ReservaDTO;
 
 @Service
@@ -115,11 +119,11 @@ public class ReservaService {
         validarAnticipacionModificacion(reserva.getFechaCreacion());
         reservaRepo.delete(reserva);
     }
+
     @Transactional(readOnly = true)
     public List<Reserva> obtenerHistorialUsuario(Long usuarioId) {
         List<Reserva> reservas = reservaRepo.findByUsuarioId(usuarioId);
         
-        // Forzar carga de relaciones LAZY
         reservas.forEach(r -> {
             r.getAlojamiento().getNombre();
             r.getUsuario().getNombre();
@@ -139,7 +143,6 @@ public class ReservaService {
         
         List<Reserva> reservas = reservaRepo.findByAlojamientoId(alojamientoId);
         
-        // Forzar carga de relaciones LAZY
         reservas.forEach(r -> {
             r.getAlojamiento().getNombre();
             r.getUsuario().getNombre();
@@ -148,11 +151,24 @@ public class ReservaService {
         return reservas;
     }
 
+    // Método público para obtener solo las fechas ocupadas (sin datos del huésped)
+    @Transactional(readOnly = true)
+    public List<FechasOcupadasDTO> obtenerFechasOcupadas(Long alojamientoId) {
+        if (!alojamientoRepo.existsById(alojamientoId)) {
+            throw new RuntimeException("Alojamiento no encontrado");
+        }
+        
+        List<Reserva> reservas = reservaRepo.findByAlojamientoId(alojamientoId);
+        
+        return reservas.stream()
+            .map(r -> new FechasOcupadasDTO(r.getCheckin(), r.getCheckout()))
+            .collect(Collectors.toList());
+    }
+
     @Transactional(readOnly = true)
     public List<Reserva> obtenerReservasPasadas(Long usuarioId) {
         List<Reserva> reservas = reservaRepo.findReservasPasadas(usuarioId, LocalDate.now());
         
-        // Forzar carga de relaciones LAZY
         reservas.forEach(r -> {
             r.getAlojamiento().getNombre();
             r.getUsuario().getNombre();
@@ -163,15 +179,12 @@ public class ReservaService {
 
     @Transactional(readOnly = true)
     public boolean verificarDisponibilidad(Long alojamientoId, LocalDate checkin, LocalDate checkout) {
-        // Validar que el alojamiento existe
         if (!alojamientoRepo.existsById(alojamientoId)) {
             throw new RuntimeException("Alojamiento no encontrado");
         }
         
-        // Validar fechas
         validarFechas(checkin, checkout);
         
-        // Buscar conflictos
         List<Reserva> conflictos = reservaRepo.findReservasEnRango(alojamientoId, checkin, checkout);
         return conflictos.isEmpty();
     }
