@@ -13,7 +13,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import com.backend.Entities.Alojamiento;
-import com.backend.Entities.Reserva;
 import com.backend.Entities.Usuario;
 import com.backend.Services.AlojamientoService;
 import com.backend.dtos.AlojamientoDTO;
