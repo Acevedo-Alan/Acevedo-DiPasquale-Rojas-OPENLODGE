@@ -293,6 +293,7 @@ function configurarBotones(esAnfitrion) {
       });
     }
   } else {
+    // BOTÓN RESERVAR
     const btnReservar = document.querySelector(
       '#vista-huesped [data-target="/pages/alojamiento/formularioReserva/formularioReserva.html"]'
     );
@@ -306,6 +307,23 @@ function configurarBotones(esAnfitrion) {
           return;
         }
         window.location.href = `/pages/alojamiento/formularioReserva/formularioReserva.html?alojamientoId=${alojamientoActual.id}`;
+      });
+    }
+
+    // BOTÓN MODIFICAR RESERVA (HUÉSPED)
+    const btnModificarReserva = document.querySelector(
+      '#vista-huesped [data-target="/pages/alojamiento/modificarReserva/modificarReserva.html"]'
+    );
+
+    if (btnModificarReserva) {
+      btnModificarReserva.addEventListener("click", (e) => {
+        e.preventDefault();
+        if (!usuarioActual?.id) {
+          alert("Debes iniciar sesión");
+          window.location.href = "/pages/autenticacion/login/login.html";
+          return;
+        }
+        window.location.href = `/pages/alojamiento/modificarReserva/modificarReserva.html?alojamientoId=${alojamientoActual.id}`;
       });
     }
   }

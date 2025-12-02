@@ -134,7 +134,6 @@ function configurarFechas() {
     }
   });
 }
-
 // Buscar alojamientos con filtros
 async function buscarAlojamientos() {
   const checkin = document.getElementById("checkin")?.value;
@@ -182,6 +181,7 @@ async function buscarAlojamientos() {
       headers["Authorization"] = `Bearer ${usuario.token}`;
     }
 
+    // CORRECCIÓN: Usar /alojamientos/buscar en lugar de /reservas/buscar
     const url = `${API_BASE_URL}/alojamientos/buscar${
       params.toString() ? "?" + params.toString() : ""
     }`;
